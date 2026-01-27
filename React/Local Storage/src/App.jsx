@@ -19,7 +19,6 @@ const App = () => {
       password,
       discription,
     });
-    console.log(oldusers);
     localStorage.setItem("All-Users", JSON.stringify(oldusers));
     setAllusers(oldusers);
 
@@ -32,7 +31,6 @@ const App = () => {
 
 
   const deletehandler = (idx) => {
-    console.log("hi");
 
     let copyarray = [...Allusers];
     copyarray.splice(idx, 1);
@@ -59,7 +57,6 @@ const App = () => {
                 value={username}
                 onChange={(e) => {
                   setusername(e.target.value);
-                  console.log(username);
                 }}
               />
               <input
@@ -69,7 +66,7 @@ const App = () => {
                 value={password}
                 onChange={(e) => {
                   setpassword(e.target.value);
-                  console.log(password);
+                  
                 }}
               />
               <input
@@ -79,7 +76,7 @@ const App = () => {
                 value={email}
                 onChange={(e) => {
                   setemail(e.target.value);
-                  console.log(email);
+                  
                 }}
               />
               <input
@@ -89,7 +86,7 @@ const App = () => {
                 value={discription}
                 onChange={(e) => {
                   setdiscription(e.target.value);
-                  console.log(discription);
+                  
                 }}
               />
             </div>
@@ -116,7 +113,7 @@ const App = () => {
             );
           })}
         </div>
-        
+
       </div>
     </>
   );
