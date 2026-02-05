@@ -67,7 +67,7 @@ const App = () => {
   };
 
   const DeleteAnCard = async (CardId)=>{
-    await axios.delete(`${API_BASE_URL}/data` + CardId)
+    await axios.delete(`${API_BASE_URL}/data/` + CardId)
     .then(res =>{
       console.log(res.data);
       GetData();
@@ -77,7 +77,7 @@ const App = () => {
 
   const UpdataCardName = async (CardId,UpdatedName ) =>{
     console.log(Name);
-    await axios.patch(`${API_BASE_URL}/data` + CardId , {Name:UpdatedName})
+    await axios.patch(`${API_BASE_URL}/data/` + CardId , {Name:UpdatedName})
     .then(res => {
       console.log(res);
       GetData();
