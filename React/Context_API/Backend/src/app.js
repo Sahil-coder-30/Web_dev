@@ -5,7 +5,7 @@ const DataModel = require('../src/models/Data.model');
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use(express.static("./public"));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.post("/data", async (req, res) => {
     const { Name, Age, Email, Phone , Address , Occupation ,Salary, MaritalStatus, Children , Hobbies , Education } = req.body
