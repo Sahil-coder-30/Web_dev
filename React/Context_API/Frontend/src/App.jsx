@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Card from "./components/Card";
+import { API_BASE_URL } from "./config";
 
 const App = () => {
   const [Data, setData] = useState([]);
@@ -39,7 +40,7 @@ const App = () => {
   };
 
   const GetData = async () => {
-    const data = await axios.get("http://localhost:3000/data");
+    const data = await axios.get(`${API_BASE_URL}/data`);
     setData(data.data.data);
     console.log(Data);
     
@@ -47,7 +48,7 @@ const App = () => {
 
   const CreateNewCard = async () => {
     await axios
-      .post("http://localhost:3000/data", {
+      .post(`${API_BASE_URL}/data`, {
         Name: Name,
         Age: Age,
         Email: Email,
@@ -66,7 +67,7 @@ const App = () => {
   };
 
   const DeleteAnCard = async (CardId)=>{
-    await axios.delete("http://localhost:3000/data/" + CardId)
+    await axios.delete(`${API_BASE_URL}/data` + CardId)
     .then(res =>{
       console.log(res.data);
       GetData();
@@ -76,7 +77,7 @@ const App = () => {
 
   const UpdataCardName = async (CardId,UpdatedName ) =>{
     console.log(Name);
-    await axios.patch("http://localhost:3000/data/"+ CardId , {Name:UpdatedName})
+    await axios.patch(`${API_BASE_URL}/data` + CardId , {Name:UpdatedName})
     .then(res => {
       console.log(res);
       GetData();
