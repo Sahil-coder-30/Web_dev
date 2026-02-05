@@ -1,0 +1,32 @@
+*{
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+html,body{
+width: 100%;
+height: 100%;
+}
+
+
+#root{
+  width: 100%;
+  height: 100%;
+}
+
+#root{
+  
+  background-color: black;
+  color: white;
+}
+
+.title_box{
+  width: 6vw;
+  height: 4vw;
+  background-color: rgb(54, 52, 52);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

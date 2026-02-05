@@ -1,8 +1,10 @@
 const express = require("express");
+const cors = require('cors')
 const NoteModel = require("./models/Note.model");
 const { default: mongoose } = require("mongoose");
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 
 // post /api/notes
@@ -48,6 +50,8 @@ app.delete("/api/notes/:id",async (req,res)=>{
         message:"Note deleted successfully."
     })
 })
+
+
 
 /**
  * - PATCH /api/notes/:id
