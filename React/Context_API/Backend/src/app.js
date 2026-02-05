@@ -2,7 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const DataModel = require('../src/models/Data.model');
+const DataModel = require('./models/Data.model');
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -54,5 +54,10 @@ app.patch("/data/:id",async (req,res)=>{
         message:"The Data is updated..."
     })
 })
+
+// Serve index.html for any unknown GET routes (SPA support)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+});
 
 module.exports = app;
