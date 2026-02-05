@@ -56,7 +56,7 @@ app.patch("/data/:id",async (req,res)=>{
 })
 
 // Serve index.html for any unknown GET routes (SPA support)
-app.get('*', (req, res) => {
+app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
