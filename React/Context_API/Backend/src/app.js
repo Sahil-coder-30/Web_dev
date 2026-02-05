@@ -2,7 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const DataModel = require('./models/Data.model');
+const DataModel = require('../src/models/Data.model');
 const app = express();
 app.use(express.json());
 app.use(cors());
