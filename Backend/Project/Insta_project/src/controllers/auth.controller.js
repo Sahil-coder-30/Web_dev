@@ -30,7 +30,8 @@ async function authRegisterController (req,res){
     })
 
     const token = jwt.sign({
-        id: user._id
+        id: user._id,
+        username : user.username
     },process.env.JWT_SECRET , {expiresIn : "1d"})
 
     res.cookie("token", token);
@@ -71,7 +72,8 @@ async function  authLoginController(req, res) {
     }
 
     const token = jwt.sign({
-        id: isUserExist._id
+        id: isUserExist._id,
+        username : isUserExist.username
     },process.env.JWT_SECRET,{expiresIn : "1d"});
 
     res.cookie("token" , token);
