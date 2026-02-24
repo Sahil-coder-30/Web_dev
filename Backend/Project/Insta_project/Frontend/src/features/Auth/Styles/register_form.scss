@@ -1,0 +1,268 @@
+// ─── Instagram Auth — Register ────────────────────────────────────────────────
+// Fully responsive: 320px → 4K. Touch-friendly. No overflow clipping.
+
+@import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Inter:wght@400;500;600&display=swap');
+
+// ── Design Tokens ──────────────────────────────────────────────────────────────
+$bg: #0e0e10;
+$surface: #1c1c1f;
+$border: #313135;
+$input-bg: #252528;
+$input-border: #3a3a3e;
+$focus-ring: rgba(131, 58, 180, 0.35);
+$ig-start: #f58529;
+$ig-mid: #dd2a7b;
+$ig-end: #8134af;
+$text: #f5f5f5;
+$text-sub: #737373;
+$error: #ff6b6b;
+$ease: 0.2s ease;
+
+// ── Breakpoints ────────────────────────────────────────────────────────────────
+$bp-xs: 320px;
+$bp-sm: 480px;
+$bp-md: 768px;
+$bp-lg: 1024px;
+$bp-xl: 1440px;
+
+// ── Page ───────────────────────────────────────────────────────────────────────
+// Register has 5 inputs — needs flex-start on very short viewports so it scrolls
+main {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2.5rem 1rem;
+  background: $bg;
+  box-sizing: border-box;
+}
+
+// ── Card ───────────────────────────────────────────────────────────────────────
+.form-container {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 2.5rem 2.25rem;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 18px;
+
+  animation: cardIn 0.35s ease both;
+
+  @keyframes cardIn {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // ── Logo ────────────────────────────────────────────────────────────────────
+  h1 {
+    font-family: 'Grand Hotel', cursive;
+    font-size: clamp(2.4rem, 8vw, 3rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.75rem;
+    text-align: center;
+
+    background: linear-gradient(45deg, $ig-start, $ig-mid, $ig-end);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  // ── Form ────────────────────────────────────────────────────────────────────
+  form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 0.7rem;
+
+    input {
+      width: 100%;
+      min-height: 48px;
+      padding: 0.78rem 0.95rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      color: $text;
+      background: $input-bg;
+      border: 1px solid $input-border;
+      border-radius: 10px;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: border-color $ease, box-shadow $ease;
+
+      &::placeholder {
+        color: $text-sub;
+        font-size: 0.9rem;
+      }
+
+      &:focus {
+        border-color: $ig-end;
+        box-shadow: 0 0 0 3px $focus-ring;
+      }
+
+      &:-webkit-autofill,
+      &:-webkit-autofill:focus {
+        -webkit-text-fill-color: $text;
+        -webkit-box-shadow: 0 0 0 1000px $input-bg inset;
+        caret-color: $text;
+      }
+    }
+
+    // ── Error message ──────────────────────────────────────────────────────────
+    .form-error {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      color: $error;
+      text-align: center;
+      padding: 0.4rem 0;
+      line-height: 1.4;
+    }
+
+    button {
+      width: 100%;
+      min-height: 48px;
+      padding: 0.85rem;
+      margin-top: 0.4rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: linear-gradient(90deg, $ig-start, $ig-mid 50%, $ig-end);
+      background-size: 200% auto;
+      transition:
+        background-position 0.4s ease,
+        opacity $ease,
+        transform $ease;
+
+      &:hover:not(:disabled) {
+        background-position: right center;
+        opacity: 0.92;
+      }
+
+      &:active:not(:disabled) {
+        transform: scale(0.98);
+        opacity: 0.85;
+      }
+
+      &:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  // ── Footer ──────────────────────────────────────────────────────────────────
+  p {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.825rem;
+    color: $text-sub;
+    text-align: center;
+    margin-top: 1.5rem;
+    line-height: 1.5;
+
+    .toggleAuthForm {
+      color: $text;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity $ease;
+
+      &:hover {
+        opacity: 0.65;
+      }
+    }
+  }
+}
+
+// ── Responsive breakpoints ─────────────────────────────────────────────────────
+
+// Very small phones — 320px (iPhone SE 1st gen, budget Androids)
+// Register has 5 fields — switch to flex-start so card can scroll naturally
+@media (max-width: #{$bp-xs}) {
+  main {
+    justify-content: flex-start;
+    padding: 1.5rem 0.75rem;
+  }
+
+  .form-container {
+    padding: 2rem 1.25rem 1.75rem;
+    border-radius: 14px;
+
+    h1 {
+      margin-bottom: 1.25rem;
+    }
+
+    form {
+      gap: 0.55rem;
+    }
+  }
+}
+
+// Small phones (321px – 480px)
+@media (max-width: #{$bp-sm}) and (min-width: #{$bp-xs + 1}) {
+  main {
+
+    // On short screens (< 700px tall), stop centering so card scrolls
+    @media (max-height: 700px) {
+      justify-content: flex-start;
+      padding-top: 1.5rem;
+    }
+  }
+
+  .form-container {
+    max-width: 100%;
+    padding: 2.5rem 1.5rem 2rem;
+    border-radius: 16px;
+  }
+}
+
+// Tablets portrait (481px – 768px)
+@media (min-width: #{$bp-sm + 1}) and (max-width: #{$bp-md}) {
+  .form-container {
+    max-width: 440px;
+    padding: 3rem 2.75rem 2.5rem;
+  }
+}
+
+// Tablets landscape + small laptops (769px – 1024px)
+@media (min-width: #{$bp-md + 1}) and (max-width: #{$bp-lg}) {
+  .form-container {
+    max-width: 400px;
+  }
+}
+
+// Large desktops (1440px+)
+@media (min-width: #{$bp-xl}) {
+  .form-container {
+    max-width: 400px;
+    padding: 3.5rem 3rem 2.75rem;
+  }
+}
+
+// ── Accessibility: respect reduced motion preference ───────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  .form-container {
+    animation: none;
+  }
+
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,7 +1,6 @@
 const postModel = require("../models/post.model");
 const ImageKit = require("@imagekit/nodejs");
 const { toFile } = require("@imagekit/nodejs");
-const { Folders } = require("@imagekit/nodejs/resources.js");
 const jwt = require("jsonwebtoken");
 const likeModel = require('../models/like.model');
 const { post } = require("../routes/user.routes");
@@ -11,6 +10,8 @@ const imagekit = new ImageKit({
 });
 
 async function createPostController(req, res) {
+  // console.log(req.file);
+  
   const file = await imagekit.files.upload({
     file: await toFile(Buffer.from(req.file.buffer), "file"),
     fileName: "Test",

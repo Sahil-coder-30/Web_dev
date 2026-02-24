@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Inter:wght@400;500;600&display=swap');
+
+// ── Hard reset ────────────────────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+// ── Root layout ───────────────────────────────────────────────────────────────
+html {
+    background: #0e0e10;
+    // Prevent horizontal scroll on any page
+    overflow-x: hidden;
+    // Smooth scrolling
+    scroll-behavior: smooth;
+}
+
+html,
+body,
+#root {
+    width: 100%;
+    min-height: 100%;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    // Prevent text size inflation on mobile orientation change
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+// ── Touch device improvements ─────────────────────────────────────────────────
+button,
+input,
+a {
+    // Removes tap highlight flash on iOS/Android
+    -webkit-tap-highlight-color: transparent;
+}
+
+// ── Images + media ────────────────────────────────────────────────────────────
+img,
+video,
+svg {
+    max-width: 100%;
+    display: block;
+}

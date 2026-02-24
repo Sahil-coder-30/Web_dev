@@ -66,7 +66,7 @@ Unlike binary trees:
 
 ## Structure of B+ Tree
 
-![Image](https://builtin.com/sites/www.builtin.com/files/styles/ckeditor_optimize/public/inline-images/1_b-tree-indexing.jpg)
+![Image](https://builtin.com/sites/www.builtin.com/files/styles/cke`ditor_optimize/public/inline-images/1_b-tree-indexing.jpg)
 
 ---
 
