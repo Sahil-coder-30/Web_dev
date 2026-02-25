@@ -9,7 +9,8 @@ const Login = () => {
 
   const handelSubmit = async (e) => {
     e.preventDefault();
-    await axios
+    try{
+      await axios
       .post(
         "http://localhost:3000/api/auth/login",
         {
@@ -23,7 +24,14 @@ const Login = () => {
       .then((res) => {
         setusername("");
         setpassword("");
-      });
+      })
+    }
+    catch(err){
+      console.log(err);
+      
+    }
+    
+      
   };
 
   return (

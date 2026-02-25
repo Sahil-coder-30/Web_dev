@@ -86,7 +86,21 @@ async function  authLoginController(req, res) {
 
 }
 
+async function getMeController(req, res){
+    const username = req.user.username;
+    const data = await userModel.findOne({username});
+
+    return res.status(200).json({
+        username : data.username,
+        fullName : data.fullName,
+        Email : data.email,
+        Bio : data.bio,
+        profileImage : data.profileImage
+    })
+}
+
 module.exports = {
     authRegisterController,
-    authLoginController
+    authLoginController,
+    getMeController
 }
