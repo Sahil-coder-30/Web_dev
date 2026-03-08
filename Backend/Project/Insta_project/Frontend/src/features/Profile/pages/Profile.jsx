@@ -79,24 +79,30 @@ const ActionButtons = ({ className = "" }) => (
 );
 
 export default function Profile() {
-  const { getProfileData, getAllPosts, profileData, postsData, loading, Allfollowers, followers } =
+  const { getProfileData, getAllPosts, profileData, postsData, loading, Allfollowers, followers, Allfollowing, following } =
     useProfile();
 
   useEffect(() => {
     getProfileData();
     getAllPosts();
-    Allfollowers();
   }, []);
+
+  useEffect(() => {
+    if (profileData?.username) {
+      Allfollowers(profileData.username);
+      Allfollowing(profileData.username);
+    }
+  }, [profileData?.username]);
 
   if (loading) {
     return <ProfileSkeleton />;
   }
   const completeProfile = profileData || {};
   const { posts } = postsData || {};
-  const followersData = followers || {};
+  const followersData = followers || [];
+  const followingData = following || [];
   const PROFILE_POSTS = posts;
   const USER_PROFILE = completeProfile;
-  console.log(followersData);
 
   return (
     <div className="feed-layout">
@@ -149,7 +155,7 @@ export default function Profile() {
             <StatItems
               posts={PROFILE_POSTS?.length || 0}
               followers={followersData?.length || 0}
-              following={USER_PROFILE?.following?.length || 0}
+              following={followingData?.length || 0}
             />
 
             {/* Row 3: Bio block */}

@@ -23,22 +23,29 @@ export const allMyPosts = async () => {
   }
 };
 
-export const allFollowers = async () => {
+export const allFollowers = async (username) => {
   try {
-    const followers = await api.get("/api/users/followers");
-    const { AllFollowers } = followers.data;
-    console.log(followers.data)
-    return AllFollowers;
+    const followers = await api.get(`/api/users/followers/${username}`);
+    return followers.data.userFollowers;
   } catch (error) {
-    throw err;
+    throw error;
+  }
+};
+
+export const allFollowing = async (username) => {
+  try {
+    const following = await api.get(`/api/users/following/${username}`);
+    return following.data.userFollowing;
+  } catch (error) {
+    throw error;
   }
 };
 
 export const userProfile = async (username) => {
   try {
     const userData = await api.get(`/api/users/${username}`);
-    // console.log(userData.data.Data)
-    return userData.data.Data;
+    // Return the full data payload to check message, isFollowing, and Data
+    return userData.data;
   } catch (error) {
     throw error;
   }
@@ -47,6 +54,51 @@ export const userProfile = async (username) => {
 export const userPosts = async (username) => {
   try {
     const res = await api.get(`/api/posts/?username=${username}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getFollowRequests = async () => {
+  try {
+    const res = await api.get("/api/users/follow");
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const requestFollow = async (username) => {
+  try {
+    const res = await api.post(`/api/users/follow/request/${username}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const acceptFollowRequest = async (username) => {
+  try {
+    const res = await api.post(`/api/users/follow/accept/${username}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const rejectFollowRequest = async (username) => {
+  try {
+    const res = await api.post(`/api/users/follow/reject/${username}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const unfollowUser = async (username) => {
+  try {
+    const res = await api.post(`/api/users/unfollow/${username}`);
     return res.data;
   } catch (error) {
     throw error;

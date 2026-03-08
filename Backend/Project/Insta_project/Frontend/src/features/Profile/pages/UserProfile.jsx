@@ -3,11 +3,10 @@ import "../styles/profile.scss";
 import DesktopSidebar from "../../Post/components/DesktopSidebar";
 import MobileBottomNav from "../components/MobileBottomNav";
 import MobileProfileHeader from "../components/MobileProfileHeader";
-import { useParams } from "react-router";
-import { useProfile } from "../hooks/useProfile";
-import Profile from "./Profile";
+import { useParams, Navigate } from "react-router";
 import ProfileSkeleton from "../../../components/Skeletons/ProfileSkeleton";
-import { userPosts } from "../services/profile.api";
+import { userPosts, userProfile, allFollowers, allFollowing, requestFollow, unfollowUser } from "../services/profile.api";
+import { useAuth } from "../../Auth/hooks/useAuth";
 
 
 // ─── Dummy Data ───────────────────────────────────────────────────────────────
@@ -84,41 +83,76 @@ const VisitorActions = ({ className = "", isFollowing, onFollow }) => (
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function UserProfile() {
-    const [activeTab, setActiveTab] = useState("posts");
-    const [isFollowing, setIsFollowing] = useState(false);
-    const [userPostsData, setUserPostsData] = useState(null);
-    const [postsLoading, setPostsLoading] = useState(false);
     const { username } = useParams();
-    const { userProfileHandller, userProfileData, loading , Allfollowers , followers } = useProfile();
+    const { currentUser, user } = useAuth();
+    const activeUser = currentUser || user;
+    const [activeTab, setActiveTab] = useState("posts");
+
+    // Discrete local state for the viewed user
+    const [USER, setUSER] = useState(null);
+    const [POSTS, setPOSTS] = useState([]);
+    const [followersData, setFollowersData] = useState([]);
+    const [followingData, setFollowingData] = useState([]);
+
+    const [loading, setLoading] = useState(true);
+    const [postsLoading, setPostsLoading] = useState(true);
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [isOwnProfile, setIsOwnProfile] = useState(false);
 
     useEffect(() => {
-        userProfileHandller(username);
-        // Allfollowers();
+        let isMounted = true;
+        setLoading(true);
+        setPostsLoading(true);
+
+        Promise.all([
+            userProfile(username).catch(() => null),
+            allFollowers(username).catch(() => []),
+            allFollowing(username).catch(() => []),
+            userPosts(username).then(res => res?.posts || []).catch(() => [])
+        ]).then(([profileRes, followersRes, followingRes, postsRes]) => {
+            if (!isMounted) return;
+
+            if (!profileRes || profileRes.message === "You are opening your own Profile....") {
+                setIsOwnProfile(true);
+                setLoading(false);
+                return;
+            }
+
+            setUSER(profileRes.Data);
+            setIsFollowing(profileRes.isFollowing === "True" || profileRes.isFollowing === true);
+            setFollowersData(followersRes || []);
+            setFollowingData(followingRes || []);
+            setPOSTS(postsRes || []);
+
+            setLoading(false);
+            setPostsLoading(false);
+        });
+
+        return () => { isMounted = false; };
     }, [username]);
 
-    useEffect(() => {
-        if (!userProfileData) return;
-        setPostsLoading(true);
-        userPosts(username)
-            .then((data) => setUserPostsData(data?.posts || []))
-            .catch(() => setUserPostsData([]))
-            .finally(() => setPostsLoading(false));
-    }, [userProfileData]);
-
-    // If backend returns "own profile" message, context sets userProfileData = null
-    if (!loading && userProfileData === null) return <Profile />;
-    if (loading || !userProfileData) return <ProfileSkeleton />;
-
-    const USER = userProfileData;
-    const POSTS = userPostsData || [];
+    const handleFollow = async () => {
+        try {
+            if (isFollowing) {
+                await unfollowUser(username);
+                setIsFollowing(false);
+            } else {
+                await requestFollow(username);
+                setIsFollowing(true);
+            }
+        } catch (error) {
+            console.error("Error toggling follow:", error);
+        }
+    };
     const HIGHLIGHTS = [];
 
-    const handleFollow = () => setIsFollowing((prev) => !prev);
+    if (isOwnProfile) return <Navigate to="/profile" replace />;
+    if (loading || !USER) return <ProfileSkeleton />;
 
-    return userProfileData ? (
+    return (
         <div className="feed-layout">
             {/* ── Left sidebar ─────────────────────────────────────── */}
-            <DesktopSidebar currentUser={null} />
+            <DesktopSidebar currentUser={activeUser} />
 
             {/* ── Main content column ──────────────────────────────── */}
             <main className="profile-main">
@@ -156,8 +190,8 @@ export default function UserProfile() {
                         {/* Row 2 — Stats */}
                         <StatItems
                             posts={POSTS.length}
-                            followers={USER.followers?.length || 0}
-                            following={USER.following?.length || 0}
+                            followers={followersData?.length || 0}
+                            following={followingData?.length || 0}
                         />
 
                         {/* Row 3 — Bio block (desktop) */}
@@ -339,7 +373,7 @@ export default function UserProfile() {
             </main>
 
             {/* ── Mobile bottom nav ─────────────────────────────────── */}
-            <MobileBottomNav currentUser={null} />
+            <MobileBottomNav currentUser={activeUser} />
         </div>
-    ) : (<Profile />)
+    );
 }

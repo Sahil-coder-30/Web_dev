@@ -2,41 +2,10 @@ import React, { useState } from "react";
 import { Link } from "react-router";
 import DesktopSidebar from "../../Post/components/DesktopSidebar";
 import MobileBottomNav from "../../Profile/components/MobileBottomNav";
+import { getFollowRequests, acceptFollowRequest, rejectFollowRequest } from "../../Profile/services/profile.api";
+import { useAuth } from "../../Auth/hooks/useAuth";
 import "../styles/notifications.scss";
 
-// ─── Current user stub (swap with auth context later) ─────────────────────────
-const CURRENT_USER = {
-    username: "alexjohnson",
-    profileImage: "https://i.pravatar.cc/150?img=1",
-};
-
-// ─── Mock follow requests ─────────────────────────────────────────────────────
-const INIT_REQUESTS = [
-    {
-        id: "fr_001",
-        username: "marco.visuals",
-        displayName: "Marco Rossi",
-        avatar: "https://i.pravatar.cc/150?img=15",
-        mutualFollowers: 4,
-        timestamp: "2h",
-    },
-    {
-        id: "fr_002",
-        username: "sara_lens",
-        displayName: "Sara Mitchell",
-        avatar: "https://i.pravatar.cc/150?img=20",
-        mutualFollowers: 12,
-        timestamp: "5h",
-    },
-    {
-        id: "fr_003",
-        username: "dev_horizon",
-        displayName: "Dev Horizon",
-        avatar: "https://i.pravatar.cc/150?img=25",
-        mutualFollowers: 0,
-        timestamp: "1d",
-    },
-];
 
 // ─── Mock activity notifications ──────────────────────────────────────────────
 const ACTIVITY = [
@@ -325,13 +294,55 @@ const ActivityRow = ({ item, style }) => (
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function NotificationsPage() {
-    const [requests, setRequests] = useState(INIT_REQUESTS);
+    const { currentUser } = useAuth();
+    const [requests, setRequests] = useState([]);
     const [showAllRequests, setShowAllRequests] = useState(false);
-    const [loading] = useState(false); // flip to true to preview skeleton
+    const [loading, setLoading] = useState(true);
 
-    // request handlers
-    const handleAccept = (id) => setRequests((p) => p.filter((r) => r.id !== id));
-    const handleDecline = (id) => setRequests((p) => p.filter((r) => r.id !== id));
+    React.useEffect(() => {
+        const fetchRequests = async () => {
+            try {
+                const data = await getFollowRequests();
+                // Backend: { message, followRequestExist: [{follower, followee, status}] }
+                const list = Array.isArray(data?.followRequestExist) ? data.followRequestExist : [];
+                const mapped = list.map((r) => ({
+                    id: r.follower,           // follower username — used for API calls
+                    username: r.follower,
+                    displayName: r.follower,
+                    avatar: `https://i.pravatar.cc/150?u=${r.follower}`,
+                    mutualFollowers: 0,
+                    timestamp: "recently",
+                }));
+                setRequests(mapped);
+            } catch (err) {
+                console.error("Failed to fetch follow requests:", err);
+                setRequests([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchRequests();
+    }, []);
+
+    // Accept — POST /api/users/follow/accept/:username (username = follower's username)
+    const handleAccept = async (followerUsername) => {
+        try {
+            await acceptFollowRequest(followerUsername);
+            setRequests((prev) => prev.filter((r) => r.id !== followerUsername));
+        } catch (err) {
+            console.error("Failed to accept follow request:", err);
+        }
+    };
+
+    // Decline — POST /api/users/follow/reject/:username (username = follower's username)
+    const handleDecline = async (followerUsername) => {
+        try {
+            await rejectFollowRequest(followerUsername);
+            setRequests((prev) => prev.filter((r) => r.id !== followerUsername));
+        } catch (err) {
+            console.error("Failed to decline follow request:", err);
+        }
+    };
 
     // group activity by period
     const GROUPS = ["Today", "This Week", "This Month"];
@@ -348,7 +359,7 @@ export default function NotificationsPage() {
     return (
         <div className="feed-layout notif-layout">
             {/* ── Left / Desktop Sidebar ─────────────────────────────────────── */}
-            <DesktopSidebar currentUser={CURRENT_USER} />
+            <DesktopSidebar currentUser={currentUser} />
 
             {/* ── Main Column ───────────────────────────────────────────────── */}
             <main className="notif-main" id="notifications-main">
@@ -462,7 +473,7 @@ export default function NotificationsPage() {
             </main>
 
             {/* ── Mobile Bottom Nav ────────────────────────────────────────────── */}
-            <MobileBottomNav currentUser={CURRENT_USER} />
+            <MobileBottomNav currentUser={currentUser} />
         </div>
     );
 }
