@@ -40,7 +40,7 @@ async function authRegisterController(req, res) {
 
   const user = await userModel.create({
     email,
-    username,
+    username : username.replace(/\s/g, ""),
     fullName,
     bio,
     password: hash,
