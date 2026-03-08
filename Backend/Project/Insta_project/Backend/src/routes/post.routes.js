@@ -55,12 +55,9 @@ postRouter.post(
  * @access [Protected]
  */
 
-postRouter.get(
-  "/feed",
-  identifyUser,
-  postController.getPostFeedController
-)
 
-// postRouter.get("/allPosts/:username", identifyUser , postController.getUserPosts)
+postRouter.get("/feed", identifyUser, postController.getPostFeedController);
+
+postRouter.get("/:username", identifyUser, postController.getUserPosts);
 
 module.exports = postRouter;
