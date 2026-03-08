@@ -156,7 +156,8 @@ async function getUserPosts(req, res){
   })
 
   return res.status(201).json({
-    message : "All the posts of the user ...."
+    message : "All the posts of the user ....",
+    userPosts
   })
 
 }
