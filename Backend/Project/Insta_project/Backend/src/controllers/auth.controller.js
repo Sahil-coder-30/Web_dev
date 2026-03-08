@@ -52,7 +52,11 @@ async function authRegisterController(req, res) {
     process.env.JWT_SECRET,
     { expiresIn: "1d" },
   );
-  res.cookie("token", token);
+  res.cookie("token", token ,{
+  httpOnly: true,
+  secure: true,        // ✅ Must be true on Vercel (HTTPS)
+  sameSite: "none",    // ✅ Must be "none" for cross-origin
+});
 
   res.status(200).json({
     message: "user has been registered successfully...",
@@ -98,7 +102,11 @@ async function authLoginController(req, res) {
     { expiresIn: "1d" },
   );
 
-  res.cookie("token", token);
+  res.cookie("token", token , {
+  httpOnly: true,
+  secure: true,        // ✅ Must be true on Vercel (HTTPS)
+  sameSite: "none",    // ✅ Must be "none" for cross-origin
+});
 
   res.status(200).json({
     message: "user loged in successfully...",
