@@ -28,7 +28,7 @@ export async function register(username, password, fullName, email, bio, profile
       };
     }
 
-    const response = await api.post("/register", data, { headers });
+    const response = await api.post("/api/auth/register", data, { headers });
 
     return response.data;
   } catch (err) {
@@ -38,7 +38,7 @@ export async function register(username, password, fullName, email, bio, profile
 
 export async function login(username, password) {
   try {
-    const response = await api.post("/login", {
+    const response = await api.post("/api/auth/login", {
       username,
       password,
     });
@@ -51,7 +51,7 @@ export async function login(username, password) {
 
 export async function getMe() {
   try {
-    const response = await api.get("/getMe");
+    const response = await api.get("/api/auth/getMe");
     return response.data;
   } catch (error) {
     throw error;
