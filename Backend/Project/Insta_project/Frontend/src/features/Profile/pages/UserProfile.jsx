@@ -93,7 +93,7 @@ export default function UserProfile() {
 
     useEffect(() => {
         userProfileHandller(username);
-        Allfollowers();
+        // Allfollowers();
     }, [username]);
 
     useEffect(() => {
