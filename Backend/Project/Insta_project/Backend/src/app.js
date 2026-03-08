@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(CookieParser());
 app.use(cors({
     credentials: true,
-    origin: "https://web-dev-isvw.vercel.app"
+    origin: "https://web-dev-lyft.vercel.app"
 }))
 
 
