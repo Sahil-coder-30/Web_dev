@@ -54,6 +54,7 @@ export const userProfile = async (username) => {
 export const userPosts = async (username) => {
   try {
     const res = await api.get(`/api/posts/${username}`);
+    console.log(res.data);
     return res.data;
   } catch (error) {
     throw error;
