@@ -1,0 +1,1090 @@
+// ─── Profile & Edit Profile specific styles ──────────────────────────────────
+@use "../../Post/styles/feed.scss" as *; // reuse tokens (modern @use)
+
+// .profile-main is a standalone layout column — does NOT depend on .feed-main
+// so it doesn't inherit the narrow 470px feed width at desktop.
+.profile-main {
+    flex: 1; // fill remaining space after sidebar in feed-layout
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden; // safety: never create horizontal scroll
+
+    // Mobile: full width
+    @media (max-width: #{$bp-tab-s - 1}) {
+        width: 100%;
+    }
+
+    // Tab-S (768-1023): full remaining width beside icon-only sidebar
+    @media (min-width: $bp-tab-s) and (max-width: #{$bp-tab-pro - 1}) {
+        max-width: calc(100% - #{$nav-width-sm});
+    }
+
+    // Tab-Pro and Desktop+: fill all remaining space beside full sidebar
+    // No max-width cap so the grid stretches edge-to-edge
+    @media (min-width: $bp-tab-pro) {
+        max-width: calc(100% - #{$nav-width-lg});
+    }
+}
+
+.profile-mobile-header {
+    // We use exactly the header from Feed, just styled slightly differently
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    border-bottom: 0; // standard IG removes border on profile top
+
+    &__logo {
+        font-size: 1.1rem;
+    }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// PROFILE HEADER — 2-column responsive layout
+//
+// Mobile  (<768px):  [avatar 86px] | [stats]
+//                    [bio: name, category, bio-text, link]
+//                    [action buttons — full width]
+//
+// Desktop (≥768px):  [avatar 150px] | [username + inline buttons]
+//                                     [stats: 3 cols]
+//                                     [bio block]
+// ────────────────────────────────────────────────────────────────────────────
+.profile-header {
+    display: flex;
+    flex-direction: row; // always row — avatar-col | info
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1rem 1rem 0.75rem;
+    width: 100%;
+
+    @media (min-width: $bp-tab-s) {
+        gap: 5rem;
+        padding: 2.5rem 2rem 2rem;
+        max-width: 935px;
+        margin: 0 auto;
+        border-bottom: 1px solid $border;
+    }
+}
+
+// ── Col 1: Avatar ────────────────────────────────────────────────────────────
+.profile-header__avatar-col {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+
+    // Bump avatar to 150px on desktop
+    .avatar--xl {
+        @media (min-width: $bp-tab-s) {
+            width: 150px;
+            height: 150px;
+        }
+    }
+}
+
+// ── Col 2: Info (all text content) ────────────────────────────────────────────
+.profile-header__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+
+    @media (min-width: $bp-tab-s) {
+        gap: 1rem;
+    }
+}
+
+// Row 1 — username + action buttons inline (desktop only)
+//          Hidden on mobile (MobileProfileHeader navbar shows username)
+.profile-header__username-row {
+    display: none; // hidden on mobile
+
+    @media (min-width: $bp-tab-s) {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 1.25rem;
+        flex-wrap: wrap; // allow wrapping if username is long
+    }
+}
+
+.profile-header__username-text {
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: $text;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+    margin: 0;
+}
+
+// Groups fullName (bold) + @username (muted) vertically
+.profile-header__name-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+// Muted @username below fullName — desktop header
+.profile-header__username-sub {
+    font-size: 0.8rem;
+    color: $text-sub;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.01em;
+}
+
+// Row 2 — stats
+// Mobile  : stat items in a vertical col (value / label stacked), compact spacing
+// Desktop : same column layout but with more gap between items
+.profile-header__stats {
+    display: flex;
+    gap: 1.25rem;
+    align-items: center;
+
+    @media (min-width: $bp-tab-s) {
+        gap: 2.5rem;
+    }
+}
+
+// Row 3 — bio block
+.profile-header__bio {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    // Hidden on mobile unless enough space
+    @media (max-width: #{$bp-tab-s - 1}) {
+        display: none; // bio shown in separate below block on mobile
+    }
+}
+
+// Profile name, category, bio-text, link
+.profile-header__name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: $text;
+    margin: 0;
+}
+
+.profile-header__category {
+    font-size: 0.8rem;
+    color: $text-sub;
+    margin: 0;
+}
+
+.profile-header__bio-text {
+    font-size: 0.875rem;
+    color: $text;
+    margin: 0;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.profile-header__link {
+    font-size: 0.875rem;
+    color: #c084fc;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+// Row 4 — action buttons
+// Desktop: shown inside username-row (handled by .profile-header__actions--desktop)
+// Mobile: shown below info col as a full-width row
+.profile-header__actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.profile-header__actions--desktop {
+    display: none;
+
+    @media (min-width: $bp-tab-s) {
+        display: flex;
+    }
+}
+
+.profile-header__actions--mobile {
+    display: flex;
+
+    @media (min-width: $bp-tab-s) {
+        display: none;
+    }
+}
+
+// Profile CTA buttons (outline style, compact for profile header)
+.profile-header__btn {
+    flex: 1;
+    min-width: 0;
+    padding: 0.4rem 1rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+    white-space: nowrap; // prevent text wrapping
+
+    @media (min-width: $bp-tab-s) {
+        flex: 0 1 auto;
+        min-width: auto;
+    }
+}
+
+.profile-header__icon-btn {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+// Stat items — DS §9: always column (value on top, label below)
+// Instagram never shows them inline
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    cursor: pointer;
+    text-align: center;
+    min-width: 0;
+}
+
+.stat-item__value {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: $text;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.2;
+}
+
+.stat-item__label {
+    font-size: 0.8rem;
+    color: $text-sub;
+    font-family: 'Inter', sans-serif;
+}
+
+// ── Mobile-only bio block — shown BELOW the header row ────────────────────────
+// (cannot be inside info col because info col is beside avatar)
+// Implemented as a separate element that renders full-width below the header row
+// in profile.scss by checking if profile-header__bio display:none on mobile
+// → We show mobile bio INSIDE profile-header__info column but BELOW stats
+// The trick: profile-header is flex-row, so info col is beside avatar on mobile.
+// Bio is INSIDE the info col but hidden on mobile.
+// Instead we add a SEPARATE .profile-bio-mobile section after the header:
+.profile-bio-mobile {
+    padding: 0.5rem 1rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-family: 'Inter', sans-serif;
+
+    @media (min-width: $bp-tab-s) {
+        display: none; // desktop shows bio inside profile-header__bio
+    }
+}
+
+.profile-bio-mobile__name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: $text;
+    margin: 0;
+}
+
+// Muted @username below fullName — mobile bio block
+.profile-bio-mobile__username {
+    font-size: 0.78rem;
+    color: $text-sub;
+    margin: 0;
+    letter-spacing: 0.01em;
+}
+
+.profile-bio-mobile__category {
+    font-size: 0.8rem;
+    color: $text-sub;
+    margin: 0;
+}
+
+.profile-bio-mobile__text {
+    font-size: 0.875rem;
+    color: $text;
+    margin: 0;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.profile-bio-mobile__link {
+    font-size: 0.875rem;
+    color: #c084fc;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+// Mobile action buttons — below bio mobile block
+.profile-actions-mobile {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0 1rem 0.75rem;
+
+    @media (min-width: $bp-tab-s) {
+        display: none;
+    }
+}
+
+// Legacy .profile-btn kept for backward compat (EditProfile still uses it)
+.profile-btn {
+    background: $surface-2;
+    border: none;
+    color: $text;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background $ease;
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        background: $surface;
+    }
+
+    &--icon {
+        padding: 0.4rem;
+
+        svg {
+            width: 24px;
+        }
+    }
+}
+
+// ── Highlights
+.profile-highlights {
+    display: flex;
+    gap: 1.25rem;
+    padding: 1.25rem 1rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-bottom: 1px solid $border;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    @media (min-width: $bp-tab-s) {
+        padding: 1.75rem 2.5rem;
+        border-bottom: none;
+        max-width: 935px;
+        margin: 0 auto;
+    }
+
+    &__item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        flex-shrink: 0;
+        cursor: pointer;
+    }
+
+    &__ring {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        padding: 2px;
+        background: $border;
+
+        @media (min-width: $bp-tab-s) {
+            width: 77px;
+            height: 77px;
+            padding: 3px;
+        }
+
+        &--new {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: $bg;
+            border: 1px solid $border;
+
+            svg {
+                width: 24px;
+                height: 24px;
+                color: $text;
+                opacity: 0.7;
+            }
+        }
+    }
+
+    &__img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid $bg;
+        object-fit: cover;
+    }
+
+    &__name {
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+}
+
+// ── Tabs
+.profile-tabs {
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid $border;
+    border-bottom: 1px solid $border;
+
+    @media (min-width: $bp-tab-s) {
+        justify-content: center;
+        gap: 4rem;
+        max-width: 935px;
+        margin: 0 auto;
+        border-bottom: none;
+    }
+
+    &__item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        padding: 0.9rem 0;
+        background: none;
+        border: none;
+        border-top: 1px solid transparent;
+        color: $text-sub;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        flex: 1;
+
+        @media (min-width: $bp-tab-s) {
+            flex: 0;
+            transform: translateY(-1px);
+        }
+
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        @media (max-width: #{$bp-tab-s - 1}) {
+            font-size: 0;
+        }
+
+        &--active {
+            color: $text;
+
+            @media (min-width: $bp-tab-s) {
+                border-top-color: $text;
+            }
+
+            svg {
+                stroke: $text;
+            }
+        }
+    }
+}
+
+// ── Photo Grid
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+
+    @media (min-width: $bp-tab-s) {
+        gap: 4px;
+    }
+
+    @media (min-width: $bp-desktop) {
+        gap: 4px;
+        padding-top: 0.25rem;
+    }
+
+    &__item {
+        aspect-ratio: 1;
+        position: relative;
+        background: $surface;
+        cursor: pointer;
+        overflow: hidden;
+
+        &:hover .profile-grid__overlay {
+            opacity: 1;
+        }
+    }
+
+    // Image is absolutely positioned so it ALWAYS fills the cell,
+    // regardless of the uploaded image's native dimensions.
+    &__img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block; // remove inline baseline gap
+    }
+
+    &__overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+
+        span {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        @media (max-width: #{$bp-tab-s - 1}) {
+            display: none;
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DS §8: STORY HIGHLIGHTS ROW (canonical classes)
+// ══════════════════════════════════════════════════════════════════════════════
+.highlights {
+    width: 100%;
+    border-bottom: 1px solid $border;
+}
+
+.highlights__scroll {
+    display: flex;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    @media (min-width: $bp-tab-s) {
+        padding: 1.25rem 2.5rem;
+        border-bottom: none;
+        max-width: 935px;
+        margin: 0 auto;
+    }
+}
+
+.highlight-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.highlight-item__ring {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @media (min-width: $bp-tab-s) {
+        width: 77px;
+        height: 77px;
+        padding: 3px;
+    }
+}
+
+.highlight-item__ring--new {
+    background: $bg;
+    border: 1px solid $border;
+}
+
+.highlight-item__ring--gradient {
+    background: linear-gradient(45deg, $ig-start, $ig-mid, $ig-end, #515bd4);
+}
+
+.highlight-item__inner {
+    width: 100%;
+    height: 100%;
+    background: $surface-2;
+    border-radius: 50%;
+    border: 2px solid $bg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        color: $text;
+        opacity: 0.7;
+    }
+}
+
+.highlight-item__img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid $bg;
+}
+
+.highlight-item__label {
+    font-size: 0.7rem;
+    color: $text;
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    max-width: 64px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+// ── Profile header duplicate block removed — canonical styles are at top of file
+
+
+
+
+
+
+
+
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DS §10: PROFILE TAB BAR (canonical class: profile-tabs__tab)
+// ══════════════════════════════════════════════════════════════════════════════
+.profile-tabs__tab {
+    flex: 1;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    border-top: 2px solid transparent;
+    color: $text-sub;
+    cursor: pointer;
+    transition: color $ease;
+
+    svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    &--active {
+        color: $text;
+        border-top-color: $text;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DS §11: POST GRID (canonical — minmax(0,1fr) never overflows)
+// ══════════════════════════════════════════════════════════════════════════════
+.post-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2px;
+
+    @media (min-width: $bp-tab-s) {
+        gap: 4px;
+    }
+}
+
+.post-grid__item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: $surface;
+    cursor: pointer;
+
+    img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+
+    &:hover img {
+        transform: scale(1.04);
+    }
+}
+
+.post-grid__badges {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-end;
+}
+
+.post-grid__badge {
+    color: #fff;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+    display: flex;
+    align-items: center;
+
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+.post-grid__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+
+    span {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    // Desktop only — DS §11
+    @media (max-width: #{$bp-tab-s - 1}) {
+        display: none;
+    }
+}
+
+.post-grid__item:hover .post-grid__overlay {
+    opacity: 1;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DS §12: SETTINGS LIST (canonical — settings-row replaces settings-list-item)
+// ══════════════════════════════════════════════════════════════════════════════
+.settings-section__title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: $text-muted;
+    padding: 0.65rem 1rem 0.35rem;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid $surface;
+    gap: 0.75rem;
+    min-height: 52px;
+
+    &--pressable {
+        cursor: pointer;
+        transition: background $ease;
+
+        &:hover {
+            background: $surface;
+        }
+    }
+
+    &--danger .settings-row__label {
+        color: #ff453a;
+    }
+}
+
+.settings-row__content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.settings-row__label {
+    font-size: 0.9375rem;
+    color: $text;
+    font-family: 'Inter', sans-serif;
+}
+
+.settings-row__sublabel {
+    font-size: 0.8rem;
+    color: $text-sub;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.settings-row__chevron {
+    width: 16px;
+    height: 16px;
+    color: $text-muted;
+    flex-shrink: 0;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DS §13: FORM INPUT FIELDS (canonical input-group__* classes)
+// ══════════════════════════════════════════════════════════════════════════════
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 0.65rem;
+}
+
+.input-group__label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: $text-sub;
+    font-family: 'Inter', sans-serif;
+}
+
+.input-group__field {
+    width: 100%;
+    background: $surface-2;
+    border: 1px solid $input-border;
+    border-radius: 8px;
+    color: $text;
+    font-size: 0.875rem;
+    font-family: 'Inter', sans-serif;
+    padding: 0.78rem 0.9rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color $ease, box-shadow $ease;
+
+    &:focus {
+        border-color: $ig-end;
+        box-shadow: 0 0 0 3px $focus-ring;
+    }
+
+    &::placeholder {
+        color: $text-sub;
+        font-size: 0.85rem;
+    }
+
+    &--textarea {
+        resize: none;
+        line-height: 1.5;
+        min-height: 90px;
+    }
+}
+
+.input-group__hint {
+    font-size: 0.7rem;
+    color: $text-muted;
+    font-family: 'Inter', sans-serif;
+}
+
+.input-group__char-count {
+    font-size: 0.7rem;
+    color: $text-muted;
+    text-align: right;
+    font-family: 'Inter', sans-serif;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DS §14: CARD SURFACE (canonical — replaces form-container where needed)
+// ══════════════════════════════════════════════════════════════════════════════
+.card {
+    background: $surface;
+    border: 1px solid $border;
+    border-radius: 16px;
+    padding: 1.5rem;
+    animation: cardIn 0.35s ease both;
+
+    &--sm {
+        padding: 0.875rem 1rem;
+        border-radius: 12px;
+    }
+
+    &--info {
+        background: rgba(129, 52, 175, 0.12);
+        border-color: rgba(129, 52, 175, 0.3);
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DS §15: BOTTOM SHEET / MODAL
+// ══════════════════════════════════════════════════════════════════════════════
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-sheet {
+    width: 100%;
+    background: $surface;
+    border: 1px solid $border;
+    border-radius: 16px 16px 0 0;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+.modal-sheet__handle {
+    width: 36px;
+    height: 4px;
+    background: $input-border;
+    border-radius: 9999px;
+    margin: 0.65rem auto 0.75rem;
+}
+
+.modal-sheet__item {
+    padding: 1rem;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    color: $text;
+    text-align: center;
+    cursor: pointer;
+    transition: background $ease;
+
+    &:hover {
+        background: $surface-2;
+    }
+
+    &--danger {
+        color: #ff453a;
+        font-weight: 600;
+    }
+
+    &--cancel {
+        color: #c084fc;
+        font-weight: 600;
+    }
+}
+
+.modal-sheet__divider {
+    height: 6px;
+    background: $bg;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DS §17: TOAST NOTIFICATION
+// ══════════════════════════════════════════════════════════════════════════════
+.toast {
+    position: fixed;
+    bottom: calc(60px + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    background: $surface;
+    border: 1px solid $border;
+    color: $text;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 300;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    animation: toastIn 0.3s ease;
+    white-space: nowrap;
+    max-width: calc(100vw - 2rem);
+
+    &--success {
+        border-left: 3px solid #30d158;
+    }
+
+    &--error {
+        border-left: 3px solid #ff453a;
+    }
+
+    svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+// ─── UserProfile page — empty state ──────────────────────────────────────────
+.upv-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 4rem 1rem;
+    color: $text-sub;
+    font-family: 'Inter', sans-serif;
+
+    svg {
+        opacity: 0.35;
+        color: $text-sub;
+    }
+
+    p {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+}

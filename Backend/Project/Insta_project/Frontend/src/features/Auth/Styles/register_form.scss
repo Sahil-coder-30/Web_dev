@@ -27,7 +27,7 @@ $bp-xl: 1440px;
 
 // ── Page ───────────────────────────────────────────────────────────────────────
 // Register has 5 inputs — needs flex-start on very short viewports so it scrolls
-main {
+.auth-main {
   min-height: 100dvh;
   width: 100%;
   display: flex;
@@ -68,13 +68,19 @@ main {
   // ── Logo ────────────────────────────────────────────────────────────────────
   h1 {
     font-family: 'Grand Hotel', cursive;
-    font-size: clamp(2.4rem, 8vw, 3rem);
+    font-size: clamp(2.2rem, 7vw, 3rem);
     font-weight: 400;
     line-height: 1;
     letter-spacing: 0.01em;
-    padding-bottom: 0.5rem;
+    padding: 0 0.5rem 0.5rem; // Add side padding to keep it away from edges and let descenders breathe
     margin-bottom: 1.75rem;
     text-align: center;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
     background: linear-gradient(45deg, $ig-start, $ig-mid, $ig-end);
     -webkit-background-clip: text;
@@ -89,7 +95,14 @@ main {
     width: 100%;
     gap: 0.7rem;
 
-    input {
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .input-group__field {
       width: 100%;
       min-height: 48px;
       padding: 0.78rem 0.95rem;
@@ -132,7 +145,7 @@ main {
       line-height: 1.4;
     }
 
-    button {
+    .btn--primary {
       width: 100%;
       min-height: 48px;
       padding: 0.85rem;
@@ -167,6 +180,32 @@ main {
         cursor: not-allowed;
       }
     }
+
+    .btn--secondary {
+      width: 100%;
+      min-height: 48px;
+      padding: 0.85rem;
+      margin-top: 0.4rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: $text;
+      border: 1px solid $input-border;
+      border-radius: 10px;
+      cursor: pointer;
+      background: transparent;
+      transition: background $ease, border-color $ease;
+
+      &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: $text-sub;
+      }
+
+      &:active:not(:disabled) {
+        transform: scale(0.98);
+      }
+    }
   }
 
   // ── Footer ──────────────────────────────────────────────────────────────────
@@ -196,7 +235,7 @@ main {
 // Very small phones — 320px (iPhone SE 1st gen, budget Androids)
 // Register has 5 fields — switch to flex-start so card can scroll naturally
 @media (max-width: #{$bp-xs}) {
-  main {
+  .auth-main {
     justify-content: flex-start;
     padding: 1.5rem 0.75rem;
   }
@@ -217,7 +256,7 @@ main {
 
 // Small phones (321px – 480px)
 @media (max-width: #{$bp-sm}) and (min-width: #{$bp-xs + 1}) {
-  main {
+  .auth-main {
 
     // On short screens (< 700px tall), stop centering so card scrolls
     @media (max-height: 700px) {

@@ -10,11 +10,12 @@ const imagekit = new ImageKit({
 });
 
 async function createPostController(req, res) {
-  // console.log(req.file);
+  console.log(req.file);
   
   const file = await imagekit.files.upload({
+
     file: await toFile(Buffer.from(req.file.buffer), "file"),
-    fileName: "Test",
+    fileName: req.file.originalname,
     folder: "cohort-2/insta-clone-project",
   });
 
@@ -86,7 +87,8 @@ async function likePostController(req, res) {
 
     if(postAlreadyLiked){
         return res.status(400).json({
-            message : "cannot like one post multiple times ..."
+            message : "cannot like one post multiple times ...",
+            status : true
         })
     }
 
@@ -97,14 +99,52 @@ async function likePostController(req, res) {
 
     return res.status(201).json({
         message : "post has been liked successfully...",
-        like
+        like,
+        status : true
     })
 
 }
+
+async function dislikePostController(req , res){
+  const postId = req.params.postId;
+    const username = req.user.username;
+
+    const isPostExist = await postModel.findById(postId);
+
+    if(!isPostExist){
+        return res.status(404).json({
+            message : "post does not exist ..."
+        })
+    }
+
+    const postAlreadyLiked = await likeModel.findOne({
+        post : postId,
+        user : username,
+    })
+
+    await likeModel.findByIdAndDelete(postAlreadyLiked._id);
+
+    res.status(200).json({
+      message : "post deleted successfully..."
+    })
+}
+
+async function getPostFeedController(req, res){
+  const posts = await postModel.find().populate("user");
+  return res.status(201).json({
+    message : "post extracted successfully...",
+    posts
+  })
+}
+
 
 module.exports = {
   createPostController,
   getAllPostData,
   getPostDetailsController,
-  likePostController
+  likePostController,
+  getPostFeedController,
+  dislikePostController
 };
+
+

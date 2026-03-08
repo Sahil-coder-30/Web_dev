@@ -5,15 +5,30 @@ const api = axios.create({
   withCredentials: true,
 });
 
-export async function register(username, password, fullName, email, bio) {
+export async function register(username, password, fullName, email, bio, profilePic) {
   try {
-    const response = await api.post("/register", {
-      username,
-      email,
-      bio,
-      fullName,
-      password,
-    });
+    let data;
+    let headers = {};
+    if (profilePic) {
+      data = new FormData();
+      data.append("username", username);
+      data.append("email", email);
+      data.append("bio", bio);
+      data.append("fullName", fullName);
+      data.append("password", password);
+      data.append("image", profilePic);
+      headers["Content-Type"] = "multipart/form-data";
+    } else {
+      data = {
+        username,
+        email,
+        bio,
+        fullName,
+        password,
+      };
+    }
+
+    const response = await api.post("/register", data, { headers });
 
     return response.data;
   } catch (err) {
@@ -42,4 +57,3 @@ export async function getMe() {
     throw error;
   }
 }
-

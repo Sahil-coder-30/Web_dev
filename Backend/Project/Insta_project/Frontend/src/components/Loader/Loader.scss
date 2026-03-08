@@ -1,0 +1,129 @@
+// ── Loader Variables
+$loader-color-1: #fdf497;
+$loader-color-2: #fd5949;
+$loader-color-3: #d6249f;
+$loader-color-4: #285AEB;
+$text-color: #ffffff;
+$bg-color: #0e0e10; // Match app theme
+
+.loader-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+
+    &--fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: $bg-color;
+        z-index: 9999;
+    }
+}
+
+.loader-spinner {
+    position: relative;
+    transform-origin: center;
+
+    // Sizes
+    &--small {
+        width: 24px;
+        height: 24px;
+    }
+
+    &--medium {
+        width: 44px;
+        height: 44px;
+    }
+
+    &--large {
+        width: 64px;
+        height: 64px;
+    }
+
+    &__svg {
+        animation: rotate 2s linear infinite;
+        width: 100%;
+        height: 100%;
+        transform-origin: center center;
+    }
+
+    &__circle {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+        animation:
+            dash 1.5s ease-in-out infinite,
+            color 6s ease-in-out infinite;
+        stroke-linecap: round;
+        transform-origin: center;
+    }
+}
+
+.loader-text {
+    font-size: 0.95rem;
+    color: $text-color;
+    font-weight: 500;
+    opacity: 0.8;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+// ── Animations ──
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes dash {
+    0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+    }
+
+    50% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -35px;
+    }
+
+    100% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -124px;
+    }
+}
+
+@keyframes color {
+
+    100%,
+    0% {
+        stroke: $loader-color-1;
+    }
+
+    40% {
+        stroke: $loader-color-2;
+    }
+
+    66% {
+        stroke: $loader-color-3;
+    }
+
+    80%,
+    90% {
+        stroke: $loader-color-4;
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}

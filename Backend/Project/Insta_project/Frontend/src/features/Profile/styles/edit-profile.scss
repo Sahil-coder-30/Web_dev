@@ -1,0 +1,419 @@
+// ─── Edit Profile specific styles ──────────────────────────────────────────────
+@use "sass:color";
+@use "../../Post/styles/feed.scss" as *; // reuse tokens (modern @use)
+
+// ── Settings & Edit Profile Layout ───────────────────────────────────────────
+// .settings-main overrides .feed-main's narrow 470px desktop cap.
+// On desktop it must fill all remaining space beside the left sidebar.
+.settings-main {
+    // Mobile: full width, no padding
+    padding: 0;
+    max-width: 100% !important; // override feed-main's 470px desktop cap
+    margin: 0 !important; // remove feed-main centering margin
+
+    @media (min-width: $bp-tab-pro) {
+        padding: 1.5rem 2rem;
+    }
+}
+
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: calc(100vh - 60px);
+
+    @media (min-width: $bp-tab-pro) {
+        flex-direction: row;
+        border: 1px solid $border;
+        border-radius: 12px;
+        background: $surface;
+        overflow: hidden;
+        min-height: 700px;
+        max-height: calc(100vh - 6rem); // don't overflow viewport
+    }
+}
+
+// ── Settings Sidebar
+.settings-sidebar {
+    display: none; // Hidden on mobile
+
+    @media (min-width: $bp-tab-pro) {
+        display: flex;
+        flex-direction: column;
+        width: 250px;
+        flex-shrink: 0;
+        border-right: 1px solid $border;
+        background: $surface;
+    }
+
+    @media (min-width: $bp-desktop) {
+        width: 315px;
+    }
+
+    &__title {
+        padding: 1.5rem 1.25rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: $text;
+    }
+
+    &__nav {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__nav-item {
+        padding: 1rem 1.25rem;
+        font-size: 0.95rem;
+        color: $text;
+        text-decoration: none;
+        transition: background $ease;
+        border-left: 2px solid transparent;
+
+        &:hover {
+            background: $surface-2;
+        }
+
+        &--active {
+            font-weight: 700;
+            border-left-color: $text;
+            background: rgba($surface-2, 0.5);
+        }
+
+        &.text-brand {
+            color: #0095f6;
+        }
+    }
+}
+
+// ── Edit Profile Content Column ────────────────────────────────────────────────
+.edit-profile-content {
+    flex: 1;
+    min-width: 0; // critical: prevents flex child from overflowing
+    overflow-y: auto; // content scrolls, container stays fixed
+    padding: 1.25rem 1rem;
+
+    @media (min-width: $bp-tab-s) {
+        padding: 1.75rem 2rem;
+    }
+
+    @media (min-width: $bp-tab-pro) {
+        padding: 2rem 2.5rem;
+    }
+
+    &__title {
+        display: none;
+
+        @media (min-width: $bp-tab-pro) {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            color: $text;
+        }
+    }
+}
+
+// Shared Buttons
+.btn-primary {
+    background: #0095f6;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+        background: color.adjust(#0095f6, $lightness: 5%);
+    }
+}
+
+.edit-profile-card__avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    background: $surface-2;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+
+    img {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .edit-profile-card__avatar-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+
+        .user {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: $text;
+        }
+
+        .name {
+            font-size: 0.85rem;
+            color: $text-sub;
+        }
+    }
+
+    @media (max-width: #{$bp-tab-s - 1}) {
+        flex-direction: column;
+        text-align: center;
+        background: transparent;
+        padding: 0;
+
+        img {
+            width: 80px;
+            height: 80px;
+        }
+    }
+}
+
+// ── Form Structure Base
+.edit-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    @media (min-width: $bp-tab-s) {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 2rem;
+    }
+
+    >label {
+        font-weight: 600;
+        color: $text;
+        font-size: 0.95rem;
+
+        @media (min-width: $bp-tab-s) {
+            width: 140px;
+            flex-shrink: 0;
+            text-align: right;
+            padding-top: 0.6rem; // align with inputs
+        }
+    }
+}
+
+.form-input-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    input[type="text"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 0.75rem 0.9rem;
+        background: $input-bg;
+        border: 1px solid $border;
+        border-radius: 8px;
+        color: $text;
+        font-family: inherit;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border $ease;
+
+        &:focus {
+            border-color: #0095f6;
+        }
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .hint {
+        font-size: 0.75rem;
+        color: $text-sub;
+        line-height: 1.4;
+    }
+
+    .char-count {
+        align-self: flex-end;
+        font-size: 0.75rem;
+        color: $text-muted;
+    }
+}
+
+// ── Checkbox Toggle row
+.toggle-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid $border;
+    border-radius: 8px;
+    background: $surface-2;
+
+    h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: $text;
+        margin-bottom: 0.2rem;
+    }
+
+    .hint {
+        margin-top: 0.2rem;
+    }
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+
+    .submit-btn {
+        width: 100%;
+        padding: 0.85rem;
+
+        @media (min-width: $bp-tab-s) {
+            width: auto;
+            padding: 0.6rem 1.5rem;
+        }
+    }
+}
+
+// ── Generic Settings List Items ────────────────────────────────────────────────
+.settings-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid $border;
+    color: $text;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity $ease;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        opacity: 0.8;
+    }
+
+    &__left {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    &__title {
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    &__desc {
+        font-size: 0.85rem;
+        color: $text-sub;
+    }
+
+    &__right {
+        display: flex;
+        align-items: center;
+        color: $text-sub;
+
+        svg {
+            width: 20px;
+            height: 20px;
+        }
+    }
+}
+
+// ── DS §13: select element inherits input-group__field styles ─────────────────
+// (input-group__field is defined in profile.scss via feed.scss import)
+// Select needs explicit appearance reset for dark theme
+select.input-group__field {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 18px;
+    padding-right: 2.5rem;
+    cursor: pointer;
+
+    option {
+        background: $surface-2;
+        color: $text;
+    }
+}
+
+// ── Avatar row — DS §1: avatar--md already handles size, but row needs layout ─
+.edit-profile-card__avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0 1.5rem;
+    border-bottom: 1px solid $border;
+    margin-bottom: 1.5rem;
+
+    // DS §1: avatar class handles border-radius + object-fit
+    img.avatar {
+        flex-shrink: 0;
+    }
+
+    .edit-profile-card__avatar-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .user {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: $text;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .name {
+            font-size: 0.8rem;
+            color: $text-sub;
+            font-family: 'Inter', sans-serif;
+        }
+    }
+}
+
+// ── edit-profile-form layout ──────────────────────────────────────────────────
+.edit-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+// submit button alignment
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid $border;
+}
+
+.submit-btn {
+    min-width: 120px;
+}

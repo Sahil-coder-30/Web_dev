@@ -1,0 +1,1632 @@
+// ─── Instagram Feed — Complete Responsive Styles ──────────────────────────────
+// Breakpoints mirrored from the 7 Stitch screen designs:
+//   Mobile      375 × 812
+//   Mobile-L    430 × 932
+//   Tab-S       768 × 1024
+//   Tab-Pro    1024 × 1366
+//   Desktop    1280 × 800
+//   Wide       1440 × 900
+
+// ── Design Tokens ──────────────────────────────────────────────────────────────
+$bg: #0e0e10;
+$surface: #1c1c1f;
+$surface-2: #252528;
+$border: #313135;
+$input-bg: #252528;
+$input-border: #3a3a3e; // DS §13: slightly lighter border for inputs
+$focus-ring: rgba(131, 58, 180, 0.35); // DS §13: purple focus glow
+$text: #f5f5f5;
+$text-sub: #737373;
+$text-muted: #4a4a4e;
+$text-link: #c084fc; // DS §9: soft purple for links
+$ig-start: #f58529;
+$ig-mid: #dd2a7b;
+$ig-end: #8134af;
+$ease: 0.2s ease;
+$nav-width-sm: 72px; // icon-only sidebar (768–1024)
+$nav-width-lg: 244px; // full sidebar (1024+)
+$right-width: 280px; // right sidebar (1024+)
+$right-width-xl: 320px; // right sidebar (1440+)
+
+// ── Breakpoints ────────────────────────────────────────────────────────────────
+$bp-mobile-l: 430px;
+$bp-tab-s: 768px;
+$bp-tab-pro: 1024px;
+$bp-desktop: 1280px;
+$bp-wide: 1440px;
+
+// ── Gradient helpers ───────────────────────────────────────────────────────────
+@mixin ig-gradient-text {
+    background: linear-gradient(45deg, $ig-start, $ig-mid, $ig-end);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+@mixin ig-gradient-border {
+    background: linear-gradient($surface, $surface) padding-box,
+        linear-gradient(45deg, $ig-start, $ig-mid, $ig-end) border-box;
+    border: 2px solid transparent;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// LAYOUT SHELL
+// ══════════════════════════════════════════════════════════════════════════════
+.feed-layout {
+    display: flex;
+    min-height: 100dvh;
+    background: $bg;
+    position: relative;
+
+    // Mobile: single column, bottom nav offset
+    @media (max-width: #{$bp-tab-s - 1}) {
+        flex-direction: column;
+        padding-bottom: 60px; // room for bottom nav
+    }
+
+    // Tab-S: left icon sidebar + centre
+    @media (min-width: $bp-tab-s) {
+        flex-direction: row;
+        padding-bottom: 0;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// LEFT / DESKTOP SIDEBAR
+// ══════════════════════════════════════════════════════════════════════════════
+.feed-sidebar {
+    display: none; // hidden on mobile
+
+    @media (min-width: $bp-tab-s) {
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        height: 100dvh;
+        width: $nav-width-sm;
+        min-width: $nav-width-sm;
+        border-right: 1px solid $border;
+        padding: 1.5rem 0.75rem;
+        background: $bg;
+        overflow: hidden;
+        transition: width $ease;
+        z-index: 100;
+    }
+
+    @media (min-width: $bp-tab-pro) {
+        width: $nav-width-lg;
+        min-width: $nav-width-lg;
+        padding: 1.5rem 1rem;
+    }
+
+    @media (min-width: $bp-wide) {
+        padding: 1.75rem 1.25rem;
+    }
+
+    // Logo
+    &__logo {
+        padding: 0.5rem 0 1.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        @media (min-width: $bp-tab-pro) {
+            justify-content: flex-start;
+            padding-left: 0.5rem;
+        }
+    }
+
+    &__logo-text {
+        font-family: 'Grand Hotel', cursive;
+        font-size: 1.75rem;
+        font-weight: 400;
+        @include ig-gradient-text;
+        white-space: nowrap;
+        // Hide text label on icon-only sidebar
+        display: none;
+
+        @media (min-width: $bp-tab-pro) {
+            display: block;
+        }
+    }
+
+    // Small icon fallback for icon-only mode
+    &__logo::before {
+        content: "📸";
+        font-size: 1.5rem;
+        display: block;
+
+        @media (min-width: $bp-tab-pro) {
+            display: none;
+        }
+    }
+
+    // Nav
+    &__nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        flex: 1;
+    }
+
+    &__nav-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem;
+        border-radius: 12px;
+        color: $text;
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 400;
+        transition: background $ease, transform $ease;
+        justify-content: center;
+
+        svg {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        span {
+            display: none; // hidden on icon-only sidebar
+        }
+
+        @media (min-width: $bp-tab-pro) {
+            justify-content: flex-start;
+
+            span {
+                display: inline;
+            }
+        }
+
+        &:hover {
+            background: $surface;
+            transform: translateX(2px);
+        }
+
+        &--active {
+            font-weight: 700;
+
+            svg {
+                stroke-width: 0;
+            }
+        }
+
+        &--profile {
+            gap: 1rem;
+        }
+    }
+
+    &__avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    // More / Settings pinned to bottom
+    &__more {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem;
+        border-radius: 12px;
+        color: $text;
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition: background $ease;
+        justify-content: center;
+
+        svg {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        span {
+            display: none;
+
+            @media (min-width: $bp-tab-pro) {
+                display: inline;
+            }
+        }
+
+        @media (min-width: $bp-tab-pro) {
+            justify-content: flex-start;
+        }
+
+        &:hover {
+            background: $surface;
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MOBILE TOP HEADER
+// ══════════════════════════════════════════════════════════════════════════════
+.feed-mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid $border;
+    background: $bg;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+
+    @media (min-width: $bp-tab-s) {
+        display: none; // replaced by sidebar on tablet+
+    }
+
+    &__logo {
+        font-family: 'Grand Hotel', cursive;
+        font-size: 1.75rem;
+        font-weight: 400;
+        @include ig-gradient-text;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    &__btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: $text;
+        padding: 0.4rem;
+        display: flex;
+        align-items: center;
+        border-radius: 8px;
+        transition: background $ease;
+
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        &:hover {
+            background: $surface;
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CENTRE MAIN COLUMN
+// ══════════════════════════════════════════════════════════════════════════════
+.feed-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+
+    // Mobile: full width, no side padding
+    @media (max-width: #{$bp-tab-s - 1}) {
+        width: 100%;
+    }
+
+    // Tab-S: take remaining space beside icon nav
+    @media (min-width: $bp-tab-s) and (max-width: #{$bp-tab-pro - 1}) {
+        max-width: calc(100% - #{$nav-width-sm});
+    }
+
+    // Tab-Pro: between both sidebars
+    @media (min-width: $bp-tab-pro) and (max-width: #{$bp-desktop - 1}) {
+        max-width: calc(100% - #{$nav-width-lg} - #{$right-width});
+    }
+
+    // Desktop+
+    @media (min-width: $bp-desktop) {
+        max-width: 470px; // Instagram's classic centre-feed width
+        margin: 0 auto;
+    }
+
+    @media (min-width: $bp-wide) {
+        max-width: 500px;
+    }
+
+    &__posts {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding-top: 0;
+
+        @media (min-width: $bp-tab-s) {
+            gap: 1.5rem;
+            padding-top: 1.5rem;
+        }
+    }
+}
+
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// POST CARD
+// ══════════════════════════════════════════════════════════════════════════════
+.feed-post {
+    display: flex;
+    flex-direction: column;
+    background: $bg;
+    border-bottom: 1px solid $border;
+
+    @media (min-width: $bp-tab-s) {
+        border: 1px solid $border;
+        border-radius: 14px;
+        overflow: hidden;
+        margin-top: 0.75rem;
+        background: $surface;
+    }
+
+    // Header
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 0.9rem;
+    }
+
+    &__user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    &__avatar-wrap {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        padding: 2px;
+        background: linear-gradient(45deg, $ig-start, $ig-mid, $ig-end);
+        flex-shrink: 0;
+
+        @media (min-width: $bp-tab-pro) {
+            width: 42px;
+            height: 42px;
+        }
+    }
+
+    &__avatar {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid $bg;
+
+        @media (min-width: $bp-tab-s) {
+            border-color: $surface;
+        }
+    }
+
+    &__meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+    }
+
+    &__username {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: $text;
+        line-height: 1.2;
+    }
+
+    &__location {
+        font-size: 0.7rem;
+        color: $text-sub;
+        line-height: 1.2;
+    }
+
+    &__more {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: $text;
+        padding: 0.4rem;
+        border-radius: 8px;
+        transition: background $ease;
+        display: flex;
+
+        svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        &:hover {
+            background: $surface-2;
+        }
+    }
+
+    // Post image — resilient to any uploaded image size / orientation
+    &__image-wrap {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+        background: $surface-2;
+        position: relative; // anchor for the absolute image
+    }
+
+    &__image {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+        transition: transform 0.4s ease;
+
+        &:hover {
+            transform: scale(1.015);
+        }
+    }
+
+    // Action buttons row
+    &__actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.65rem 0.9rem 0.25rem;
+    }
+
+    &__actions-left {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    &__action-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: $text;
+        padding: 0.25rem;
+        display: flex;
+        align-items: center;
+        border-radius: 8px;
+        transition: transform $ease, color $ease;
+
+        svg {
+            width: 26px;
+            height: 26px;
+
+            @media (min-width: $bp-tab-pro) {
+                width: 28px;
+                height: 28px;
+            }
+        }
+
+        &:hover {
+            transform: scale(1.15);
+            color: $ig-mid;
+        }
+
+        &:active {
+            transform: scale(0.92);
+        }
+    }
+
+    // Body (likes, caption, comments, timestamp, add-comment)
+    &__body {
+        padding: 0.25rem 0.9rem 0.9rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    &__likes {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: $text;
+    }
+
+    &__caption {
+        font-size: 0.875rem;
+        color: $text;
+        line-height: 1.5;
+    }
+
+    &__caption-user {
+        font-weight: 700;
+    }
+
+    &__view-comments {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: $text-sub;
+        font-size: 0.825rem;
+        padding: 0;
+        text-align: left;
+        transition: color $ease;
+
+        &:hover {
+            color: $text;
+        }
+    }
+
+    &__comment {
+        font-size: 0.825rem;
+        color: $text;
+        line-height: 1.5;
+    }
+
+    &__comment-user {
+        font-weight: 700;
+    }
+
+    &__time {
+        font-size: 0.7rem;
+        color: $text-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-top: 0.15rem;
+    }
+
+    // Add comment row
+    &__add-comment {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        border-top: 1px solid $border;
+        padding-top: 0.65rem;
+        margin-top: 0.35rem;
+    }
+
+    &__comment-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    &__comment-input {
+        flex: 1;
+        background: none;
+        border: none;
+        outline: none;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.85rem;
+        color: $text;
+        caret-color: $ig-end;
+
+        &::placeholder {
+            color: $text-muted;
+        }
+    }
+
+    &__comment-post {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.825rem;
+        font-weight: 700;
+        color: $ig-mid;
+        padding: 0;
+        transition: opacity $ease;
+
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// RIGHT SIDEBAR (≥1024px only)
+// ══════════════════════════════════════════════════════════════════════════════
+.feed-right-sidebar {
+    display: none;
+
+    @media (min-width: $bp-tab-pro) {
+        display: flex;
+        flex-direction: column;
+        width: $right-width;
+        min-width: $right-width;
+        padding: 2rem 1rem 1rem;
+        position: sticky;
+        top: 0;
+        height: 100dvh;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: $border transparent;
+    }
+
+    @media (min-width: $bp-wide) {
+        width: $right-width-xl;
+        min-width: $right-width-xl;
+        padding: 2rem 1.25rem 1rem;
+    }
+
+    // Current user row
+    &__current-user {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    &__user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    &__user-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__username {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: $text;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__name {
+        font-size: 0.78rem;
+        color: $text-sub;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__switch {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: $ig-mid;
+        padding: 0;
+        transition: opacity $ease;
+
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+
+    // Suggestions header
+    &__suggestions-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.9rem;
+    }
+
+    &__suggestions-title {
+        font-size: 0.825rem;
+        font-weight: 700;
+        color: $text-sub;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    &__see-all {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: $text;
+        padding: 0;
+        transition: opacity $ease;
+
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+
+    // Suggestions list
+    &__suggestions {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+    }
+
+    &__suggestion-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    &__sugg-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    &__sugg-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+    }
+
+    &__sugg-username {
+        font-size: 0.825rem;
+        font-weight: 700;
+        color: $text;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__sugg-reason {
+        font-size: 0.72rem;
+        color: $text-sub;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__follow-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: $ig-mid;
+        padding: 0;
+        transition: opacity $ease;
+        flex-shrink: 0;
+
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+
+    // Footer
+    &__footer {
+        margin-top: auto;
+        padding-top: 2rem;
+    }
+
+    &__footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 0.5rem;
+    }
+
+    &__footer-link {
+        font-size: 0.68rem;
+        color: $text-muted;
+        text-decoration: none;
+        transition: color $ease;
+
+        &:hover {
+            color: $text-sub;
+        }
+    }
+
+    &__copyright {
+        font-size: 0.65rem;
+        color: $text-muted;
+        margin-top: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MOBILE BOTTOM NAV (hidden on ≥768px)
+// ══════════════════════════════════════════════════════════════════════════════
+.feed-bottom-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: $bg;
+    border-top: 1px solid $border;
+    z-index: 100;
+    padding: 0 0.5rem;
+
+    @media (min-width: $bp-tab-s) {
+        display: none; // replaced by sidebar
+    }
+
+    &__item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem;
+        color: $text;
+        text-decoration: none;
+        border-radius: 10px;
+        transition: background $ease, transform $ease;
+        flex: 1;
+
+        svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        &--active svg {
+            // bolder filled look
+            filter: drop-shadow(0 0 4px rgba($ig-end, 0.5));
+        }
+
+        &:hover {
+            background: $surface;
+            transform: translateY(-2px);
+        }
+    }
+
+    &__avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid $ig-mid;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TABLET-S SPECIFIC TWEAKS (768–1023px)
+// ══════════════════════════════════════════════════════════════════════════════
+@media (min-width: $bp-tab-s) and (max-width: #{$bp-tab-pro - 1}) {
+    .feed-main {
+        padding: 0 1rem;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TABLET-PRO / DESKTOP TWEAKS (1024–1279)
+// ══════════════════════════════════════════════════════════════════════════════
+@media (min-width: $bp-tab-pro) and (max-width: #{$bp-desktop - 1}) {
+    .feed-layout {
+        align-items: flex-start;
+    }
+
+    .feed-main {
+        // centred between both sidebars
+        flex: 1;
+        min-width: 0;
+        padding: 0 1.5rem;
+        max-width: none;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DESKTOP+ TWEAKS  (≥1280px)
+// ══════════════════════════════════════════════════════════════════════════════
+@media (min-width: $bp-desktop) {
+    .feed-layout {
+        max-width: 1300px;
+        margin: 0 auto;
+        min-height: 100dvh;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// WIDE DESKTOP (≥1440px)
+// ══════════════════════════════════════════════════════════════════════════════
+@media (min-width: $bp-wide) {
+    .feed-layout {
+        max-width: 1500px;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MOBILE LARGE (430px+ phones)
+// ══════════════════════════════════════════════════════════════════════════════
+@media (min-width: $bp-mobile-l) and (max-width: #{$bp-tab-s - 1}) {
+    .feed-post {
+        &__image-wrap {
+            // Slightly taller ratio on large phones for breathing room
+            aspect-ratio: 4 / 5;
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ACCESSIBILITY — reduce motion
+// ══════════════════════════════════════════════════════════════════════════════
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DS CANONICAL COMPONENT CLASSES
+// Source of truth: DESIGN_SYSTEM.md
+// All new components use these classes. Old feed-* classes remain for backward compat.
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── AVATAR ─────────────────────────────────────────────────────────────────────
+.avatar-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.avatar-wrap--story {
+    padding: 2px;
+    background: linear-gradient(45deg, $ig-start, $ig-mid, $ig-end, #515bd4);
+    border-radius: 50%;
+
+    .avatar {
+        border: 2px solid $bg;
+    }
+}
+
+.avatar {
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: $surface;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: block;
+}
+
+.avatar--xs {
+    width: 24px;
+    height: 24px;
+}
+
+.avatar--sm {
+    width: 32px;
+    height: 32px;
+}
+
+.avatar--md {
+    width: 44px;
+    height: 44px;
+}
+
+.avatar--lg {
+    width: 64px;
+    height: 64px;
+}
+
+.avatar--xl {
+    width: 86px;
+    height: 86px;
+}
+
+.avatar--2xl {
+    width: 150px;
+    height: 150px;
+}
+
+.avatar--fallback {
+    background: $surface-2;
+    color: $text-sub;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+}
+
+// ── ICON BUTTON ────────────────────────────────────────────────────────────────
+.icon-btn {
+    background: none;
+    border: none;
+    color: $text;
+    cursor: pointer;
+    padding: 0.35rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: background $ease;
+    flex-shrink: 0;
+
+    &:hover {
+        background: $surface-2;
+    }
+
+    svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+// Notification badge
+.badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 16px;
+    height: 16px;
+    background: #ff453a;
+    color: #fff;
+    font-size: 0.625rem;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    border-radius: 9999px;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+// ── BUTTON ─────────────────────────────────────────────────────────────────────
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.78rem 1rem;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    white-space: nowrap;
+    user-select: none;
+    text-decoration: none;
+    transition: background-position 0.4s ease, opacity $ease, transform $ease;
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    &:active {
+        transform: scale(0.98);
+        opacity: 0.85;
+    }
+}
+
+.btn--primary {
+    background: linear-gradient(90deg, $ig-start, $ig-mid 50%, $ig-end);
+    background-size: 200% auto;
+    color: #fff;
+
+    &:hover {
+        background-position: right center;
+        opacity: 0.92;
+    }
+}
+
+.btn--outline {
+    background: transparent;
+    color: $text;
+    border: 1px solid $border;
+
+    &:hover {
+        background: $surface-2;
+    }
+}
+
+.btn--ghost {
+    background: transparent;
+    color: #c084fc;
+
+    &:hover {
+        color: #a855f7;
+    }
+}
+
+.btn--danger {
+    background: transparent;
+    color: #ff453a;
+}
+
+.btn--full {
+    width: 100%;
+}
+
+.btn--sm {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8rem;
+}
+
+.btn--loading {
+    pointer-events: none;
+}
+
+.btn__spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+// ── NAVBAR (top bar — mobile + tablet) ────────────────────────────────────────
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    height: 44px;
+    background: $bg;
+    border-bottom: 1px solid $border;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+
+    @media (min-width: $bp-tab-s) {
+        display: none;
+    }
+
+    // replaced by sidebar on tablet+
+}
+
+.navbar__wordmark {
+    font-family: 'Grand Hotel', cursive;
+    font-size: 1.6rem;
+    padding-bottom: 0.25rem;
+    @include ig-gradient-text;
+}
+
+.navbar__username-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.navbar__username {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text;
+}
+
+.navbar__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+.navbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.navbar__spacer {
+    width: 36px;
+}
+
+// ── BOTTOM NAV (DS canonical — mobile only) ─────────────────────────────────
+.bottom-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 49px;
+    background: $bg;
+    border-top: 1px solid $border;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+
+    @media (min-width: $bp-tab-s) {
+        display: none;
+    }
+}
+
+.bottom-nav__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    color: $text;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+
+    svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    &--active .avatar {
+        border: 2px solid $ig-mid;
+    }
+}
+
+// ── LEFT SIDEBAR (DS canonical) ────────────────────────────────────────────────
+.sidebar {
+    width: 245px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    border-right: 1px solid $border;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0.75rem;
+    flex-shrink: 0;
+    background: $bg;
+    display: none; // hidden on mobile
+
+    @media (min-width: $bp-tab-s) {
+        display: flex;
+        width: 72px; // icon-only
+    }
+
+    @media (min-width: $bp-tab-pro) {
+        width: 245px;
+    }
+}
+
+.sidebar__logo {
+    font-size: 1.6rem;
+    padding: 0.75rem 0.75rem 1.5rem;
+}
+
+.sidebar__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.sidebar__item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    color: $text;
+    text-decoration: none;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background $ease;
+    justify-content: center;
+
+    &:hover {
+        background: $surface;
+    }
+
+    &--active {
+        font-weight: 600;
+    }
+
+    svg {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+    @media (min-width: $bp-tab-pro) {
+        justify-content: flex-start;
+    }
+}
+
+.sidebar__label {
+    white-space: nowrap;
+    display: none;
+
+    @media (min-width: $bp-tab-pro) {
+        display: inline;
+    }
+}
+
+.sidebar__bottom {
+    padding-top: 0.5rem;
+    border-top: 1px solid $border;
+}
+
+// ── POST CARD (DS canonical) ───────────────────────────────────────────────────
+.post-card {
+    background: $bg;
+    border-bottom: 1px solid $border;
+    width: 100%;
+    animation: cardIn 0.35s ease both;
+
+    @media (min-width: $bp-tab-s) {
+        background: $surface;
+        border: 1px solid $border;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+}
+
+.post-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 0.75rem;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.post-card__user {
+    align-items: center;
+    gap: 0.65rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.post-card__user-info {
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+}
+
+.post-card__username {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $text;
+    display: block;
+}
+
+.post-card__location {
+    font-size: 0.75rem;
+    color: $text-sub;
+    display: block;
+}
+
+.post-card__header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.post-card__media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: $surface;
+
+    @media (min-width: $bp-mobile-l) and (max-width: #{$bp-tab-s - 1}) {
+        aspect-ratio: 4 / 5;
+    }
+}
+
+.post-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+
+    &:hover {
+        transform: scale(1.015);
+    }
+}
+
+.post-card__dots {
+    position: absolute;
+    bottom: 0.65rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+}
+
+.post-card__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+
+    &--active {
+        background: $ig-mid;
+    }
+}
+
+.post-card__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem 0.5rem;
+}
+
+.post-card__actions-left {
+    display: flex;
+    align-items: center;
+}
+
+.post-card__footer {
+    padding: 0 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.post-card__likes {
+    font-size: 0.875rem;
+    color: $text;
+    font-weight: 700;
+}
+
+.post-card__caption {
+    font-size: 0.875rem;
+    color: $text;
+    line-height: 1.5;
+}
+
+.post-card__caption-user {
+    font-weight: 700;
+    margin-right: 0.35rem;
+}
+
+.post-card__caption-text {
+    word-break: break-word;
+}
+
+.post-card__more-btn,
+.post-card__comments-btn {
+    background: none;
+    border: none;
+    color: $text-sub;
+    font-size: 0.875rem;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+    transition: color $ease;
+
+    &:hover {
+        color: $text;
+    }
+}
+
+.post-card__timestamp {
+    font-size: 0.7rem;
+    color: $text-muted;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+// ── TOGGLE SWITCH (DS canonical) ──────────────────────────────────────────────
+.toggle {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.toggle__track {
+    display: block;
+    width: 51px;
+    height: 31px;
+    background: $border;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: background 0.25s ease;
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 27px;
+        height: 27px;
+        background: #fff;
+        border-radius: 50%;
+        transition: transform 0.25s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+}
+
+.toggle input:checked~.toggle__track {
+    background: $ig-end;
+}
+
+.toggle input:checked~.toggle__track::after {
+    transform: translateX(20px);
+}
+
+// ── SKELETON SHIMMER (DS canonical) ───────────────────────────────────────────
+@keyframes shimmer {
+    0% {
+        background-position: -800px 0;
+    }
+
+    100% {
+        background-position: 800px 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, $surface 25%, $surface-2 50%, $surface 75%);
+    background-size: 800px 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+}
+
+.skeleton--circle {
+    border-radius: 50%;
+}
+
+.skeleton--avatar-md {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+}
+
+.skeleton--media {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 0;
+}
+
+.skeleton--line {
+    height: 11px;
+    border-radius: 9999px;
+}
+
+.skeleton--w35 {
+    width: 35%;
+}
+
+.skeleton--w55 {
+    width: 55%;
+}
+
+.skeleton--w70 {
+    width: 70%;
+}
+
+.skeleton--w90 {
+    width: 90%;
+}
+
+.skeleton-post__header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.65rem 0.75rem;
+}
+
+.skeleton-post__lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.skeleton-post__footer {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}

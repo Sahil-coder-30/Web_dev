@@ -27,7 +27,7 @@ $bp-xl: 1440px; // desktops
 
 // ── Page ───────────────────────────────────────────────────────────────────────
 // 100dvh accounts for mobile browser address bars (Safari, Chrome mobile)
-main {
+.auth-main {
   min-height: 100dvh;
   width: 100%;
   display: flex;
@@ -71,14 +71,20 @@ main {
   // ── Logo ────────────────────────────────────────────────────────────────────
   h1 {
     font-family: 'Grand Hotel', cursive;
-    // Fluid: 2.4rem on tiny screens → 3rem on desktop
-    font-size: clamp(2.4rem, 8vw, 3rem);
+    // Fluid: 2.2rem on tiny screens → 3rem on desktop
+    font-size: clamp(2.2rem, 7vw, 3rem);
     font-weight: 400;
     line-height: 1;
     letter-spacing: 0.01em;
-    padding-bottom: 0.5rem; // gives Grand Hotel descenders room to breathe
+    padding: 0 0.5rem 0.5rem; // Add side padding to keep it away from edges and let descenders breathe
     margin-bottom: 1.75rem;
     text-align: center;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
     background: linear-gradient(45deg, $ig-start, $ig-mid, $ig-end);
     -webkit-background-clip: text;
@@ -93,7 +99,14 @@ main {
     width: 100%;
     gap: 0.7rem;
 
-    input {
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .input-group__field {
       width: 100%;
       // min 48px height = touch-friendly (WCAG 2.5.5 / Apple HIG)
       min-height: 48px;
@@ -138,7 +151,7 @@ main {
       line-height: 1.4;
     }
 
-    button {
+    .btn--primary {
       width: 100%;
       min-height: 48px; // touch-friendly
       padding: 0.85rem;
@@ -201,7 +214,7 @@ main {
 
 // Very small phones (320px — iPhone SE 1st gen, Moto E, etc.)
 @media (max-width: #{$bp-xs}) {
-  main {
+  .auth-main {
     padding: 1.5rem 0.75rem;
   }
 

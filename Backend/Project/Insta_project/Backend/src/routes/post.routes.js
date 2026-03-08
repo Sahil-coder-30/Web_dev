@@ -2,7 +2,7 @@ const express = require("express");
 const postRouter = express.Router();
 const postController = require("../controllers/post.controller");
 const multer = require("multer");
-const upload = multer({ Storage: multer.memoryStorage() });
+const upload = multer({ storage: multer.memoryStorage() });
 const identifyUser = require("../middleware/auth.middleware");
 
 /**
@@ -48,5 +48,19 @@ postRouter.post(
   identifyUser,
   postController.likePostController,
 );
+
+/**
+ * @route GET /api/posts/feed
+ * @description the api is used to all the post from the db along with the user data
+ * @access [Protected]
+ */
+
+postRouter.get(
+  "/feed",
+  identifyUser,
+  postController.getPostFeedController
+)
+
+// postRouter.get("/allPosts/:username", identifyUser , postController.getUserPosts)
 
 module.exports = postRouter;

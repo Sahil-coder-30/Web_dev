@@ -1,0 +1,627 @@
+// ─── Notifications Page Styles ─────────────────────────────────────────────
+// Tokens imported from the canonical feed.scss (DS §2)
+@use "../../Post/styles/feed.scss" as *; // modern @use replaces @import
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 1. PAGE SHELL
+// ══════════════════════════════════════════════════════════════════════════════
+
+// .notif-main sits inside .feed-layout  ← same flex-row as all other pages.
+// It mirrors .profile-main / .feed-main breakpoint math exactly.
+.notif-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: $bg;
+    overflow-x: hidden;
+
+    @media (max-width: #{$bp-tab-s - 1}) {
+        width: 100%;
+    }
+
+    @media (min-width: $bp-tab-s) and (max-width: #{$bp-tab-pro - 1}) {
+        max-width: calc(100% - #{$nav-width-sm});
+    }
+
+    @media (min-width: $bp-tab-pro) {
+        max-width: calc(100% - #{$nav-width-lg});
+    }
+}
+
+// Scrollable zone — centred content column at 630 px max (wider than feed so
+// follow-request buttons have breathing room).
+.notif-scroll {
+    flex: 1;
+    overflow-y: auto;
+    max-width: 630px;
+    width: 100%;
+    margin: 0 auto;
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
+
+    @media (min-width: $bp-tab-s) {
+        padding-bottom: 2.5rem;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 2. MOBILE STICKY HEADER  (hidden ≥ 768px)
+// ══════════════════════════════════════════════════════════════════════════════
+.notif-mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.75rem;
+    height: 52px;
+    background: rgba(14, 14, 16, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid $border;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    gap: 0.5rem;
+
+    // DS §4: icon-btn reset for back arrow
+    .icon-btn {
+        color: $text;
+    }
+
+    @media (min-width: $bp-tab-s) {
+        display: none; // sidebar handles nav on tablet+
+    }
+
+    &__back {
+        flex-shrink: 0;
+    }
+
+    &__title {
+        font-family: "Inter", sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        color: $text;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    &__badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        height: 18px;
+        background: linear-gradient(135deg, $ig-mid, $ig-end);
+        color: #fff;
+        font-size: 0.625rem;
+        font-weight: 700;
+        border-radius: 9999px;
+        padding: 0 4px;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 3. DESKTOP PAGE HEADER  (hidden on mobile)
+// ══════════════════════════════════════════════════════════════════════════════
+.notif-page-header {
+    display: none; // hidden on mobile, shown on tablet+
+
+    @media (min-width: $bp-tab-s) {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 1.75rem 1.25rem 0.75rem;
+        max-width: 630px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    @media (min-width: $bp-tab-pro) {
+        padding: 2.25rem 1.5rem 1rem;
+    }
+
+    &__title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: $text;
+        font-family: "Inter", sans-serif;
+        margin: 0;
+    }
+
+    &__new {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, $ig-mid, $ig-end);
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: 700;
+        font-family: "Inter", sans-serif;
+        padding: 0.2rem 0.6rem;
+        border-radius: 9999px;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 4. SECTION HEADERS
+// ══════════════════════════════════════════════════════════════════════════════
+.notif-section {
+    margin-bottom: 0.5rem;
+
+    &__head {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem 0.35rem;
+
+        @media (min-width: $bp-tab-s) {
+            padding: 1rem 1.25rem 0.4rem;
+        }
+    }
+
+    &__title {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: $text;
+        font-family: "Inter", sans-serif;
+        margin: 0;
+    }
+
+    &__count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        height: 18px;
+        background: $ig-mid;
+        color: #fff;
+        font-size: 0.625rem;
+        font-weight: 700;
+        border-radius: 9999px;
+        padding: 0 4px;
+        font-family: "Inter", sans-serif;
+    }
+
+    &__see-all {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: $text-link;
+        font-family: "Inter", sans-serif;
+        margin-left: auto;
+        padding: 0;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+            opacity: 0.75;
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 5. FOLLOW REQUEST CARDS
+// ══════════════════════════════════════════════════════════════════════════════
+.follow-req-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.follow-req-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1rem;
+    gap: 0.75rem;
+    border-bottom: 1px solid $surface;
+    animation: notifIn 0.3s ease both;
+    transition: background 0.15s ease;
+
+    @media (min-width: $bp-tab-s) {
+        padding: 0.8rem 1.25rem;
+    }
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    // Left: avatar + text info  (is a Link for navigation)
+    &__left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+        min-width: 0;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    &__info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    &__username {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: $text;
+        font-family: "Inter", sans-serif;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__sub {
+        font-size: 0.75rem;
+        color: $text-sub;
+        font-family: "Inter", sans-serif;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    // Right: action buttons
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+
+    &__btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        font-family: "Inter", sans-serif;
+        cursor: pointer;
+        border: none;
+        outline: none;
+        transition: opacity 0.2s ease, transform 0.15s ease;
+        white-space: nowrap;
+        padding: 0.45rem 0.9rem;
+
+        svg {
+            width: 13px;
+            height: 13px;
+            flex-shrink: 0;
+        }
+
+        &:active {
+            transform: scale(0.97);
+        }
+
+        // -- Accept: IG gradient
+        &--accept {
+            background: linear-gradient(90deg, $ig-start, $ig-mid 50%, $ig-end);
+            background-size: 200% auto;
+            color: #fff;
+
+            &:hover {
+                background-position: right center;
+                opacity: 0.92;
+            }
+        }
+
+        // -- Decline: muted surface
+        &--decline {
+            background: $surface-2;
+            color: $text-sub;
+
+            &:hover {
+                background: $surface;
+                color: $text;
+            }
+        }
+
+        // Hide text labels on tiny phones — stay as icon circles
+        @media (max-width: 374px) {
+            span {
+                display: none;
+            }
+
+            padding: 0.45rem;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 6. ACTIVITY NOTIFICATION ROWS
+// ══════════════════════════════════════════════════════════════════════════════
+.notif-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.notif-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid rgba(49, 49, 53, 0.5);
+    transition: background 0.15s ease;
+    animation: notifIn 0.3s ease both;
+    position: relative;
+    cursor: pointer;
+
+    @media (min-width: $bp-tab-s) {
+        padding: 0.75rem 1.25rem;
+    }
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.025);
+    }
+
+    // Unread accent — left gradient bar + subtle background wash
+    &--unread {
+        background: rgba(131, 52, 175, 0.055);
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, $ig-mid, $ig-end);
+            border-radius: 0 2px 2px 0;
+        }
+
+        &:hover {
+            background: rgba(131, 52, 175, 0.09);
+        }
+    }
+
+    // Avatar wrapper — relative anchor for the type badge
+    &__avatar-wrap {
+        position: relative;
+        flex-shrink: 0;
+
+        a {
+            display: block;
+            border-radius: 50%;
+        }
+    }
+
+    // Text block
+    &__content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__text {
+        font-size: 0.875rem;
+        color: $text;
+        font-family: "Inter", sans-serif;
+        line-height: 1.5;
+        margin: 0;
+        word-break: break-word;
+
+        @media (min-width: $bp-tab-s) {
+            font-size: 0.9rem;
+        }
+    }
+
+    &__username {
+        font-weight: 700;
+        color: $text;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    &__message {
+        font-weight: 400;
+        color: $text;
+    }
+
+    &__time {
+        font-size: 0.75rem;
+        color: $text-sub;
+        white-space: nowrap;
+    }
+
+    // Post thumbnail (right side)
+    &__thumb {
+        flex-shrink: 0;
+        width: 46px;
+        height: 46px;
+        border-radius: 4px;
+        overflow: hidden;
+        background: $surface;
+
+        @media (min-width: $bp-tab-s) {
+            width: 54px;
+            height: 54px;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+    }
+
+    // Follow CTA (right side when no thumbnail)
+    &__cta {
+        flex-shrink: 0;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 7. TYPE BADGE — sits inside the avatar, bottom-right corner
+// ══════════════════════════════════════════════════════════════════════════════
+.notif-badge {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid $bg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        width: 10px;
+        height: 10px;
+        flex-shrink: 0;
+    }
+
+    &--like {
+        background: #ff453a;
+        color: #fff;
+    }
+
+    &--comment {
+        background: #0a84ff;
+        color: #fff;
+    }
+
+    &--follow {
+        background: linear-gradient(135deg, $ig-mid, $ig-end);
+        color: #fff;
+    }
+
+    &--mention {
+        background: #30d158;
+        color: #fff;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 8. SKELETON LOADER ROWS (DS §16 — reuse .skeleton shimmer tokens)
+// ══════════════════════════════════════════════════════════════════════════════
+.notif-skeleton {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(49, 49, 53, 0.4);
+
+    @media (min-width: $bp-tab-s) {
+        padding: 0.75rem 1.25rem;
+    }
+
+    &__lines {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+// DS §16 skeleton classes (defined in global style.scss / feed.scss)
+// Re-declaring here for scoped safety
+@keyframes shimmer {
+    0% {
+        background-position: -600px 0;
+    }
+
+    100% {
+        background-position: 600px 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #1c1c1f 25%, #252528 50%, #1c1c1f 75%);
+    background-size: 600px 100%;
+    animation: shimmer 1.4s infinite linear;
+    border-radius: 4px;
+}
+
+.skeleton--circle {
+    border-radius: 50%;
+}
+
+.skeleton--line {
+    height: 11px;
+    border-radius: 9999px;
+}
+
+.skeleton--w35 {
+    width: 35%;
+}
+
+.skeleton--w45 {
+    width: 45%;
+}
+
+.skeleton--w70 {
+    width: 70%;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 9. EMPTY STATE
+// ══════════════════════════════════════════════════════════════════════════════
+.notif-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 5rem 2rem;
+    text-align: center;
+
+    &__icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: 2px solid $border;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $text-sub;
+
+        svg {
+            width: 30px;
+            height: 30px;
+        }
+    }
+
+    &__title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: $text;
+        font-family: "Inter", sans-serif;
+        margin: 0;
+    }
+
+    &__sub {
+        font-size: 0.875rem;
+        color: $text-sub;
+        font-family: "Inter", sans-serif;
+        max-width: 280px;
+        line-height: 1.6;
+        margin: 0;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 10. ENTRANCE ANIMATION (DS §14 — cardIn variant)
+// ══════════════════════════════════════════════════════════════════════════════
+@keyframes notifIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
