@@ -64,6 +64,7 @@ const Feed = () => {
 
   const POSTS = feed?.posts;
   const CURRENT_USER = currentUser;
+  
 
   // useMemo MUST be above any early return — Rules of Hooks
   const postsList = useMemo(() => {

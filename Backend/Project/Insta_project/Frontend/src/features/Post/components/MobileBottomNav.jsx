@@ -37,7 +37,7 @@ const MobileBottomNav = ({ currentUser }) => {
                 {/* Profile — avatar--xs, active state adds gradient ring border via CSS */}
                 <Link to="/profile" className={itemClass("/profile")} aria-label="Profile">
                     <img
-                        src={currentUser?.avatar}
+                        src={currentUser?.profileImage}
                         alt={currentUser?.username || "profile"}
                         className="avatar avatar--xs"
                     />
