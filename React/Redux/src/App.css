@@ -1,0 +1,36 @@
+*{
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+html,body,#root{ 
+width: 100%;
+height: 100%;
+background-color: black;
+color: white;
+}
+
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.alpha{
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+button{
+    padding: 10px;
+    margin: 10px;
+    
+}
+
+button:active{
+    scale: 0.9;
+}
