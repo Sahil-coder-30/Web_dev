@@ -1,0 +1,676 @@
+$primary: #c7621a;
+$bg-dark: #0A0806;
+$panel-dark: #141210;
+$input-bg: #1C1916;
+$input-border: #2A2520;
+$text-light: #f1f5f9;
+$text-muted: #cbd5e1;
+$text-darker: #64748b;
+
+.star-field {
+  background-image: 
+      radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+      radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+      radial-gradient(2px 2px at 50px 160px, #c7621a, rgba(0,0,0,0)),
+      radial-gradient(1px 1px at 90px 40px, #fff, rgba(0,0,0,0)),
+      radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
+      radial-gradient(1px 1px at 160px 120px, #c7621a, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+.register-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: $bg-dark;
+  color: $text-light;
+  overflow: hidden;
+
+  .font-serif { font-family: 'DM Serif Display', serif; }
+  .text-primary { color: $primary; }
+
+  /* Left Panel for Register */
+  .left-panel {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    background-color: $bg-dark;
+    position: relative;
+    overflow: hidden;
+    border-right: 1px solid $input-border;
+
+    @media (min-width: 1024px) {
+      display: flex;
+    }
+
+    .bg-stars {
+      position: absolute;
+      inset: 0;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .branding-top {
+      position: absolute;
+      top: 2.5rem;
+      left: 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      .logo {
+        color: $primary;
+        width: 2rem;
+        height: 2rem;
+      }
+      .brand-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+      }
+    }
+
+    .mascot-area {
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .mascot-wrapper {
+        position: relative;
+        width: 20rem;
+        height: 20rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .mascot-circle {
+          position: relative;
+          width: 16rem;
+          height: 16rem;
+          border: 3px solid #0f172a;
+          background-color: #E8E4E1;
+          border-radius: 50%;
+          overflow: hidden;
+          box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+
+          .lab-coat {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50%;
+            background-color: $primary;
+            border-top: 3px solid #0f172a;
+          }
+
+          .nova-head {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8rem;
+            height: 8rem;
+            background-color: #E8E4E1;
+            border: 3px solid #0f172a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .eyes {
+              display: flex;
+              gap: 1rem;
+              .eye {
+                width: 0.75rem;
+                height: 0.75rem;
+                background-color: #0f172a;
+                border-radius: 50%;
+              }
+            }
+          }
+        }
+
+        .telescope {
+          position: absolute;
+          bottom: 2.5rem;
+          right: -1rem;
+          width: 12rem;
+          height: 3rem;
+          background-color: #3D2B1F;
+          border: 3px solid #0f172a;
+          border-radius: 0.5rem;
+          transform: rotate(-30deg);
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          padding-right: 0.25rem;
+
+          .lens {
+            width: 2rem;
+            height: 2rem;
+            background-color: $primary;
+            border: 3px solid #0f172a;
+            border-radius: 0.125rem;
+          }
+        }
+
+        .floating-star {
+          position: absolute;
+          top: -2.5rem;
+          right: 0;
+          color: $primary;
+          font-size: 3rem;
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: .5; }
+        }
+      }
+
+      .text-center {
+        text-align: center;
+        padding: 0 3rem;
+
+        h2 {
+          font-size: 3rem;
+          color: $text-light;
+          line-height: 1.2;
+          margin-bottom: 1rem;
+          font-weight: 400;
+        }
+        p {
+          color: $text-muted;
+          font-size: 1.125rem;
+          font-weight: 300;
+          max-width: 24rem;
+          margin: 0 auto;
+        }
+      }
+    }
+  }
+
+  /* Right Panel for Form */
+  .right-panel {
+    width: 100%;
+    background-color: $panel-dark;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem;
+
+    @media (min-width: 640px) { padding: 4rem; }
+    @media (min-width: 1024px) { padding: 6rem 8rem; width: 50%; }
+
+    .mobile-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 3rem;
+      @media (min-width: 1024px) { display: none; }
+      
+      .logo {
+        color: $primary;
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+      .brand-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+      }
+    }
+
+    .form-wrapper {
+      width: 100%;
+      max-width: 28rem;
+      margin: 0 auto;
+
+      h1 {
+        font-size: 2.25rem;
+        color: $text-light;
+        margin-bottom: 2rem;
+        font-weight: 400;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+
+        .input-group {
+          display: flex;
+          flex-direction: column;
+
+          label {
+            font-size: 0.875rem;
+            font-weight: 300;
+            color: $text-darker;
+            margin-bottom: 0.5rem;
+          }
+
+          .input-container {
+            position: relative;
+
+            input {
+              width: 100%;
+              background-color: $input-bg;
+              border: 1px solid $input-border;
+              border-radius: 0.5rem;
+              padding: 0.875rem 1rem;
+              color: $text-light;
+              font-weight: 300;
+              transition: all 0.2s;
+              font-family: inherit;
+
+              &::placeholder { color: $text-darker; }
+              &:focus {
+                outline: none;
+                border-color: $primary;
+                box-shadow: 0 0 0 2px rgba($primary, 0.2);
+              }
+            }
+
+            button {
+              position: absolute;
+              right: 1rem;
+              top: 50%;
+              transform: translateY(-50%);
+              background: none;
+              border: none;
+              color: $text-darker;
+              cursor: pointer;
+              transition: color 0.2s;
+
+              &:hover { color: $text-muted; }
+            }
+          }
+        }
+
+        .submit-btn {
+          width: 100%;
+          background-color: $primary;
+          color: white;
+          font-weight: 600;
+          border: none;
+          border-radius: 0.5rem;
+          padding: 1rem;
+          margin-top: 0.5rem;
+          cursor: pointer;
+          transition: all 0.2s;
+          box-shadow: 0 10px 15px -3px rgba($primary, 0.2);
+
+          &:hover {
+            background-color: rgba($primary, 0.9);
+          }
+        }
+      }
+
+      .footer-text {
+        margin-top: 2.5rem;
+        text-align: center;
+        color: $text-darker;
+        font-weight: 300;
+        font-size: 0.95rem;
+
+        a {
+          color: $primary;
+          font-weight: 500;
+          margin-left: 0.25rem;
+          text-decoration: none;
+          &:hover { color: rgba($primary, 0.8); }
+        }
+      }
+    }
+
+    .terms-footer {
+      margin-top: auto;
+      padding-top: 2rem;
+      text-align: center;
+
+      @media (min-width: 1024px) {
+        text-align: left;
+      }
+
+      p {
+        font-size: 10px;
+        color: $text-darker;
+        text-transform: uppercase;
+        letter-spacing: -0.05em;
+        line-height: 1.6;
+
+        a {
+          color: inherit;
+          text-decoration: underline;
+          text-decoration-color: #1e293b;
+          margin: 0 0.5rem;
+          &:hover { color: $text-muted; }
+        }
+      }
+    }
+  }
+}
+
+/* Verify Email OTP specific styles using the same file */
+.verify-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 0;
+  background-color: $panel-dark;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: $text-light;
+
+  @media (min-width: 768px) {
+    padding: 1rem;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 72rem;
+    min-height: 700px;
+    background-color: $panel-dark;
+    overflow: hidden;
+
+    @media (min-width: 1024px) {
+      flex-direction: row;
+      border-radius: 0.75rem;
+      border: 1px solid rgba($input-border, 0.5);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    
+    .left-panel-verify {
+      display: none;
+      width: 50%;
+      position: relative;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 3rem;
+      background-color: #171411;
+      overflow: hidden;
+
+      @media (min-width: 1024px) {
+        display: flex;
+      }
+
+      .bg-image {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          opacity: 0.4;
+        }
+        .overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, #171411, transparent);
+        }
+      }
+
+      .content-z {
+        position: relative;
+        z-index: 10;
+        
+        .branding-v {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 2rem;
+          .logo {
+            color: $primary;
+            width: 2rem;
+            height: 2rem;
+          }
+          .brand-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+          }
+        }
+
+        h1 {
+          font-family: 'DM Serif Display', serif;
+          font-size: 3rem;
+          font-style: italic;
+          line-height: 1.1;
+          margin-bottom: 1rem;
+        }
+
+        p {
+          color: $text-muted;
+          font-size: 1.125rem;
+          font-weight: 400;
+          max-width: 24rem;
+        }
+
+        .promo-box {
+          margin-top: 2.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+
+          .icon-box {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: rgba($primary, 0.2);
+            color: $primary;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .info {
+            background-color: rgba($primary, 0.1);
+            border: 1px solid rgba($primary, 0.2);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            backdrop-filter: blur(4px);
+
+            .title {
+              font-size: 0.875rem;
+              font-weight: 500;
+              color: $primary;
+              margin: 0;
+            }
+            .subtitle {
+              font-size: 0.75rem;
+              color: $text-darker;
+              margin: 0;
+            }
+          }
+        }
+      }
+    }
+
+    .right-panel-verify {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+
+      @media (min-width: 1024px) {
+        width: 50%;
+        height: auto;
+        padding: 4rem;
+      }
+
+      .verify-wrapper {
+        width: 100%;
+        max-width: 28rem;
+
+        .header-v {
+          text-align: center;
+          margin-bottom: 2rem;
+          @media (min-width: 1024px) { text-align: left; }
+
+          h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2.25rem;
+            font-style: italic;
+            margin-bottom: 0.5rem;
+          }
+          p {
+            color: $text-darker;
+            font-weight: 300;
+            font-size: 1rem;
+          }
+        }
+
+        .otp-inputs {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          gap: 0.5rem;
+          margin-bottom: 2rem;
+
+          @media (min-width: 768px) {
+            gap: 1rem;
+          }
+
+          input {
+            flex: 1;
+            min-width: 0;
+            height: 3.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background-color: $input-bg;
+            border: 1px solid $input-border;
+            border-radius: 0.5rem;
+            color: $text-light;
+            transition: all 0.2s;
+
+            @media (min-width: 768px) {
+              height: 4rem;
+            }
+
+            &:focus {
+              outline: none;
+              border-color: $primary;
+              box-shadow: 0 0 0 2px rgba($primary, 0.2);
+            }
+          }
+
+          .dash {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: $text-darker;
+            font-weight: 700;
+            flex-shrink: 0;
+          }
+        }
+
+        .verify-btn {
+          width: 100%;
+          max-width: 100%;
+          background-color: $primary;
+          color: white;
+          font-weight: 600;
+          padding: 1rem;
+          border: none;
+          border-radius: 0.5rem;
+          cursor: pointer;
+          transition: all 0.2s;
+          box-shadow: 0 10px 15px -3px rgba($primary, 0.2);
+          margin: 0 auto;
+          display: flex;
+
+          &:hover {
+            background-color: rgba($primary, 0.9);
+          }
+          &:active {
+            transform: scale(0.98);
+          }
+        }
+
+        .resend {
+          text-align: center;
+          margin-top: 1rem;
+          margin-bottom: 2rem;
+          a {
+            color: $text-darker;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+
+            span {
+              color: $primary;
+              font-weight: 700;
+            }
+
+            &:hover {
+              color: $primary;
+            }
+          }
+        }
+
+        .bottom-links {
+          padding-top: 2rem;
+          border-top: 1px solid rgba($input-border, 0.5);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: none;
+            color: $text-muted;
+            font-size: 0.875rem;
+            cursor: pointer;
+            padding: 0;
+
+            .material-symbols-outlined {
+              font-size: 1.125rem;
+              transition: transform 0.2s;
+            }
+
+            &:hover {
+              color: $text-light;
+              .material-symbols-outlined {
+                transform: translateX(-4px);
+              }
+            }
+          }
+
+          .badges {
+            display: flex;
+            gap: 1rem;
+            span {
+              color: $text-darker;
+              font-size: 0.625rem;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              font-weight: 700;
+            }
+          }
+        }
+      }
+    }
+  }
+}

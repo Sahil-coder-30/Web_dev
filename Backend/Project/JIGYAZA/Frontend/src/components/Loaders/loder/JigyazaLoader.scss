@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap');
+
+// ── Variables ──────────────────────────────────────────────
+$bg: transparent; // Changed from #0A0806 so it works gracefully inside buttons and other pages
+$accent: #C8621A;
+$accent-light: #E8924A;
+$track: #1A1714;
+$core-bg: #1C1510;
+
+// ── Keyframes ──────────────────────────────────────────────
+@keyframes spin-cw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes spin-ccw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+@keyframes pulse-core {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%       { transform: scale(1.35); opacity: 0.75; }
+}
+
+@keyframes orbit1 {
+  from { transform: rotate(0deg)   translateY(-38px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateY(-38px) rotate(-360deg); }
+}
+
+@keyframes orbit2 {
+  from { transform: rotate(130deg) translateY(-38px) rotate(-130deg); }
+  to   { transform: rotate(490deg) translateY(-38px) rotate(-490deg); }
+}
+
+@keyframes orbit3 {
+  from { transform: rotate(250deg) translateY(-38px) rotate(-250deg); }
+  to   { transform: rotate(610deg) translateY(-38px) rotate(-610deg); }
+}
+
+@keyframes pulse-ring1 {
+  0%, 100% { transform: scale(0.92); opacity: 0.6; }
+  50%       { transform: scale(1.08); opacity: 0; }
+}
+
+@keyframes pulse-ring2 {
+  0%, 100% { transform: scale(0.92); opacity: 0.4; }
+  50%       { transform: scale(1.18); opacity: 0; }
+}
+
+@keyframes arc-spin {
+  from { transform: rotate(-90deg); }
+  to   { transform: rotate(270deg); }
+}
+
+@keyframes arc-spin2 {
+  from { transform: rotate(90deg); }
+  to   { transform: rotate(450deg); }
+}
+
+@keyframes tick-fade {
+  0%, 100% { opacity: 0.15; }
+  50%       { opacity: 0.8; }
+}
+
+// ── Reduced Motion ─────────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+// ── Page Wrapper ───────────────────────────────────────────
+.jigyaza-page {
+  background: $bg;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+// ── SVG Element Animations ─────────────────────────────────
+.jigyaza-loader {
+
+  // Pulse rings
+  .pulse-ring-1 {
+    transform-origin: center;
+    transform-box: view-box;
+    animation: pulse-ring1 2.8s ease-out infinite;
+  }
+
+  .pulse-ring-2 {
+    transform-origin: center;
+    transform-box: view-box;
+    animation: pulse-ring2 2.8s ease-out infinite 0.7s;
+  }
+
+  // Outer arcs
+  .arc-outer-cw {
+    transform-origin: center;
+    transform-box: view-box;
+    animation: spin-cw 4s linear infinite;
+  }
+
+  .arc-outer-ccw {
+    transform-origin: center;
+    transform-box: view-box;
+    animation: spin-ccw 6s linear infinite;
+  }
+
+  // Middle dashed ring
+  .ring-middle-dashed {
+    transform-origin: center;
+    transform-box: view-box;
+    animation: spin-ccw 5s linear infinite;
+  }
+
+  // Compass ticks
+  .tick-top    { transform-origin: center; transform-box: view-box; animation: tick-fade 2s ease-in-out infinite 0s; }
+  .tick-right  { transform-origin: center; transform-box: view-box; animation: tick-fade 2s ease-in-out infinite 0.5s; }
+  .tick-bottom { transform-origin: center; transform-box: view-box; animation: tick-fade 2s ease-in-out infinite 1s; }
+  .tick-left   { transform-origin: center; transform-box: view-box; animation: tick-fade 2s ease-in-out infinite 1.5s; }
+
+  // Inner arcs
+  .arc-inner-fast {
+    transform-origin: center;
+    transform-box: view-box;
+    animation: arc-spin 1.8s linear infinite;
+  }
+
+  .arc-inner-slow {
+    transform-origin: center;
+    transform-box: view-box;
+    animation: arc-spin2 3s linear infinite;
+  }
+
+  // Orbiting dots
+  .orbit-dot-1 {
+    transform-origin: center;
+    transform-box: view-box;
+    animation: orbit1 3.2s linear infinite;
+  }
+
+  .orbit-dot-2 {
+    transform-origin: center;
+    transform-box: view-box;
+    animation: orbit2 3.2s linear infinite;
+  }
+
+  .orbit-dot-3 {
+    transform-origin: center;
+    transform-box: view-box;
+    animation: orbit3 3.2s linear infinite;
+  }
+
+  // Core pulse
+  .core-pulse {
+    transform-origin: center;
+    transform-box: view-box;
+    animation: pulse-core 1.6s ease-in-out infinite;
+  }
+}

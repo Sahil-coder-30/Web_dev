@@ -1,0 +1,115 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+
+@keyframes spin-cw{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes spin-ccw{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+@keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes pulse-core{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.35);opacity:0.75}}
+@keyframes orbit1{from{transform:rotate(0deg) translateY(-38px) rotate(0deg)}to{transform:rotate(360deg) translateY(-38px) rotate(-360deg)}}
+@keyframes orbit2{from{transform:rotate(130deg) translateY(-38px) rotate(-130deg)}to{transform:rotate(490deg) translateY(-38px) rotate(-490deg)}}
+@keyframes orbit3{from{transform:rotate(250deg) translateY(-38px) rotate(-250deg)}to{transform:rotate(610deg) translateY(-38px) rotate(-610deg)}}
+@keyframes pulse-ring1{0%,100%{transform:scale(0.92);opacity:0.6}50%{transform:scale(1.08);opacity:0}}
+@keyframes pulse-ring2{0%,100%{transform:scale(0.92);opacity:0.4}50%{transform:scale(1.18);opacity:0}}
+@keyframes arc-spin{from{transform:rotate(-90deg)}to{transform:rotate(270deg)}}
+@keyframes arc-spin2{from{transform:rotate(90deg)}to{transform:rotate(450deg)}}
+@keyframes tick-fade{0%,100%{opacity:0.15}50%{opacity:0.8}}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;}
+}
+
+.page{background:#0A0806;min-height:500px;display:flex;align-items:center;justify-content:center;border-radius:16px;}
+</style>
+
+<div class="page">
+  <svg width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- ── PULSE RINGS (expand outward from core) ── -->
+    <circle cx="110" cy="110" r="90" fill="none" stroke="#C8621A" stroke-width="1"
+      style="transform-origin:110px 110px;animation:pulse-ring1 2.8s ease-out infinite;"/>
+    <circle cx="110" cy="110" r="90" fill="none" stroke="#C8621A" stroke-width="0.6"
+      style="transform-origin:110px 110px;animation:pulse-ring2 2.8s ease-out infinite 0.7s;"/>
+
+    <!-- ── OUTERMOST STATIC TRACK ── -->
+    <circle cx="110" cy="110" r="90" stroke="#1A1714" stroke-width="1" fill="none"/>
+
+    <!-- ── OUTER SPINNING ARC — long, slow ── -->
+    <g style="transform-origin:110px 110px;animation:spin-cw 4s linear infinite;">
+      <path d="
+        M110 20
+        A90 90 0 0 1 191.5 155
+      " stroke="#C8621A" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+
+    <!-- ── OUTER SPINNING ARC 2 — short, opposite ── -->
+    <g style="transform-origin:110px 110px;animation:spin-ccw 6s linear infinite;">
+      <path d="
+        M110 200
+        A90 90 0 0 1 28.5 65
+      " stroke="#C8621A" stroke-width="1" fill="none" stroke-linecap="round" stroke-opacity="0.35"/>
+    </g>
+
+    <!-- ── MIDDLE TRACK ── -->
+    <circle cx="110" cy="110" r="62" stroke="#1A1714" stroke-width="1" fill="none"/>
+
+    <!-- ── MIDDLE DASHED RING — counter spin ── -->
+    <g style="transform-origin:110px 110px;animation:spin-ccw 5s linear infinite;">
+      <circle cx="110" cy="110" r="62" stroke="#C8621A" stroke-width="1.2" fill="none"
+        stroke-dasharray="5 8" stroke-opacity="0.4"/>
+    </g>
+
+    <!-- ── COMPASS TICK MARKS — on middle ring ── -->
+    <!-- top -->
+    <line x1="110" y1="46" x2="110" y2="54"
+      stroke="#C8621A" stroke-width="2" stroke-linecap="round"
+      style="transform-origin:110px 110px;animation:tick-fade 2s ease-in-out infinite 0s;"/>
+    <!-- right -->
+    <line x1="174" y1="110" x2="166" y2="110"
+      stroke="#C8621A" stroke-width="2" stroke-linecap="round"
+      style="transform-origin:110px 110px;animation:tick-fade 2s ease-in-out infinite 0.5s;"/>
+    <!-- bottom -->
+    <line x1="110" y1="174" x2="110" y2="166"
+      stroke="#C8621A" stroke-width="2" stroke-linecap="round"
+      style="transform-origin:110px 110px;animation:tick-fade 2s ease-in-out infinite 1s;"/>
+    <!-- left -->
+    <line x1="46" y1="110" x2="54" y2="110"
+      stroke="#C8621A" stroke-width="2" stroke-linecap="round"
+      style="transform-origin:110px 110px;animation:tick-fade 2s ease-in-out infinite 1.5s;"/>
+
+    <!-- ── INNER TRACK ── -->
+    <circle cx="110" cy="110" r="34" stroke="#1A1714" stroke-width="1" fill="none"/>
+
+    <!-- ── INNER ARC — fast spin ── -->
+    <g style="transform-origin:110px 110px;animation:arc-spin 1.8s linear infinite;">
+      <path d="M110 76 A34 34 0 0 1 144 110"
+        stroke="#C8621A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </g>
+
+    <!-- ── INNER ARC 2 — opposite slow ── -->
+    <g style="transform-origin:110px 110px;animation:arc-spin2 3s linear infinite;">
+      <path d="M110 144 A34 34 0 0 1 76 110"
+        stroke="#C8621A" stroke-width="1" fill="none" stroke-linecap="round" stroke-opacity="0.4"/>
+    </g>
+
+    <!-- ── 3 ORBITING DOTS on outer ring ── -->
+    <g style="transform-origin:110px 110px;animation:orbit1 3.2s linear infinite;">
+      <circle cx="110" cy="110" r="5.5" fill="#C8621A"/>
+    </g>
+    <g style="transform-origin:110px 110px;animation:orbit2 3.2s linear infinite;">
+      <circle cx="110" cy="110" r="3.8" fill="#C8621A" fill-opacity="0.65"/>
+    </g>
+    <g style="transform-origin:110px 110px;animation:orbit3 3.2s linear infinite;">
+      <circle cx="110" cy="110" r="2.5" fill="#C8621A" fill-opacity="0.35"/>
+    </g>
+
+    <!-- ── CORE DOT ── -->
+    <circle cx="110" cy="110" r="10" fill="#1C1510"/>
+    <circle cx="110" cy="110" r="7" fill="#C8621A"
+      style="transform-origin:110px 110px;animation:pulse-core 1.6s ease-in-out infinite;"/>
+    <!-- core inner highlight -->
+    <circle cx="108" cy="108" r="2.5" fill="#E8924A" opacity="0.6"/>
+
+  </svg>
+</div>

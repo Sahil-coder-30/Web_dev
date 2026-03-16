@@ -2,6 +2,7 @@ import userModel from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../services/mail.service.js";
+import redis from "../config/cache.js";
 
 export const registerController = async (req, res) => {
   const { username, email, password } = req.body;
@@ -188,9 +189,9 @@ export const loginController = async (req, res) => {
   });
 };
 
-export const logoutController = (req, res) => {
+export const logoutController = async (req, res) => {
   const token = req.cookies.token;
-  
+
   if (!token) {
     return res.status(400).json({ message: "No token found in cookies." });
   }
@@ -200,5 +201,50 @@ export const logoutController = (req, res) => {
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
   });
+
+  try {
+    console.log(
+      "🔍 LOGOUT: Attempting to blacklist token:",
+      token.substring(0, 20) + "...",
+    );
+    console.log("LOGOUT: Redis client status:", redis.status);
+    await redis.set(token, Date.now().toString(), "EX", 7 * 24 * 60 * 60); // Blacklist token for 7 days
+    console.log("LOGOUT: Token stored in Redis successfully");
+    const verify = await redis.get(token);
+    console.log(
+      "LOGOUT: Verification - token retrieved:",
+      verify ? "YES" : "NO",
+    );
+  } catch (error) {
+    console.error("❌ Redis connection details:", {
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+      status: redis.status,
+    });
+    // Continue with logout even if Redis fails
+  }
+
   return res.status(200).json({ message: "Logout successful!" });
 };
+
+export const getProfileController = async (req, res) => {
+  const userId = req.user.id; // This will be set by the identifyUser middleware
+
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized access." });
+  }
+
+  const user = await userModel.findById(userId).select("-password");
+  console.log(user);
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found." });
+  }
+
+  return res.status(200).json({
+    message: "User profile retrieved successfully!",
+    user,
+  });
+};
+
+

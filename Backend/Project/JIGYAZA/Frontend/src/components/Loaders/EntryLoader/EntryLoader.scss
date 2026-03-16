@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap');
+
+// ── Variables ──────────────────────────────────────────────
+$bg:          #0A0806;
+$accent:      #C8621A;
+$accent-light:#E8924A;
+$track:       #1A1714;
+$core-bg:     #1C1510;
+
+// ── Keyframes ──────────────────────────────────────────────
+@keyframes spin-cw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes spin-ccw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+@keyframes pulse-core {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%       { transform: scale(1.35); opacity: 0.75; }
+}
+
+@keyframes orbit1 {
+  from { transform: rotate(0deg)   translateY(-90px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateY(-90px) rotate(-360deg); }
+}
+
+@keyframes orbit2 {
+  from { transform: rotate(130deg) translateY(-90px) rotate(-130deg); }
+  to   { transform: rotate(490deg) translateY(-90px) rotate(-490deg); }
+}
+
+@keyframes orbit3 {
+  from { transform: rotate(250deg) translateY(-90px) rotate(-250deg); }
+  to   { transform: rotate(610deg) translateY(-90px) rotate(-610deg); }
+}
+
+@keyframes pulse-ring1 {
+  0%, 100% { transform: scale(0.92); opacity: 0.6; }
+  50%       { transform: scale(1.08); opacity: 0; }
+}
+
+@keyframes pulse-ring2 {
+  0%, 100% { transform: scale(0.92); opacity: 0.4; }
+  50%       { transform: scale(1.18); opacity: 0; }
+}
+
+@keyframes arc-spin {
+  from { transform: rotate(-90deg); }
+  to   { transform: rotate(270deg); }
+}
+
+@keyframes arc-spin2 {
+  from { transform: rotate(90deg); }
+  to   { transform: rotate(450deg); }
+}
+
+@keyframes tick-fade {
+  0%, 100% { opacity: 0.15; }
+  50%       { opacity: 0.8; }
+}
+
+// ── Reduced Motion ─────────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+// ── Page Wrapper ───────────────────────────────────────────
+.jigyaza-page {
+  background: $bg;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+// ── Loader ─────────────────────────────────────────────────
+// All CSS loop animations are gated behind `.is-active`
+// GSAP adds this class to each layer group after its entry tween completes.
+// This prevents the spin/pulse from fighting GSAP's scale during entry.
+
+.jigyaza-loader {
+
+  // ── LAYER 1 · Pulse rings ──────────────────────────────
+  .layer-pulse-rings {
+
+    &.is-active {
+      .pulse-ring-1 {
+        transform-origin: center;
+        transform-box: view-box;
+        animation: pulse-ring1 2.8s ease-out infinite;
+      }
+      .pulse-ring-2 {
+        transform-origin: center;
+        transform-box: view-box;
+        animation: pulse-ring2 2.8s ease-out infinite 0.7s;
+      }
+    }
+  }
+
+  // ── LAYER 2 · Outer arcs ───────────────────────────────
+  .layer-outer-arcs {
+
+    &.is-active {
+      .arc-outer-cw {
+        transform-origin: center;
+        transform-box: view-box;
+        animation: spin-cw 4s linear infinite;
+      }
+      .arc-outer-ccw {
+        transform-origin: center;
+        transform-box: view-box;
+        animation: spin-ccw 6s linear infinite;
+      }
+    }
+  }
+
+  // ── LAYER 3 · Middle ring + ticks ─────────────────────
+  .layer-middle {
+
+    &.is-active {
+      .ring-middle-dashed {
+        transform-origin: center;
+        transform-box: view-box;
+        animation: spin-ccw 5s linear infinite;
+      }
+      .tick-top    { transform-origin: center; transform-box: view-box; animation: tick-fade 2s ease-in-out infinite 0s; }
+      .tick-right  { transform-origin: center; transform-box: view-box; animation: tick-fade 2s ease-in-out infinite 0.5s; }
+      .tick-bottom { transform-origin: center; transform-box: view-box; animation: tick-fade 2s ease-in-out infinite 1s; }
+      .tick-left   { transform-origin: center; transform-box: view-box; animation: tick-fade 2s ease-in-out infinite 1.5s; }
+    }
+  }
+
+  // ── LAYER 4 · Inner arcs ───────────────────────────────
+  .layer-inner-arcs {
+
+    &.is-active {
+      .arc-inner-fast {
+        transform-origin: center;
+        transform-box: view-box;
+        animation: arc-spin 1.8s linear infinite;
+      }
+      .arc-inner-slow {
+        transform-origin: center;
+        transform-box: view-box;
+        animation: arc-spin2 3s linear infinite;
+      }
+    }
+  }
+
+  // ── LAYER 5 · Orbit dots + core ───────────────────────
+  .layer-orbit-core {
+
+    &.is-active {
+      .orbit-dot-1 {
+        transform-origin: center;
+        transform-box: view-box;
+        animation: orbit1 3.2s linear infinite;
+      }
+      .orbit-dot-2 {
+        transform-origin: center;
+        transform-box: view-box;
+        animation: orbit2 3.2s linear infinite;
+      }
+      .orbit-dot-3 {
+        transform-origin: center;
+        transform-box: view-box;
+        animation: orbit3 3.2s linear infinite;
+      }
+      .core-pulse {
+        transform-origin: center;
+        transform-box: view-box;
+        animation: pulse-core 1.6s ease-in-out infinite;
+      }
+    }
+  }
+}
+
+// ── Text Formatting ────────────────────────────────────────
+.entry-text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .entry-welcome-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.95rem;  // Much smaller, refined font size
+    font-weight: 500;
+    letter-spacing: 0.35em; // Wide tracking for premium tech aesthetic
+    text-transform: uppercase;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    
+    // Shiny Metallic Silver/White
+    .word-welcome {
+      display: inline-block;
+      background: linear-gradient(180deg, #FFFFFF 0%, #D8D2C9 35%, #8B8278 50%, #CFC8BC 55%, #FFFFFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0px 1px 2px rgba(0,0,0,0.5));
+    }
+    
+    // Shiny Metallic Copper/Orange
+    .word-designation {
+      display: inline-block;
+      background: linear-gradient(180deg, #FFA96A 0%, #E8924A 35%, #823809 50%, #D56C1F 55%, #FFA96A 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0px 1px 2px rgba(0,0,0,0.5));
+      font-style: italic;
+    }
+  }
+}
