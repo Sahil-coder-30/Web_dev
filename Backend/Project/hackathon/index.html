@@ -3,43 +3,52 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Project Chaitanya — Architecture</title>
+    <title>Project CHAITANYA — Architecture</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <style>
-      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
       :root {
         --bg: #0a0a0a;
         --red: #c42b2b;
-        --red-glow: rgba(196,43,43,0.4);
+        --red-glow: rgba(196, 43, 43, 0.4);
         --teal: #1a8a63;
-        --teal-glow: rgba(26,138,99,0.4);
+        --teal-glow: rgba(26, 138, 99, 0.4);
         --blue: #2e5fbf;
         --purple: #6b4ec4;
         --amber: #b87014;
         --green: #2e7a28;
       }
 
-      html, body {
+      html,
+      body {
         background: var(--bg);
         min-height: 100vh;
         width: 100%;
         overflow: hidden;
-        font-family: 'Space Grotesk', sans-serif;
+        font-family: "Space Grotesk", sans-serif;
         color: #fff;
       }
 
       /* ── TOOLBAR ── */
       #toolbar {
         position: fixed;
-        top: 0; left: 0; right: 0;
+        top: 0;
+        left: 0;
+        right: 0;
         height: 52px;
-        background: rgba(10,10,10,0.96);
-        border-bottom: 1px solid rgba(196,43,43,0.35);
+        background: rgba(10, 10, 10, 0.96);
+        border-bottom: 1px solid rgba(196, 43, 43, 0.35);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -49,14 +58,16 @@
       }
 
       .toolbar-title {
-        font-family: 'Space Mono', monospace;
+        font-family: "Space Mono", monospace;
         font-size: clamp(9px, 1.5vw, 13px);
         letter-spacing: 3px;
         color: #fff;
         text-transform: uppercase;
         white-space: nowrap;
       }
-      .toolbar-title span { color: var(--red); }
+      .toolbar-title span {
+        color: var(--red);
+      }
 
       .toolbar-controls {
         display: flex;
@@ -65,33 +76,36 @@
       }
 
       .ctrl-btn {
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.12);
-        color: rgba(255,255,255,0.7);
-        font-family: 'Space Mono', monospace;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.7);
+        font-family: "Space Mono", monospace;
         font-size: 11px;
         padding: 5px 11px;
         border-radius: 4px;
         cursor: pointer;
-        transition: background 0.15s, border-color 0.15s, color 0.15s;
+        transition:
+          background 0.15s,
+          border-color 0.15s,
+          color 0.15s;
         letter-spacing: 1px;
         user-select: none;
       }
       .ctrl-btn:hover {
-        background: rgba(196,43,43,0.18);
+        background: rgba(196, 43, 43, 0.18);
         border-color: var(--red);
         color: #fff;
       }
       .ctrl-btn.active {
-        background: rgba(196,43,43,0.25);
+        background: rgba(196, 43, 43, 0.25);
         border-color: var(--red);
         color: #fff;
       }
 
       #zoom-label {
-        font-family: 'Space Mono', monospace;
+        font-family: "Space Mono", monospace;
         font-size: 10px;
-        color: rgba(255,255,255,0.35);
+        color: rgba(255, 255, 255, 0.35);
         width: 38px;
         text-align: center;
         letter-spacing: 1px;
@@ -100,11 +114,16 @@
       /* ── SVG STAGE ── */
       #stage {
         position: fixed;
-        top: 52px; left: 0; right: 0; bottom: 0;
+        top: 52px;
+        left: 0;
+        right: 0;
+        bottom: 0;
         overflow: hidden;
         cursor: grab;
       }
-      #stage.panning { cursor: grabbing; }
+      #stage.panning {
+        cursor: grabbing;
+      }
 
       #root-svg {
         width: 100%;
@@ -113,7 +132,9 @@
       }
 
       /* ── NODE HOVER / ACTIVE ── */
-      .node-group { cursor: pointer; }
+      .node-group {
+        cursor: pointer;
+      }
 
       .node-rect {
         transition: filter 0.2s;
@@ -122,20 +143,32 @@
       .node-group.active .node-rect {
         filter: brightness(1.5) drop-shadow(0 0 8px currentColor);
       }
-      .node-group.dimmed .node-rect { opacity: 0.2; }
-      .node-group.dimmed text { opacity: 0.2; }
+      .node-group.dimmed .node-rect {
+        opacity: 0.2;
+      }
+      .node-group.dimmed text {
+        opacity: 0.2;
+      }
 
       /* ── FLOW ANIMATION ── */
       @keyframes dash-flow {
-        to { stroke-dashoffset: -24; }
+        to {
+          stroke-dashoffset: -24;
+        }
       }
       .flow-line {
         stroke-dasharray: 8 6;
         animation: dash-flow 1.6s linear infinite;
       }
-      .flow-line-red { stroke: var(--red); }
-      .flow-line-teal { stroke: var(--teal); }
-      .flow-line-white { stroke: rgba(255,255,255,0.3); }
+      .flow-line-red {
+        stroke: var(--red);
+      }
+      .flow-line-teal {
+        stroke: var(--teal);
+      }
+      .flow-line-white {
+        stroke: rgba(255, 255, 255, 0.3);
+      }
 
       /* ── DETAIL PANEL ── */
       #detail-panel {
@@ -143,33 +176,41 @@
         bottom: 18px;
         right: 18px;
         width: min(340px, calc(100vw - 36px));
-        background: rgba(10,10,10,0.97);
-        border: 1px solid rgba(196,43,43,0.5);
+        background: rgba(10, 10, 10, 0.97);
+        border: 1px solid rgba(196, 43, 43, 0.5);
         border-radius: 10px;
         padding: 18px 20px;
         z-index: 200;
         transform: translateY(calc(100% + 18px));
-        transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         backdrop-filter: blur(12px);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(196,43,43,0.15);
+        box-shadow:
+          0 8px 32px rgba(0, 0, 0, 0.6),
+          0 0 0 1px rgba(196, 43, 43, 0.15);
       }
-      #detail-panel.visible { transform: translateY(0); }
+      #detail-panel.visible {
+        transform: translateY(0);
+      }
 
       #panel-close {
         position: absolute;
-        top: 12px; right: 14px;
-        background: none; border: none;
-        color: rgba(255,255,255,0.35);
+        top: 12px;
+        right: 14px;
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.35);
         font-size: 18px;
         cursor: pointer;
         line-height: 1;
         padding: 2px 6px;
         transition: color 0.15s;
       }
-      #panel-close:hover { color: var(--red); }
+      #panel-close:hover {
+        color: var(--red);
+      }
 
       #panel-tag {
-        font-family: 'Space Mono', monospace;
+        font-family: "Space Mono", monospace;
         font-size: 9px;
         letter-spacing: 2px;
         text-transform: uppercase;
@@ -180,7 +221,7 @@
       }
 
       #panel-title {
-        font-family: 'Space Grotesk', sans-serif;
+        font-family: "Space Grotesk", sans-serif;
         font-size: 16px;
         font-weight: 700;
         margin-bottom: 6px;
@@ -190,7 +231,7 @@
       #panel-desc {
         font-size: 12.5px;
         line-height: 1.65;
-        color: rgba(255,255,255,0.55);
+        color: rgba(255, 255, 255, 0.55);
         margin-bottom: 12px;
       }
 
@@ -201,7 +242,7 @@
         margin-bottom: 4px;
       }
       .chip {
-        font-family: 'Space Mono', monospace;
+        font-family: "Space Mono", monospace;
         font-size: 9.5px;
         padding: 3px 8px;
         border-radius: 3px;
@@ -212,10 +253,12 @@
       /* ── LEGEND BAR ── */
       #legend-bar {
         position: fixed;
-        bottom: 0; left: 0; right: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
         height: 36px;
-        background: rgba(10,10,10,0.92);
-        border-top: 1px solid rgba(255,255,255,0.06);
+        background: rgba(10, 10, 10, 0.92);
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
         display: flex;
         align-items: center;
         padding: 0 18px;
@@ -225,7 +268,9 @@
         scrollbar-width: none;
         backdrop-filter: blur(6px);
       }
-      #legend-bar::-webkit-scrollbar { display: none; }
+      #legend-bar::-webkit-scrollbar {
+        display: none;
+      }
 
       .leg-item {
         display: flex;
@@ -235,58 +280,71 @@
         flex-shrink: 0;
       }
       .leg-swatch {
-        width: 9px; height: 9px;
+        width: 9px;
+        height: 9px;
         border-radius: 2px;
         border-width: 1.5px;
         border-style: solid;
         flex-shrink: 0;
       }
       .leg-line {
-        width: 22px; height: 2px;
+        width: 22px;
+        height: 2px;
         flex-shrink: 0;
         border-radius: 1px;
       }
       .leg-line-dash {
-        width: 22px; height: 0;
+        width: 22px;
+        height: 0;
         flex-shrink: 0;
         border-top: 2px dashed;
-        border-color: rgba(255,255,255,0.2);
+        border-color: rgba(255, 255, 255, 0.2);
       }
       .leg-txt {
-        font-family: 'Space Mono', monospace;
+        font-family: "Space Mono", monospace;
         font-size: clamp(7px, 1.1vw, 8.5px);
-        color: rgba(255,255,255,0.38);
+        color: rgba(255, 255, 255, 0.38);
         letter-spacing: 0.4px;
       }
 
       /* ── MINI MAP ── */
       #minimap {
         position: fixed;
-        bottom: 46px; left: 18px;
-        width: 140px; height: 70px;
-        background: rgba(15,15,15,0.9);
-        border: 1px solid rgba(255,255,255,0.08);
+        bottom: 46px;
+        left: 18px;
+        width: 140px;
+        height: 70px;
+        background: rgba(15, 15, 15, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 6px;
         z-index: 95;
         overflow: hidden;
         display: none;
       }
-      @media (min-width: 900px) { #minimap { display: block; } }
-      #minimap-svg { width: 100%; height: 100%; }
+      @media (min-width: 900px) {
+        #minimap {
+          display: block;
+        }
+      }
+      #minimap-svg {
+        width: 100%;
+        height: 100%;
+      }
       #minimap-viewport {
-        fill: rgba(196,43,43,0.08);
-        stroke: rgba(196,43,43,0.5);
+        fill: rgba(196, 43, 43, 0.08);
+        stroke: rgba(196, 43, 43, 0.5);
         stroke-width: 0.8;
       }
 
       /* ── TOAST ── */
       #toast {
         position: fixed;
-        top: 62px; left: 50%;
+        top: 62px;
+        left: 50%;
         transform: translateX(-50%) translateY(-80px);
-        background: rgba(196,43,43,0.9);
+        background: rgba(196, 43, 43, 0.9);
         color: #fff;
-        font-family: 'Space Mono', monospace;
+        font-family: "Space Mono", monospace;
         font-size: 10px;
         letter-spacing: 1.5px;
         padding: 6px 14px;
@@ -295,18 +353,28 @@
         transition: transform 0.3s ease;
         pointer-events: none;
       }
-      #toast.show { transform: translateX(-50%) translateY(0); }
+      #toast.show {
+        transform: translateX(-50%) translateY(0);
+      }
 
       /* ── ANIMATION for flow pulses ── */
       @keyframes pulse-dot {
-        0%   { r: 3; opacity: 0.9; }
-        70%  { r: 7; opacity: 0.2; }
-        100% { r: 3; opacity: 0; }
+        0% {
+          r: 3;
+          opacity: 0.9;
+        }
+        70% {
+          r: 7;
+          opacity: 0.2;
+        }
+        100% {
+          r: 3;
+          opacity: 0;
+        }
       }
     </style>
   </head>
   <body>
-
     <!-- TOOLBAR -->
     <div id="toolbar">
       <div class="toolbar-title">
@@ -317,57 +385,163 @@
         <button class="ctrl-btn" id="btn-zoom-out">−</button>
         <span id="zoom-label">100%</span>
         <button class="ctrl-btn" id="btn-zoom-in">+</button>
-        <button class="ctrl-btn" id="btn-flow" title="Toggle flow animation">FLOW ●</button>
+        <button class="ctrl-btn" id="btn-flow" title="Toggle flow animation">
+          FLOW ●
+        </button>
         <button class="ctrl-btn" id="btn-reset-highlight">RESET</button>
       </div>
     </div>
 
     <!-- MAIN STAGE -->
     <div id="stage">
-      <svg id="root-svg" viewBox="0 0 1280 642" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <svg
+        id="root-svg"
+        viewBox="0 0 1280 642"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="xMidYMid meet"
+      >
         <defs>
           <!-- Arrow markers -->
-          <marker id="aw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-            <path d="M2 2L8 5L2 8" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/>
+          <marker
+            id="aw"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="5"
+            markerHeight="5"
+            orient="auto-start-reverse"
+          >
+            <path
+              d="M2 2L8 5L2 8"
+              fill="none"
+              stroke="rgba(255,255,255,0.3)"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
           </marker>
-          <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-            <path d="M2 2L8 5L2 8" fill="none" stroke="#c42b2b" stroke-width="1.5" stroke-linecap="round"/>
+          <marker
+            id="ar"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="5"
+            markerHeight="5"
+            orient="auto-start-reverse"
+          >
+            <path
+              d="M2 2L8 5L2 8"
+              fill="none"
+              stroke="#c42b2b"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
           </marker>
-          <marker id="at" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-            <path d="M2 2L8 5L2 8" fill="none" stroke="#1a8a63" stroke-width="1.5" stroke-linecap="round"/>
+          <marker
+            id="at"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="5"
+            markerHeight="5"
+            orient="auto-start-reverse"
+          >
+            <path
+              d="M2 2L8 5L2 8"
+              fill="none"
+              stroke="#1a8a63"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
           </marker>
           <!-- Glow filter -->
           <filter id="glow-red" x="-40%" y="-40%" width="180%" height="180%">
-            <feGaussianBlur stdDeviation="3" result="blur"/>
-            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
           </filter>
           <filter id="glow-teal" x="-40%" y="-40%" width="180%" height="180%">
-            <feGaussianBlur stdDeviation="3" result="blur"/>
-            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
           </filter>
         </defs>
 
         <!-- ── BACKGROUND TEXTURE ── -->
-        <pattern id="dot-pat" x="0" y="0" width="14" height="14" patternUnits="userSpaceOnUse">
-          <circle cx="7" cy="7" r="0.7" fill="rgba(180,40,20,0.18)"/>
+        <pattern
+          id="dot-pat"
+          x="0"
+          y="0"
+          width="14"
+          height="14"
+          patternUnits="userSpaceOnUse"
+        >
+          <circle cx="7" cy="7" r="0.7" fill="rgba(180,40,20,0.18)" />
         </pattern>
-        <rect x="0" y="0" width="320" height="642" fill="url(#dot-pat)"/>
+        <rect x="0" y="0" width="320" height="642" fill="url(#dot-pat)" />
 
         <!-- Dark red bg circle -->
         <radialGradient id="bg-circ-grad" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#2e0a0a"/>
-          <stop offset="60%" stop-color="#150404"/>
-          <stop offset="100%" stop-color="transparent"/>
+          <stop offset="0%" stop-color="#2e0a0a" />
+          <stop offset="60%" stop-color="#150404" />
+          <stop offset="100%" stop-color="transparent" />
         </radialGradient>
-        <ellipse cx="1160" cy="580" rx="230" ry="180" fill="url(#bg-circ-grad)" opacity="0.8"/>
+        <ellipse
+          cx="1160"
+          cy="580"
+          rx="230"
+          ry="180"
+          fill="url(#bg-circ-grad)"
+          opacity="0.8"
+        />
 
         <!-- Red top line -->
-        <line x1="0" y1="71" x2="1280" y2="71" stroke="#c42b2b" stroke-width="1.5"/>
+        <line
+          x1="0"
+          y1="71"
+          x2="1280"
+          y2="71"
+          stroke="#c42b2b"
+          stroke-width="1.5"
+        />
 
         <!-- ── ZONE LABELS ── -->
-        <text font-family="'Space Mono',monospace" fill="rgba(255,255,255,0.28)" font-size="8.5" letter-spacing="1.5" x="640" y="28" text-anchor="middle">CLIENT LAYER</text>
-        <text font-family="'Space Mono',monospace" fill="rgba(255,255,255,0.28)" font-size="8.5" letter-spacing="1.5" x="640" y="178" text-anchor="middle">BACKEND LAYER</text>
-        <text font-family="'Space Mono',monospace" fill="rgba(255,255,255,0.28)" font-size="8.5" letter-spacing="1.5" x="640" y="425" text-anchor="middle">DATA + INGESTION LAYER</text>
+        <text
+          font-family="'Space Mono',monospace"
+          fill="rgba(255,255,255,0.28)"
+          font-size="8.5"
+          letter-spacing="1.5"
+          x="640"
+          y="28"
+          text-anchor="middle"
+        >
+          CLIENT LAYER
+        </text>
+        <text
+          font-family="'Space Mono',monospace"
+          fill="rgba(255,255,255,0.28)"
+          font-size="8.5"
+          letter-spacing="1.5"
+          x="640"
+          y="178"
+          text-anchor="middle"
+        >
+          BACKEND LAYER
+        </text>
+        <text
+          font-family="'Space Mono',monospace"
+          fill="rgba(255,255,255,0.28)"
+          font-size="8.5"
+          letter-spacing="1.5"
+          x="640"
+          y="425"
+          text-anchor="middle"
+        >
+          DATA + INGESTION LAYER
+        </text>
 
         <!-- ═══════════════════════════════════
              TIER 1: CLIENT
@@ -375,39 +549,208 @@
 
         <!-- Google OAuth2 -->
         <g class="node-group" id="node-oauth" data-id="oauth">
-          <rect class="node-rect" x="48" y="36" width="178" height="58" rx="7" fill="#140606" stroke="#c42b2b" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="137" y="57" text-anchor="middle" dominant-baseline="central">Google OAuth2</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="137" y="75" text-anchor="middle" dominant-baseline="central">Authentication</text>
+          <rect
+            class="node-rect"
+            x="48"
+            y="36"
+            width="178"
+            height="58"
+            rx="7"
+            fill="#140606"
+            stroke="#c42b2b"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="137"
+            y="57"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Google OAuth2
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="137"
+            y="75"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Authentication
+          </text>
         </g>
 
         <!-- React + Vite + Redux -->
         <g class="node-group" id="node-react" data-id="react">
-          <rect class="node-rect" x="268" y="36" width="240" height="58" rx="7" fill="#050b1c" stroke="#2e5fbf" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="388" y="57" text-anchor="middle" dominant-baseline="central">React + Vite + Redux</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="388" y="75" text-anchor="middle" dominant-baseline="central">UI · global state · real-time hooks</text>
+          <rect
+            class="node-rect"
+            x="268"
+            y="36"
+            width="240"
+            height="58"
+            rx="7"
+            fill="#050b1c"
+            stroke="#2e5fbf"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="388"
+            y="57"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            React + Vite + Redux
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="388"
+            y="75"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            UI · global state · real-time hooks
+          </text>
         </g>
 
         <!-- Socket.io Client -->
         <g class="node-group" id="node-socket-client" data-id="socket-client">
-          <rect class="node-rect" x="560" y="36" width="220" height="58" rx="7" fill="#04130e" stroke="#1a8a63" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="670" y="57" text-anchor="middle" dominant-baseline="central">Socket.io client</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="670" y="75" text-anchor="middle" dominant-baseline="central">Persistent WS · low latency</text>
+          <rect
+            class="node-rect"
+            x="560"
+            y="36"
+            width="220"
+            height="58"
+            rx="7"
+            fill="#04130e"
+            stroke="#1a8a63"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="670"
+            y="57"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Socket.io client
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="670"
+            y="75"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Persistent WS · low latency
+          </text>
         </g>
 
         <!-- User Browser -->
         <g class="node-group" id="node-browser" data-id="browser">
-          <rect class="node-rect" x="836" y="36" width="200" height="58" rx="7" fill="#111" stroke="#444" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="936" y="57" text-anchor="middle" dominant-baseline="central">User Browser</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="936" y="75" text-anchor="middle" dominant-baseline="central">Corrected stream · green highlight</text>
+          <rect
+            class="node-rect"
+            x="836"
+            y="36"
+            width="200"
+            height="58"
+            rx="7"
+            fill="#111"
+            stroke="#444"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="936"
+            y="57"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            User Browser
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="936"
+            y="75"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Corrected stream · green highlight
+          </text>
         </g>
 
         <!-- ── Tier 1 → 2 connections ── -->
-        <line x1="137" y1="94" x2="137" y2="186" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" marker-end="url(#aw)"/>
-        <line x1="388" y1="94" x2="388" y2="186" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" marker-end="url(#aw)" marker-start="url(#aw)"/>
-        <line x1="670" y1="94" x2="670" y2="186" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" marker-end="url(#aw)" marker-start="url(#aw)"/>
+        <line
+          x1="137"
+          y1="94"
+          x2="137"
+          y2="186"
+          stroke="rgba(255,255,255,0.25)"
+          stroke-width="1.2"
+          marker-end="url(#aw)"
+        />
+        <line
+          x1="388"
+          y1="94"
+          x2="388"
+          y2="186"
+          stroke="rgba(255,255,255,0.25)"
+          stroke-width="1.2"
+          marker-end="url(#aw)"
+          marker-start="url(#aw)"
+        />
+        <line
+          x1="670"
+          y1="94"
+          x2="670"
+          y2="186"
+          stroke="rgba(255,255,255,0.25)"
+          stroke-width="1.2"
+          marker-end="url(#aw)"
+          marker-start="url(#aw)"
+        />
         <!-- Corrected output (animated) -->
-        <line class="flow-line flow-line-teal" id="corrected-arrow" x1="936" y1="94" x2="936" y2="186" stroke="#1a8a63" stroke-width="1.5" marker-end="url(#at)"/>
-        <text font-family="'Space Mono',monospace" fill="#1a8a63" font-size="8" x="942" y="142" dominant-baseline="central">corrected ✓</text>
+        <line
+          class="flow-line flow-line-teal"
+          id="corrected-arrow"
+          x1="936"
+          y1="94"
+          x2="936"
+          y2="186"
+          stroke="#1a8a63"
+          stroke-width="1.5"
+          marker-end="url(#at)"
+        />
+        <text
+          font-family="'Space Mono',monospace"
+          fill="#1a8a63"
+          font-size="8"
+          x="942"
+          y="142"
+          dominant-baseline="central"
+        >
+          corrected ✓
+        </text>
 
         <!-- ═══════════════════════════════════
              TIER 2: BACKEND
@@ -415,85 +758,451 @@
 
         <!-- Node.js + Express -->
         <g class="node-group" id="node-express" data-id="express">
-          <rect class="node-rect" x="48" y="186" width="242" height="60" rx="7" fill="#060f06" stroke="#2e7a28" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="169" y="207" text-anchor="middle" dominant-baseline="central">Node.js + Express.js</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="169" y="225" text-anchor="middle" dominant-baseline="central">JWT middleware · REST routing</text>
+          <rect
+            class="node-rect"
+            x="48"
+            y="186"
+            width="242"
+            height="60"
+            rx="7"
+            fill="#060f06"
+            stroke="#2e7a28"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="169"
+            y="207"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Node.js + Express.js
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="169"
+            y="225"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            JWT middleware · REST routing
+          </text>
         </g>
 
         <!-- LLM API -->
         <g class="node-group" id="node-llm" data-id="llm">
-          <rect class="node-rect" x="316" y="186" width="196" height="60" rx="7" fill="#140606" stroke="#c42b2b" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="414" y="207" text-anchor="middle" dominant-baseline="central">LLM API</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="414" y="225" text-anchor="middle" dominant-baseline="central">Claude / GPT-4o (source)</text>
+          <rect
+            class="node-rect"
+            x="316"
+            y="186"
+            width="196"
+            height="60"
+            rx="7"
+            fill="#140606"
+            stroke="#c42b2b"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="414"
+            y="207"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            LLM API
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="414"
+            y="225"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Claude / GPT-4o (source)
+          </text>
         </g>
 
         <!-- Socket.io Server -->
         <g class="node-group" id="node-socket-server" data-id="socket-server">
-          <rect class="node-rect" x="540" y="186" width="200" height="60" rx="7" fill="#04130e" stroke="#1a8a63" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="640" y="207" text-anchor="middle" dominant-baseline="central">Socket.io server</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="640" y="225" text-anchor="middle" dominant-baseline="central">Full-duplex · emit corrected stream</text>
+          <rect
+            class="node-rect"
+            x="540"
+            y="186"
+            width="200"
+            height="60"
+            rx="7"
+            fill="#04130e"
+            stroke="#1a8a63"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="640"
+            y="207"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Socket.io server
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="640"
+            y="225"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Full-duplex · emit corrected stream
+          </text>
         </g>
 
         <!-- Node → LLM -->
-        <line x1="290" y1="216" x2="316" y2="216" stroke="rgba(255,255,255,0.3)" stroke-width="1.2" marker-end="url(#aw)"/>
+        <line
+          x1="290"
+          y1="216"
+          x2="316"
+          y2="216"
+          stroke="rgba(255,255,255,0.3)"
+          stroke-width="1.2"
+          marker-end="url(#aw)"
+        />
 
         <!-- LLM → Interceptor (SSE, animated) -->
-        <path class="flow-line flow-line-red" id="sse-path" d="M 414 246 L 414 290 L 156 290 L 156 335" fill="none" stroke="#c42b2b" stroke-width="1.5" marker-end="url(#ar)"/>
-        <rect x="270" y="280" width="110" height="14" rx="3" fill="rgba(196,43,43,0.12)"/>
-        <text font-family="'Space Mono',monospace" fill="#c42b2b" font-size="8" x="325" y="287" text-anchor="middle" dominant-baseline="central">SSE token stream</text>
+        <path
+          class="flow-line flow-line-red"
+          id="sse-path"
+          d="M 414 246 L 414 290 L 156 290 L 156 335"
+          fill="none"
+          stroke="#c42b2b"
+          stroke-width="1.5"
+          marker-end="url(#ar)"
+        />
+        <rect
+          x="270"
+          y="280"
+          width="110"
+          height="14"
+          rx="3"
+          fill="rgba(196,43,43,0.12)"
+        />
+        <text
+          font-family="'Space Mono',monospace"
+          fill="#c42b2b"
+          font-size="8"
+          x="325"
+          y="287"
+          text-anchor="middle"
+          dominant-baseline="central"
+        >
+          SSE token stream
+        </text>
 
         <!-- Rewrite Agent → Socket.io (corrected, animated) -->
-        <path class="flow-line flow-line-teal" d="M 1020 362 L 1060 362 L 1060 216 L 740 216" fill="none" stroke="#1a8a63" stroke-width="1.5" marker-end="url(#at)"/>
-        <text font-family="'Space Mono',monospace" fill="#1a8a63" font-size="8" x="1065" y="290" text-anchor="start" dominant-baseline="central">corrected ✓</text>
+        <path
+          class="flow-line flow-line-teal"
+          d="M 1020 362 L 1060 362 L 1060 216 L 740 216"
+          fill="none"
+          stroke="#1a8a63"
+          stroke-width="1.5"
+          marker-end="url(#at)"
+        />
+        <text
+          font-family="'Space Mono',monospace"
+          fill="#1a8a63"
+          font-size="8"
+          x="1065"
+          y="290"
+          text-anchor="start"
+          dominant-baseline="central"
+        >
+          corrected ✓
+        </text>
 
         <!-- ═══════════════════════════════════
              LANGGRAPH PIPELINE CONTAINER
         ═══════════════════════════════════ -->
-        <rect x="32" y="316" width="1010" height="100" rx="10" fill="rgba(196,43,43,0.04)" stroke="#c42b2b" stroke-width="0.8" stroke-dasharray="7 4"/>
-        <text font-family="'Space Mono',monospace" fill="#e03030" font-size="9" font-weight="700" letter-spacing="2" x="537" y="313" text-anchor="middle">LANGGRAPH AI FIREWALL PIPELINE</text>
+        <rect
+          x="32"
+          y="316"
+          width="1010"
+          height="100"
+          rx="10"
+          fill="rgba(196,43,43,0.04)"
+          stroke="#c42b2b"
+          stroke-width="0.8"
+          stroke-dasharray="7 4"
+        />
+        <text
+          font-family="'Space Mono',monospace"
+          fill="#e03030"
+          font-size="9"
+          font-weight="700"
+          letter-spacing="2"
+          x="537"
+          y="313"
+          text-anchor="middle"
+        >
+          LANGGRAPH AI FIREWALL PIPELINE
+        </text>
 
         <!-- Stream Interceptor -->
         <g class="node-group" id="node-interceptor" data-id="interceptor">
-          <rect class="node-rect" x="48" y="330" width="196" height="72" rx="7" fill="#130c02" stroke="#b87014" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="146" y="353" text-anchor="middle" dominant-baseline="central">Stream interceptor</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="146" y="371" text-anchor="middle" dominant-baseline="central">Token-by-token analysis</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="146" y="387" text-anchor="middle" dominant-baseline="central">Claim boundary detection</text>
+          <rect
+            class="node-rect"
+            x="48"
+            y="330"
+            width="196"
+            height="72"
+            rx="7"
+            fill="#130c02"
+            stroke="#b87014"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="146"
+            y="353"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Stream interceptor
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="146"
+            y="371"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Token-by-token analysis
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="146"
+            y="387"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Claim boundary detection
+          </text>
         </g>
 
         <!-- Claim Detector -->
         <g class="node-group" id="node-claim" data-id="claim">
-          <rect class="node-rect" x="272" y="330" width="180" height="72" rx="7" fill="#130c02" stroke="#b87014" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="362" y="353" text-anchor="middle" dominant-baseline="central">Claim detector</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="362" y="371" text-anchor="middle" dominant-baseline="central">Boundary parser</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="362" y="387" text-anchor="middle" dominant-baseline="central">Heuristic · NLP signals</text>
+          <rect
+            class="node-rect"
+            x="272"
+            y="330"
+            width="180"
+            height="72"
+            rx="7"
+            fill="#130c02"
+            stroke="#b87014"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="362"
+            y="353"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Claim detector
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="362"
+            y="371"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Boundary parser
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="362"
+            y="387"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Heuristic · NLP signals
+          </text>
         </g>
 
         <!-- LangChain RAG -->
         <g class="node-group" id="node-rag" data-id="rag">
-          <rect class="node-rect" x="480" y="330" width="196" height="72" rx="7" fill="#0b0616" stroke="#6b4ec4" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="578" y="353" text-anchor="middle" dominant-baseline="central">LangChain RAG</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="578" y="371" text-anchor="middle" dominant-baseline="central">Semantic vector search</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="578" y="387" text-anchor="middle" dominant-baseline="central">Cosine similarity check</text>
+          <rect
+            class="node-rect"
+            x="480"
+            y="330"
+            width="196"
+            height="72"
+            rx="7"
+            fill="#0b0616"
+            stroke="#6b4ec4"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="578"
+            y="353"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            LangChain RAG
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="578"
+            y="371"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Semantic vector search
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="578"
+            y="387"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Cosine similarity check
+          </text>
         </g>
 
         <!-- Rewrite Agent -->
         <g class="node-group" id="node-rewrite" data-id="rewrite">
-          <rect class="node-rect" x="704" y="330" width="196" height="72" rx="7" fill="#140606" stroke="#c42b2b" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="802" y="353" text-anchor="middle" dominant-baseline="central">Rewrite agent</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="802" y="371" text-anchor="middle" dominant-baseline="central">Auto-correct hallucination</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="802" y="387" text-anchor="middle" dominant-baseline="central">Self-heal output mid-stream</text>
+          <rect
+            class="node-rect"
+            x="704"
+            y="330"
+            width="196"
+            height="72"
+            rx="7"
+            fill="#140606"
+            stroke="#c42b2b"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="802"
+            y="353"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Rewrite agent
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="802"
+            y="371"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Auto-correct hallucination
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="802"
+            y="387"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Self-heal output mid-stream
+          </text>
         </g>
 
         <!-- Pipeline arrows -->
-        <line x1="244" y1="366" x2="272" y2="366" stroke="rgba(255,255,255,0.35)" stroke-width="1.3" marker-end="url(#aw)"/>
-        <line x1="452" y1="366" x2="480" y2="366" stroke="rgba(255,255,255,0.35)" stroke-width="1.3" marker-end="url(#aw)"/>
-        <line x1="676" y1="366" x2="704" y2="366" stroke="rgba(255,255,255,0.35)" stroke-width="1.3" marker-end="url(#aw)"/>
+        <line
+          x1="244"
+          y1="366"
+          x2="272"
+          y2="366"
+          stroke="rgba(255,255,255,0.35)"
+          stroke-width="1.3"
+          marker-end="url(#aw)"
+        />
+        <line
+          x1="452"
+          y1="366"
+          x2="480"
+          y2="366"
+          stroke="rgba(255,255,255,0.35)"
+          stroke-width="1.3"
+          marker-end="url(#aw)"
+        />
+        <line
+          x1="676"
+          y1="366"
+          x2="704"
+          y2="366"
+          stroke="rgba(255,255,255,0.35)"
+          stroke-width="1.3"
+          marker-end="url(#aw)"
+        />
 
         <!-- ═══════════════════════════════════
              DATA LAYER CONNECTIONS
         ═══════════════════════════════════ -->
-        <path d="M 550 402 L 550 448 L 196 448 L 196 460" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#aw)"/>
-        <path d="M 606 402 L 606 440 L 560 440 L 560 460" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#aw)"/>
+        <path
+          d="M 550 402 L 550 448 L 196 448 L 196 460"
+          fill="none"
+          stroke="rgba(255,255,255,0.2)"
+          stroke-width="1.2"
+          stroke-dasharray="5 3"
+          marker-end="url(#aw)"
+        />
+        <path
+          d="M 606 402 L 606 440 L 560 440 L 560 460"
+          fill="none"
+          stroke="rgba(255,255,255,0.2)"
+          stroke-width="1.2"
+          stroke-dasharray="5 3"
+          marker-end="url(#aw)"
+        />
 
         <!-- ═══════════════════════════════════
              TIER 3: DATA
@@ -501,43 +1210,216 @@
 
         <!-- MongoDB Atlas -->
         <g class="node-group" id="node-mongo" data-id="mongo">
-          <rect class="node-rect" x="68" y="460" width="256" height="68" rx="7" fill="#060f06" stroke="#2e7a28" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="196" y="483" text-anchor="middle" dominant-baseline="central">MongoDB Atlas</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="196" y="501" text-anchor="middle" dominant-baseline="central">Vector Search · Ground Truth Vault</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="196" y="517" text-anchor="middle" dominant-baseline="central">cosine similarity index</text>
+          <rect
+            class="node-rect"
+            x="68"
+            y="460"
+            width="256"
+            height="68"
+            rx="7"
+            fill="#060f06"
+            stroke="#2e7a28"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="196"
+            y="483"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            MongoDB Atlas
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="196"
+            y="501"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Vector Search · Ground Truth Vault
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="196"
+            y="517"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            cosine similarity index
+          </text>
         </g>
 
         <!-- OpenAI Embeddings -->
         <g class="node-group" id="node-embed" data-id="embed">
-          <rect class="node-rect" x="364" y="460" width="256" height="68" rx="7" fill="#0b0616" stroke="#6b4ec4" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="492" y="483" text-anchor="middle" dominant-baseline="central">OpenAI Embeddings</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="492" y="501" text-anchor="middle" dominant-baseline="central">text-embedding-3-small</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="492" y="517" text-anchor="middle" dominant-baseline="central">1536-dim vector space</text>
+          <rect
+            class="node-rect"
+            x="364"
+            y="460"
+            width="256"
+            height="68"
+            rx="7"
+            fill="#0b0616"
+            stroke="#6b4ec4"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="492"
+            y="483"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            OpenAI Embeddings
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="492"
+            y="501"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            text-embedding-3-small
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="492"
+            y="517"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            1536-dim vector space
+          </text>
         </g>
 
         <!-- LangChain.js Ingestion -->
         <g class="node-group" id="node-ingest" data-id="ingest">
-          <rect class="node-rect" x="660" y="460" width="256" height="68" rx="7" fill="#04130e" stroke="#1a8a63" stroke-width="1"/>
-          <text font-family="'Space Grotesk',sans-serif" fill="#fff" font-size="11" font-weight="600" x="788" y="483" text-anchor="middle" dominant-baseline="central">LangChain.js</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="788" y="501" text-anchor="middle" dominant-baseline="central">Document ingestion · chunking</text>
-          <text font-family="'Space Grotesk',sans-serif" fill="rgba(255,255,255,0.5)" font-size="9.5" x="788" y="517" text-anchor="middle" dominant-baseline="central">PDF, DOCX, TXT loaders</text>
+          <rect
+            class="node-rect"
+            x="660"
+            y="460"
+            width="256"
+            height="68"
+            rx="7"
+            fill="#04130e"
+            stroke="#1a8a63"
+            stroke-width="1"
+          />
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="#fff"
+            font-size="11"
+            font-weight="600"
+            x="788"
+            y="483"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            LangChain.js
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="788"
+            y="501"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            Document ingestion · chunking
+          </text>
+          <text
+            font-family="'Space Grotesk',sans-serif"
+            fill="rgba(255,255,255,0.5)"
+            font-size="9.5"
+            x="788"
+            y="517"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
+            PDF, DOCX, TXT loaders
+          </text>
         </g>
 
         <!-- Ingestion arrows -->
-        <line x1="660" y1="494" x2="620" y2="494" stroke="rgba(255,255,255,0.18)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#aw)"/>
-        <line x1="364" y1="494" x2="324" y2="494" stroke="rgba(255,255,255,0.18)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#aw)"/>
-        <text font-family="'Space Mono',monospace" fill="rgba(255,255,255,0.35)" font-size="8" x="642" y="488" text-anchor="end" dominant-baseline="central">embed →</text>
-        <text font-family="'Space Mono',monospace" fill="rgba(255,255,255,0.35)" font-size="8" x="348" y="488" text-anchor="end" dominant-baseline="central">store →</text>
+        <line
+          x1="660"
+          y1="494"
+          x2="620"
+          y2="494"
+          stroke="rgba(255,255,255,0.18)"
+          stroke-width="1.1"
+          stroke-dasharray="4 3"
+          marker-end="url(#aw)"
+        />
+        <line
+          x1="364"
+          y1="494"
+          x2="324"
+          y2="494"
+          stroke="rgba(255,255,255,0.18)"
+          stroke-width="1.1"
+          stroke-dasharray="4 3"
+          marker-end="url(#aw)"
+        />
+        <text
+          font-family="'Space Mono',monospace"
+          fill="rgba(255,255,255,0.35)"
+          font-size="8"
+          x="642"
+          y="488"
+          text-anchor="end"
+          dominant-baseline="central"
+        >
+          embed →
+        </text>
+        <text
+          font-family="'Space Mono',monospace"
+          fill="rgba(255,255,255,0.35)"
+          font-size="8"
+          x="348"
+          y="488"
+          text-anchor="end"
+          dominant-baseline="central"
+        >
+          store →
+        </text>
 
         <!-- Divider -->
-        <line x1="32" y1="553" x2="1248" y2="553" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+        <line
+          x1="32"
+          y1="553"
+          x2="1248"
+          y2="553"
+          stroke="rgba(255,255,255,0.07)"
+          stroke-width="1"
+        />
 
         <!-- ── FLOW PULSE DOTS (animated) ── -->
         <circle class="pulse-dot" r="3" fill="#c42b2b" opacity="0">
           <animateMotion dur="2.2s" repeatCount="indefinite" begin="0s">
-            <mpath href="#sse-path"/>
+            <mpath href="#sse-path" />
           </animateMotion>
-          <animate attributeName="opacity" values="0;1;1;0" dur="2.2s" repeatCount="indefinite"/>
+          <animate
+            attributeName="opacity"
+            values="0;1;1;0"
+            dur="2.2s"
+            repeatCount="indefinite"
+          />
         </circle>
       </svg>
     </div>
@@ -553,34 +1435,168 @@
 
     <!-- LEGEND BAR -->
     <div id="legend-bar">
-      <div class="leg-item"><div class="leg-swatch" style="background:#050b1c;border-color:#2e5fbf"></div><span class="leg-txt">Frontend</span></div>
-      <div class="leg-item"><div class="leg-swatch" style="background:#04130e;border-color:#1a8a63"></div><span class="leg-txt">Transport</span></div>
-      <div class="leg-item"><div class="leg-swatch" style="background:#060f06;border-color:#2e7a28"></div><span class="leg-txt">Backend / DB</span></div>
-      <div class="leg-item"><div class="leg-swatch" style="background:#130c02;border-color:#b87014"></div><span class="leg-txt">Stream proc.</span></div>
-      <div class="leg-item"><div class="leg-swatch" style="background:#0b0616;border-color:#6b4ec4"></div><span class="leg-txt">AI / ML</span></div>
-      <div class="leg-item"><div class="leg-swatch" style="background:#140606;border-color:#c42b2b"></div><span class="leg-txt">External</span></div>
-      <div class="leg-item"><div class="leg-swatch" style="background:#111;border-color:#444"></div><span class="leg-txt">User interface</span></div>
-      <div class="leg-item"><div class="leg-line" style="background:#c42b2b"></div><span class="leg-txt">SSE stream</span></div>
-      <div class="leg-item"><div class="leg-line" style="background:#1a8a63"></div><span class="leg-txt">Corrected output</span></div>
-      <div class="leg-item"><div class="leg-line-dash"></div><span class="leg-txt">Offline ingestion</span></div>
+      <div class="leg-item">
+        <div
+          class="leg-swatch"
+          style="background: #050b1c; border-color: #2e5fbf"
+        ></div>
+        <span class="leg-txt">Frontend</span>
+      </div>
+      <div class="leg-item">
+        <div
+          class="leg-swatch"
+          style="background: #04130e; border-color: #1a8a63"
+        ></div>
+        <span class="leg-txt">Transport</span>
+      </div>
+      <div class="leg-item">
+        <div
+          class="leg-swatch"
+          style="background: #060f06; border-color: #2e7a28"
+        ></div>
+        <span class="leg-txt">Backend / DB</span>
+      </div>
+      <div class="leg-item">
+        <div
+          class="leg-swatch"
+          style="background: #130c02; border-color: #b87014"
+        ></div>
+        <span class="leg-txt">Stream proc.</span>
+      </div>
+      <div class="leg-item">
+        <div
+          class="leg-swatch"
+          style="background: #0b0616; border-color: #6b4ec4"
+        ></div>
+        <span class="leg-txt">AI / ML</span>
+      </div>
+      <div class="leg-item">
+        <div
+          class="leg-swatch"
+          style="background: #140606; border-color: #c42b2b"
+        ></div>
+        <span class="leg-txt">External</span>
+      </div>
+      <div class="leg-item">
+        <div
+          class="leg-swatch"
+          style="background: #111; border-color: #444"
+        ></div>
+        <span class="leg-txt">User interface</span>
+      </div>
+      <div class="leg-item">
+        <div class="leg-line" style="background: #c42b2b"></div>
+        <span class="leg-txt">SSE stream</span>
+      </div>
+      <div class="leg-item">
+        <div class="leg-line" style="background: #1a8a63"></div>
+        <span class="leg-txt">Corrected output</span>
+      </div>
+      <div class="leg-item">
+        <div class="leg-line-dash"></div>
+        <span class="leg-txt">Offline ingestion</span>
+      </div>
     </div>
 
     <!-- MINIMAP -->
     <div id="minimap">
-      <svg id="minimap-svg" viewBox="0 0 1280 642" xmlns="http://www.w3.org/2000/svg">
+      <svg
+        id="minimap-svg"
+        viewBox="0 0 1280 642"
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <!-- Simplified minimap nodes -->
-        <rect x="48" y="36" width="178" height="58" rx="4" fill="rgba(196,43,43,0.3)"/>
-        <rect x="268" y="36" width="240" height="58" rx="4" fill="rgba(46,95,191,0.3)"/>
-        <rect x="560" y="36" width="220" height="58" rx="4" fill="rgba(26,138,99,0.3)"/>
-        <rect x="836" y="36" width="200" height="58" rx="4" fill="rgba(80,80,80,0.3)"/>
-        <rect x="48" y="186" width="242" height="60" rx="4" fill="rgba(46,122,40,0.3)"/>
-        <rect x="316" y="186" width="196" height="60" rx="4" fill="rgba(196,43,43,0.3)"/>
-        <rect x="540" y="186" width="200" height="60" rx="4" fill="rgba(26,138,99,0.3)"/>
-        <rect x="32" y="316" width="1010" height="100" rx="6" fill="rgba(196,43,43,0.1)" stroke="rgba(196,43,43,0.4)" stroke-width="1"/>
-        <rect x="68" y="460" width="256" height="68" rx="4" fill="rgba(46,122,40,0.3)"/>
-        <rect x="364" y="460" width="256" height="68" rx="4" fill="rgba(107,78,196,0.3)"/>
-        <rect x="660" y="460" width="256" height="68" rx="4" fill="rgba(26,138,99,0.3)"/>
-        <rect id="minimap-viewport" x="0" y="0" width="1280" height="642"/>
+        <rect
+          x="48"
+          y="36"
+          width="178"
+          height="58"
+          rx="4"
+          fill="rgba(196,43,43,0.3)"
+        />
+        <rect
+          x="268"
+          y="36"
+          width="240"
+          height="58"
+          rx="4"
+          fill="rgba(46,95,191,0.3)"
+        />
+        <rect
+          x="560"
+          y="36"
+          width="220"
+          height="58"
+          rx="4"
+          fill="rgba(26,138,99,0.3)"
+        />
+        <rect
+          x="836"
+          y="36"
+          width="200"
+          height="58"
+          rx="4"
+          fill="rgba(80,80,80,0.3)"
+        />
+        <rect
+          x="48"
+          y="186"
+          width="242"
+          height="60"
+          rx="4"
+          fill="rgba(46,122,40,0.3)"
+        />
+        <rect
+          x="316"
+          y="186"
+          width="196"
+          height="60"
+          rx="4"
+          fill="rgba(196,43,43,0.3)"
+        />
+        <rect
+          x="540"
+          y="186"
+          width="200"
+          height="60"
+          rx="4"
+          fill="rgba(26,138,99,0.3)"
+        />
+        <rect
+          x="32"
+          y="316"
+          width="1010"
+          height="100"
+          rx="6"
+          fill="rgba(196,43,43,0.1)"
+          stroke="rgba(196,43,43,0.4)"
+          stroke-width="1"
+        />
+        <rect
+          x="68"
+          y="460"
+          width="256"
+          height="68"
+          rx="4"
+          fill="rgba(46,122,40,0.3)"
+        />
+        <rect
+          x="364"
+          y="460"
+          width="256"
+          height="68"
+          rx="4"
+          fill="rgba(107,78,196,0.3)"
+        />
+        <rect
+          x="660"
+          y="460"
+          width="256"
+          height="68"
+          rx="4"
+          fill="rgba(26,138,99,0.3)"
+        />
+        <rect id="minimap-viewport" x="0" y="0" width="1280" height="642" />
       </svg>
     </div>
 
@@ -588,380 +1604,380 @@
     <div id="toast">CLICK ANY NODE FOR DETAILS</div>
 
     <script>
-    (() => {
-      'use strict';
+      (() => {
+        'use strict';
 
-      // ── NODE DATA ──
-      const NODE_DATA = {
-        oauth: {
-          tag: 'Authentication', tagColor: '#c42b2b', tagBg: 'rgba(196,43,43,0.15)',
-          title: 'Google OAuth2',
-          desc: 'Handles user identity via Google's OAuth 2.0 protocol. Issues JWT tokens stored in HTTP-only cookies, passed through Express middleware on every authenticated request.',
-          chips: ['OAuth 2.0', 'JWT', 'HTTP-only cookie', 'Session mgmt'],
-          chipColor: '#c42b2b', chipBg: 'rgba(196,43,43,0.12)',
-          related: ['node-express']
-        },
-        react: {
-          tag: 'Frontend', tagColor: '#2e5fbf', tagBg: 'rgba(46,95,191,0.15)',
-          title: 'React + Vite + Redux',
-          desc: 'SPA frontend built with React 18, bundled via Vite for sub-second HMR. Redux Toolkit manages global state (auth, stream buffer, correction diffs). Custom hooks subscribe to Socket.io events and update the live stream UI.',
-          chips: ['React 18', 'Vite', 'Redux Toolkit', 'Custom hooks', 'HMR'],
-          chipColor: '#2e5fbf', chipBg: 'rgba(46,95,191,0.12)',
-          related: ['node-socket-client', 'node-express']
-        },
-        'socket-client': {
-          tag: 'Transport', tagColor: '#1a8a63', tagBg: 'rgba(26,138,99,0.15)',
-          title: 'Socket.io client',
-          desc: 'Maintains a persistent WebSocket connection to the Socket.io server. Listens for corrected stream events and token patches emitted by the Rewrite Agent, rendering them in the browser with green diff highlights.',
-          chips: ['WebSocket', 'Auto-reconnect', 'Event-driven', 'Token patches'],
-          chipColor: '#1a8a63', chipBg: 'rgba(26,138,99,0.12)',
-          related: ['node-socket-server', 'node-browser']
-        },
-        browser: {
-          tag: 'User Interface', tagColor: '#888', tagBg: 'rgba(100,100,100,0.15)',
-          title: 'User Browser',
-          desc: 'The end-user view of the corrected LLM stream. Hallucinated tokens are visually struck through in red and replaced with corrected tokens highlighted in green — all happening mid-stream, without interrupting the flow.',
-          chips: ['Green highlights', 'Red strikethrough', 'Live diff', 'Streaming UX'],
-          chipColor: '#888', chipBg: 'rgba(100,100,100,0.12)',
-          related: ['node-socket-client']
-        },
-        express: {
-          tag: 'Backend', tagColor: '#2e7a28', tagBg: 'rgba(46,122,40,0.15)',
-          title: 'Node.js + Express.js',
-          desc: 'REST API server. JWT middleware validates every request before routing to LLM proxy endpoints. Orchestrates the prompt pipeline, attaches user context, and streams the LLM response through the LangGraph firewall.',
-          chips: ['Node 20', 'Express 4', 'JWT middleware', 'REST routing', 'Proxy'],
-          chipColor: '#2e7a28', chipBg: 'rgba(46,122,40,0.12)',
-          related: ['node-llm', 'node-oauth', 'node-react']
-        },
-        llm: {
-          tag: 'External / LLM', tagColor: '#c42b2b', tagBg: 'rgba(196,43,43,0.15)',
-          title: 'LLM API',
-          desc: 'The hallucination source — Claude or GPT-4o called via HTTP. Responses are delivered as SSE (Server-Sent Events) token streams. The raw stream never reaches the client; it's intercepted by the LangGraph pipeline first.',
-          chips: ['Claude 3.5', 'GPT-4o', 'SSE stream', 'Token-by-token', 'Proxied'],
-          chipColor: '#c42b2b', chipBg: 'rgba(196,43,43,0.12)',
-          related: ['node-interceptor', 'node-express']
-        },
-        'socket-server': {
-          tag: 'Transport', tagColor: '#1a8a63', tagBg: 'rgba(26,138,99,0.15)',
-          title: 'Socket.io server',
-          desc: 'Receives corrected stream segments from the Rewrite Agent and emits them to connected browser clients. Supports rooms per user session, enabling concurrent multi-user streams with isolated correction pipelines.',
-          chips: ['WebSocket', 'Rooms', 'Namespace isolation', 'Emit events'],
-          chipColor: '#1a8a63', chipBg: 'rgba(26,138,99,0.12)',
-          related: ['node-socket-client', 'node-rewrite']
-        },
-        interceptor: {
-          tag: 'Stream Processing', tagColor: '#b87014', tagBg: 'rgba(184,112,20,0.15)',
-          title: 'Stream Interceptor',
-          desc: 'The first node in the LangGraph pipeline. Buffers incoming SSE tokens and performs real-time analysis — detecting sentence boundaries, tracking factual claim patterns, and signaling the Claim Detector when a verifiable assertion is forming.',
-          chips: ['LangGraph node', 'Token buffer', 'Boundary detect', 'State machine'],
-          chipColor: '#b87014', chipBg: 'rgba(184,112,20,0.12)',
-          related: ['node-llm', 'node-claim']
-        },
-        claim: {
-          tag: 'Stream Processing', tagColor: '#b87014', tagBg: 'rgba(184,112,20,0.15)',
-          title: 'Claim Detector',
-          desc: 'Parses buffered token windows to identify factual claims — dates, statistics, named entities, citations. Uses a combination of regex heuristics and lightweight NLP pattern matching to mark claim spans before passing to RAG.',
-          chips: ['LangGraph node', 'NLP patterns', 'Entity detect', 'Heuristics'],
-          chipColor: '#b87014', chipBg: 'rgba(184,112,20,0.12)',
-          related: ['node-interceptor', 'node-rag']
-        },
-        rag: {
-          tag: 'AI / ML', tagColor: '#6b4ec4', tagBg: 'rgba(107,78,196,0.15)',
-          title: 'LangChain RAG',
-          desc: 'Performs semantic vector search against the MongoDB Atlas ground-truth vault. Embeds each claim span using OpenAI text-embedding-3-small, then computes cosine similarity against stored knowledge chunks. Returns the top-k matching passages.',
-          chips: ['LangChain.js', 'Vector search', 'Cosine similarity', 'Top-k retrieval'],
-          chipColor: '#6b4ec4', chipBg: 'rgba(107,78,196,0.12)',
-          related: ['node-mongo', 'node-embed', 'node-rewrite', 'node-claim']
-        },
-        rewrite: {
-          tag: 'AI / ML', tagColor: '#c42b2b', tagBg: 'rgba(196,43,43,0.15)',
-          title: 'Rewrite Agent',
-          desc: 'The core self-healing node. When RAG returns a low-similarity score (potential hallucination), the agent calls a secondary LLM prompt to rewrite the offending claim using retrieved ground-truth passages. The corrected tokens replace the hallucinated ones in the outgoing stream.',
-          chips: ['LangGraph node', 'Self-healing', 'Secondary LLM call', 'Diff patch', 'Mid-stream'],
-          chipColor: '#c42b2b', chipBg: 'rgba(196,43,43,0.12)',
-          related: ['node-socket-server', 'node-rag']
-        },
-        mongo: {
-          tag: 'Database', tagColor: '#2e7a28', tagBg: 'rgba(46,122,40,0.15)',
-          title: 'MongoDB Atlas',
-          desc: 'Cloud-hosted document database serving as the Ground Truth Vault. Uses Atlas Vector Search with a cosine similarity index on pre-computed 1536-dimensional embedding vectors. Stores authoritative knowledge chunks ingested offline.',
-          chips: ['MongoDB Atlas', 'Vector Search', '1536-dim', 'Cosine index', 'Ground truth'],
-          chipColor: '#2e7a28', chipBg: 'rgba(46,122,40,0.12)',
-          related: ['node-rag', 'node-ingest']
-        },
-        embed: {
-          tag: 'AI / ML', tagColor: '#6b4ec4', tagBg: 'rgba(107,78,196,0.15)',
-          title: 'OpenAI Embeddings',
-          desc: 'text-embedding-3-small model producing 1536-dimensional vectors. Used in both the offline ingestion pipeline (embedding document chunks) and the real-time RAG queries (embedding incoming claim spans) to ensure a shared vector space.',
-          chips: ['text-embedding-3-small', '1536-dim', 'Shared space', 'Batch + real-time'],
-          chipColor: '#6b4ec4', chipBg: 'rgba(107,78,196,0.12)',
-          related: ['node-rag', 'node-ingest', 'node-mongo']
-        },
-        ingest: {
-          tag: 'Ingestion', tagColor: '#1a8a63', tagBg: 'rgba(26,138,99,0.15)',
-          title: 'LangChain.js Ingestion',
-          desc: 'Offline document pipeline. Loads PDF, DOCX, and TXT files using LangChain loaders, splits them into overlapping chunks, embeds each chunk via OpenAI, and stores the vectors in MongoDB Atlas. Runs as a batch job when the knowledge base is updated.',
-          chips: ['LangChain.js', 'PDF/DOCX/TXT', 'Chunking', 'Batch embed', 'Offline job'],
-          chipColor: '#1a8a63', chipBg: 'rgba(26,138,99,0.12)',
-          related: ['node-embed', 'node-mongo']
+        // ── NODE DATA ──
+        const NODE_DATA = {
+          oauth: {
+            tag: 'Authentication', tagColor: '#c42b2b', tagBg: 'rgba(196,43,43,0.15)',
+            title: 'Google OAuth2',
+            desc: 'Handles user identity via Google's OAuth 2.0 protocol. Issues JWT tokens stored in HTTP-only cookies, passed through Express middleware on every authenticated request.',
+            chips: ['OAuth 2.0', 'JWT', 'HTTP-only cookie', 'Session mgmt'],
+            chipColor: '#c42b2b', chipBg: 'rgba(196,43,43,0.12)',
+            related: ['node-express']
+          },
+          react: {
+            tag: 'Frontend', tagColor: '#2e5fbf', tagBg: 'rgba(46,95,191,0.15)',
+            title: 'React + Vite + Redux',
+            desc: 'SPA frontend built with React 18, bundled via Vite for sub-second HMR. Redux Toolkit manages global state (auth, stream buffer, correction diffs). Custom hooks subscribe to Socket.io events and update the live stream UI.',
+            chips: ['React 18', 'Vite', 'Redux Toolkit', 'Custom hooks', 'HMR'],
+            chipColor: '#2e5fbf', chipBg: 'rgba(46,95,191,0.12)',
+            related: ['node-socket-client', 'node-express']
+          },
+          'socket-client': {
+            tag: 'Transport', tagColor: '#1a8a63', tagBg: 'rgba(26,138,99,0.15)',
+            title: 'Socket.io client',
+            desc: 'Maintains a persistent WebSocket connection to the Socket.io server. Listens for corrected stream events and token patches emitted by the Rewrite Agent, rendering them in the browser with green diff highlights.',
+            chips: ['WebSocket', 'Auto-reconnect', 'Event-driven', 'Token patches'],
+            chipColor: '#1a8a63', chipBg: 'rgba(26,138,99,0.12)',
+            related: ['node-socket-server', 'node-browser']
+          },
+          browser: {
+            tag: 'User Interface', tagColor: '#888', tagBg: 'rgba(100,100,100,0.15)',
+            title: 'User Browser',
+            desc: 'The end-user view of the corrected LLM stream. Hallucinated tokens are visually struck through in red and replaced with corrected tokens highlighted in green — all happening mid-stream, without interrupting the flow.',
+            chips: ['Green highlights', 'Red strikethrough', 'Live diff', 'Streaming UX'],
+            chipColor: '#888', chipBg: 'rgba(100,100,100,0.12)',
+            related: ['node-socket-client']
+          },
+          express: {
+            tag: 'Backend', tagColor: '#2e7a28', tagBg: 'rgba(46,122,40,0.15)',
+            title: 'Node.js + Express.js',
+            desc: 'REST API server. JWT middleware validates every request before routing to LLM proxy endpoints. Orchestrates the prompt pipeline, attaches user context, and streams the LLM response through the LangGraph firewall.',
+            chips: ['Node 20', 'Express 4', 'JWT middleware', 'REST routing', 'Proxy'],
+            chipColor: '#2e7a28', chipBg: 'rgba(46,122,40,0.12)',
+            related: ['node-llm', 'node-oauth', 'node-react']
+          },
+          llm: {
+            tag: 'External / LLM', tagColor: '#c42b2b', tagBg: 'rgba(196,43,43,0.15)',
+            title: 'LLM API',
+            desc: 'The hallucination source — Claude or GPT-4o called via HTTP. Responses are delivered as SSE (Server-Sent Events) token streams. The raw stream never reaches the client; it's intercepted by the LangGraph pipeline first.',
+            chips: ['Claude 3.5', 'GPT-4o', 'SSE stream', 'Token-by-token', 'Proxied'],
+            chipColor: '#c42b2b', chipBg: 'rgba(196,43,43,0.12)',
+            related: ['node-interceptor', 'node-express']
+          },
+          'socket-server': {
+            tag: 'Transport', tagColor: '#1a8a63', tagBg: 'rgba(26,138,99,0.15)',
+            title: 'Socket.io server',
+            desc: 'Receives corrected stream segments from the Rewrite Agent and emits them to connected browser clients. Supports rooms per user session, enabling concurrent multi-user streams with isolated correction pipelines.',
+            chips: ['WebSocket', 'Rooms', 'Namespace isolation', 'Emit events'],
+            chipColor: '#1a8a63', chipBg: 'rgba(26,138,99,0.12)',
+            related: ['node-socket-client', 'node-rewrite']
+          },
+          interceptor: {
+            tag: 'Stream Processing', tagColor: '#b87014', tagBg: 'rgba(184,112,20,0.15)',
+            title: 'Stream Interceptor',
+            desc: 'The first node in the LangGraph pipeline. Buffers incoming SSE tokens and performs real-time analysis — detecting sentence boundaries, tracking factual claim patterns, and signaling the Claim Detector when a verifiable assertion is forming.',
+            chips: ['LangGraph node', 'Token buffer', 'Boundary detect', 'State machine'],
+            chipColor: '#b87014', chipBg: 'rgba(184,112,20,0.12)',
+            related: ['node-llm', 'node-claim']
+          },
+          claim: {
+            tag: 'Stream Processing', tagColor: '#b87014', tagBg: 'rgba(184,112,20,0.15)',
+            title: 'Claim Detector',
+            desc: 'Parses buffered token windows to identify factual claims — dates, statistics, named entities, citations. Uses a combination of regex heuristics and lightweight NLP pattern matching to mark claim spans before passing to RAG.',
+            chips: ['LangGraph node', 'NLP patterns', 'Entity detect', 'Heuristics'],
+            chipColor: '#b87014', chipBg: 'rgba(184,112,20,0.12)',
+            related: ['node-interceptor', 'node-rag']
+          },
+          rag: {
+            tag: 'AI / ML', tagColor: '#6b4ec4', tagBg: 'rgba(107,78,196,0.15)',
+            title: 'LangChain RAG',
+            desc: 'Performs semantic vector search against the MongoDB Atlas ground-truth vault. Embeds each claim span using OpenAI text-embedding-3-small, then computes cosine similarity against stored knowledge chunks. Returns the top-k matching passages.',
+            chips: ['LangChain.js', 'Vector search', 'Cosine similarity', 'Top-k retrieval'],
+            chipColor: '#6b4ec4', chipBg: 'rgba(107,78,196,0.12)',
+            related: ['node-mongo', 'node-embed', 'node-rewrite', 'node-claim']
+          },
+          rewrite: {
+            tag: 'AI / ML', tagColor: '#c42b2b', tagBg: 'rgba(196,43,43,0.15)',
+            title: 'Rewrite Agent',
+            desc: 'The core self-healing node. When RAG returns a low-similarity score (potential hallucination), the agent calls a secondary LLM prompt to rewrite the offending claim using retrieved ground-truth passages. The corrected tokens replace the hallucinated ones in the outgoing stream.',
+            chips: ['LangGraph node', 'Self-healing', 'Secondary LLM call', 'Diff patch', 'Mid-stream'],
+            chipColor: '#c42b2b', chipBg: 'rgba(196,43,43,0.12)',
+            related: ['node-socket-server', 'node-rag']
+          },
+          mongo: {
+            tag: 'Database', tagColor: '#2e7a28', tagBg: 'rgba(46,122,40,0.15)',
+            title: 'MongoDB Atlas',
+            desc: 'Cloud-hosted document database serving as the Ground Truth Vault. Uses Atlas Vector Search with a cosine similarity index on pre-computed 1536-dimensional embedding vectors. Stores authoritative knowledge chunks ingested offline.',
+            chips: ['MongoDB Atlas', 'Vector Search', '1536-dim', 'Cosine index', 'Ground truth'],
+            chipColor: '#2e7a28', chipBg: 'rgba(46,122,40,0.12)',
+            related: ['node-rag', 'node-ingest']
+          },
+          embed: {
+            tag: 'AI / ML', tagColor: '#6b4ec4', tagBg: 'rgba(107,78,196,0.15)',
+            title: 'OpenAI Embeddings',
+            desc: 'text-embedding-3-small model producing 1536-dimensional vectors. Used in both the offline ingestion pipeline (embedding document chunks) and the real-time RAG queries (embedding incoming claim spans) to ensure a shared vector space.',
+            chips: ['text-embedding-3-small', '1536-dim', 'Shared space', 'Batch + real-time'],
+            chipColor: '#6b4ec4', chipBg: 'rgba(107,78,196,0.12)',
+            related: ['node-rag', 'node-ingest', 'node-mongo']
+          },
+          ingest: {
+            tag: 'Ingestion', tagColor: '#1a8a63', tagBg: 'rgba(26,138,99,0.15)',
+            title: 'LangChain.js Ingestion',
+            desc: 'Offline document pipeline. Loads PDF, DOCX, and TXT files using LangChain loaders, splits them into overlapping chunks, embeds each chunk via OpenAI, and stores the vectors in MongoDB Atlas. Runs as a batch job when the knowledge base is updated.',
+            chips: ['LangChain.js', 'PDF/DOCX/TXT', 'Chunking', 'Batch embed', 'Offline job'],
+            chipColor: '#1a8a63', chipBg: 'rgba(26,138,99,0.12)',
+            related: ['node-embed', 'node-mongo']
+          }
+        };
+
+        // ── STATE ──
+        let zoom = 1;
+        let panX = 0, panY = 0;
+        let isPanning = false;
+        let panStart = { x: 0, y: 0 };
+        let flowEnabled = true;
+        let activeNode = null;
+
+        const stage = document.getElementById('stage');
+        const svg = document.getElementById('root-svg');
+        const panel = document.getElementById('detail-panel');
+        const zoomLabel = document.getElementById('zoom-label');
+        const toast = document.getElementById('toast');
+        const minimapVP = document.getElementById('minimap-viewport');
+
+        // ── ZOOM / PAN ──
+        function applyTransform() {
+          svg.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+          svg.style.transformOrigin = '0 0';
+          zoomLabel.textContent = Math.round(zoom * 100) + '%';
+          updateMinimap();
         }
-      };
 
-      // ── STATE ──
-      let zoom = 1;
-      let panX = 0, panY = 0;
-      let isPanning = false;
-      let panStart = { x: 0, y: 0 };
-      let flowEnabled = true;
-      let activeNode = null;
-
-      const stage = document.getElementById('stage');
-      const svg = document.getElementById('root-svg');
-      const panel = document.getElementById('detail-panel');
-      const zoomLabel = document.getElementById('zoom-label');
-      const toast = document.getElementById('toast');
-      const minimapVP = document.getElementById('minimap-viewport');
-
-      // ── ZOOM / PAN ──
-      function applyTransform() {
-        svg.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
-        svg.style.transformOrigin = '0 0';
-        zoomLabel.textContent = Math.round(zoom * 100) + '%';
-        updateMinimap();
-      }
-
-      function fitToScreen() {
-        const sw = stage.clientWidth;
-        const sh = stage.clientHeight;
-        const scaleX = sw / 1280;
-        const scaleY = sh / 642;
-        zoom = Math.min(scaleX, scaleY) * 0.96;
-        panX = (sw - 1280 * zoom) / 2;
-        panY = (sh - 642 * zoom) / 2;
-        applyTransform();
-      }
-
-      document.getElementById('btn-fit').addEventListener('click', fitToScreen);
-
-      document.getElementById('btn-zoom-in').addEventListener('click', () => {
-        zoom = Math.min(zoom * 1.2, 4);
-        applyTransform();
-      });
-
-      document.getElementById('btn-zoom-out').addEventListener('click', () => {
-        zoom = Math.max(zoom * 0.8, 0.2);
-        applyTransform();
-      });
-
-      // Mouse wheel zoom
-      stage.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        const rect = stage.getBoundingClientRect();
-        const cx = e.clientX - rect.left;
-        const cy = e.clientY - rect.top;
-        const delta = e.deltaY < 0 ? 1.12 : 0.89;
-        const newZoom = Math.min(Math.max(zoom * delta, 0.2), 4);
-        panX = cx - (cx - panX) * (newZoom / zoom);
-        panY = cy - (cy - panY) * (newZoom / zoom);
-        zoom = newZoom;
-        applyTransform();
-      }, { passive: false });
-
-      // Mouse pan
-      stage.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.node-group')) return;
-        isPanning = true;
-        panStart = { x: e.clientX - panX, y: e.clientY - panY };
-        stage.classList.add('panning');
-      });
-      window.addEventListener('mousemove', (e) => {
-        if (!isPanning) return;
-        panX = e.clientX - panStart.x;
-        panY = e.clientY - panStart.y;
-        applyTransform();
-      });
-      window.addEventListener('mouseup', () => {
-        isPanning = false;
-        stage.classList.remove('panning');
-      });
-
-      // Touch pan + pinch zoom
-      let touches = [];
-      let lastPinchDist = null;
-      stage.addEventListener('touchstart', (e) => {
-        touches = [...e.touches];
-        if (touches.length === 1) {
-          isPanning = true;
-          panStart = { x: touches[0].clientX - panX, y: touches[0].clientY - panY };
-        }
-        if (touches.length === 2) {
-          isPanning = false;
-          lastPinchDist = Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
-        }
-      }, { passive: true });
-      stage.addEventListener('touchmove', (e) => {
-        touches = [...e.touches];
-        if (touches.length === 1 && isPanning) {
-          panX = touches[0].clientX - panStart.x;
-          panY = touches[0].clientY - panStart.y;
+        function fitToScreen() {
+          const sw = stage.clientWidth;
+          const sh = stage.clientHeight;
+          const scaleX = sw / 1280;
+          const scaleY = sh / 642;
+          zoom = Math.min(scaleX, scaleY) * 0.96;
+          panX = (sw - 1280 * zoom) / 2;
+          panY = (sh - 642 * zoom) / 2;
           applyTransform();
         }
-        if (touches.length === 2 && lastPinchDist !== null) {
-          const dist = Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
-          const cx = (touches[0].clientX + touches[1].clientX) / 2;
-          const cy = (touches[0].clientY + touches[1].clientY) / 2;
+
+        document.getElementById('btn-fit').addEventListener('click', fitToScreen);
+
+        document.getElementById('btn-zoom-in').addEventListener('click', () => {
+          zoom = Math.min(zoom * 1.2, 4);
+          applyTransform();
+        });
+
+        document.getElementById('btn-zoom-out').addEventListener('click', () => {
+          zoom = Math.max(zoom * 0.8, 0.2);
+          applyTransform();
+        });
+
+        // Mouse wheel zoom
+        stage.addEventListener('wheel', (e) => {
+          e.preventDefault();
           const rect = stage.getBoundingClientRect();
-          const mx = cx - rect.left;
-          const my = cy - rect.top;
-          const delta = dist / lastPinchDist;
+          const cx = e.clientX - rect.left;
+          const cy = e.clientY - rect.top;
+          const delta = e.deltaY < 0 ? 1.12 : 0.89;
           const newZoom = Math.min(Math.max(zoom * delta, 0.2), 4);
-          panX = mx - (mx - panX) * (newZoom / zoom);
-          panY = my - (my - panY) * (newZoom / zoom);
+          panX = cx - (cx - panX) * (newZoom / zoom);
+          panY = cy - (cy - panY) * (newZoom / zoom);
           zoom = newZoom;
-          lastPinchDist = dist;
           applyTransform();
+        }, { passive: false });
+
+        // Mouse pan
+        stage.addEventListener('mousedown', (e) => {
+          if (e.target.closest('.node-group')) return;
+          isPanning = true;
+          panStart = { x: e.clientX - panX, y: e.clientY - panY };
+          stage.classList.add('panning');
+        });
+        window.addEventListener('mousemove', (e) => {
+          if (!isPanning) return;
+          panX = e.clientX - panStart.x;
+          panY = e.clientY - panStart.y;
+          applyTransform();
+        });
+        window.addEventListener('mouseup', () => {
+          isPanning = false;
+          stage.classList.remove('panning');
+        });
+
+        // Touch pan + pinch zoom
+        let touches = [];
+        let lastPinchDist = null;
+        stage.addEventListener('touchstart', (e) => {
+          touches = [...e.touches];
+          if (touches.length === 1) {
+            isPanning = true;
+            panStart = { x: touches[0].clientX - panX, y: touches[0].clientY - panY };
+          }
+          if (touches.length === 2) {
+            isPanning = false;
+            lastPinchDist = Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+          }
+        }, { passive: true });
+        stage.addEventListener('touchmove', (e) => {
+          touches = [...e.touches];
+          if (touches.length === 1 && isPanning) {
+            panX = touches[0].clientX - panStart.x;
+            panY = touches[0].clientY - panStart.y;
+            applyTransform();
+          }
+          if (touches.length === 2 && lastPinchDist !== null) {
+            const dist = Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+            const cx = (touches[0].clientX + touches[1].clientX) / 2;
+            const cy = (touches[0].clientY + touches[1].clientY) / 2;
+            const rect = stage.getBoundingClientRect();
+            const mx = cx - rect.left;
+            const my = cy - rect.top;
+            const delta = dist / lastPinchDist;
+            const newZoom = Math.min(Math.max(zoom * delta, 0.2), 4);
+            panX = mx - (mx - panX) * (newZoom / zoom);
+            panY = my - (my - panY) * (newZoom / zoom);
+            zoom = newZoom;
+            lastPinchDist = dist;
+            applyTransform();
+          }
+        }, { passive: true });
+        stage.addEventListener('touchend', () => {
+          isPanning = false;
+          lastPinchDist = null;
+        }, { passive: true });
+
+        // ── MINIMAP ──
+        function updateMinimap() {
+          const sw = stage.clientWidth;
+          const sh = stage.clientHeight;
+          // Viewport in SVG space
+          const vx = -panX / zoom;
+          const vy = -panY / zoom;
+          const vw = sw / zoom;
+          const vh = sh / zoom;
+          minimapVP.setAttribute('x', vx);
+          minimapVP.setAttribute('y', vy);
+          minimapVP.setAttribute('width', vw);
+          minimapVP.setAttribute('height', vh);
         }
-      }, { passive: true });
-      stage.addEventListener('touchend', () => {
-        isPanning = false;
-        lastPinchDist = null;
-      }, { passive: true });
 
-      // ── MINIMAP ──
-      function updateMinimap() {
-        const sw = stage.clientWidth;
-        const sh = stage.clientHeight;
-        // Viewport in SVG space
-        const vx = -panX / zoom;
-        const vy = -panY / zoom;
-        const vw = sw / zoom;
-        const vh = sh / zoom;
-        minimapVP.setAttribute('x', vx);
-        minimapVP.setAttribute('y', vy);
-        minimapVP.setAttribute('width', vw);
-        minimapVP.setAttribute('height', vh);
-      }
+        // ── FLOW TOGGLE ──
+        const flowLines = document.querySelectorAll('.flow-line');
+        const btnFlow = document.getElementById('btn-flow');
 
-      // ── FLOW TOGGLE ──
-      const flowLines = document.querySelectorAll('.flow-line');
-      const btnFlow = document.getElementById('btn-flow');
-
-      btnFlow.addEventListener('click', () => {
-        flowEnabled = !flowEnabled;
-        flowLines.forEach(l => {
-          l.style.animationPlayState = flowEnabled ? 'running' : 'paused';
+        btnFlow.addEventListener('click', () => {
+          flowEnabled = !flowEnabled;
+          flowLines.forEach(l => {
+            l.style.animationPlayState = flowEnabled ? 'running' : 'paused';
+          });
+          btnFlow.classList.toggle('active', !flowEnabled);
+          btnFlow.textContent = flowEnabled ? 'FLOW ●' : 'FLOW ○';
         });
-        btnFlow.classList.toggle('active', !flowEnabled);
-        btnFlow.textContent = flowEnabled ? 'FLOW ●' : 'FLOW ○';
-      });
 
-      // ── HIGHLIGHT RELATED ──
-      document.getElementById('btn-reset-highlight').addEventListener('click', () => {
+        // ── HIGHLIGHT RELATED ──
+        document.getElementById('btn-reset-highlight').addEventListener('click', () => {
+          document.querySelectorAll('.node-group').forEach(g => {
+            g.classList.remove('active', 'dimmed');
+          });
+          activeNode = null;
+          closePanel();
+        });
+
+        // ── NODE INTERACTION ──
         document.querySelectorAll('.node-group').forEach(g => {
-          g.classList.remove('active', 'dimmed');
+          g.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = g.dataset.id;
+            if (!id || !NODE_DATA[id]) return;
+
+            if (activeNode === id) {
+              // Deselect
+              document.querySelectorAll('.node-group').forEach(n => n.classList.remove('active','dimmed'));
+              activeNode = null;
+              closePanel();
+              return;
+            }
+
+            activeNode = id;
+            const data = NODE_DATA[id];
+
+            // Dim all, highlight active + related
+            document.querySelectorAll('.node-group').forEach(n => {
+              const nid = 'node-' + n.dataset.id;
+              if (n === g || (data.related && data.related.includes(nid))) {
+                n.classList.remove('dimmed');
+                n.classList.toggle('active', n === g);
+              } else {
+                n.classList.add('dimmed');
+                n.classList.remove('active');
+              }
+            });
+
+            showPanel(data);
+          });
+
+          // Hover tooltip hint
+          g.addEventListener('mouseenter', () => {
+            g.style.cursor = 'pointer';
+          });
         });
-        activeNode = null;
-        closePanel();
-      });
 
-      // ── NODE INTERACTION ──
-      document.querySelectorAll('.node-group').forEach(g => {
-        g.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const id = g.dataset.id;
-          if (!id || !NODE_DATA[id]) return;
-
-          if (activeNode === id) {
-            // Deselect
+        stage.addEventListener('click', (e) => {
+          if (e.target === stage || e.target === svg) {
             document.querySelectorAll('.node-group').forEach(n => n.classList.remove('active','dimmed'));
             activeNode = null;
             closePanel();
-            return;
           }
+        });
 
-          activeNode = id;
-          const data = NODE_DATA[id];
+        // ── PANEL ──
+        function showPanel(data) {
+          const tag = document.getElementById('panel-tag');
+          tag.textContent = data.tag;
+          tag.style.color = data.tagColor;
+          tag.style.background = data.tagBg;
+          tag.style.border = '1px solid ' + data.tagColor + '44';
 
-          // Dim all, highlight active + related
-          document.querySelectorAll('.node-group').forEach(n => {
-            const nid = 'node-' + n.dataset.id;
-            if (n === g || (data.related && data.related.includes(nid))) {
-              n.classList.remove('dimmed');
-              n.classList.toggle('active', n === g);
-            } else {
-              n.classList.add('dimmed');
-              n.classList.remove('active');
-            }
+          document.getElementById('panel-title').textContent = data.title;
+          document.getElementById('panel-desc').textContent = data.desc;
+
+          const chipsEl = document.getElementById('panel-chips');
+          chipsEl.innerHTML = '';
+          (data.chips || []).forEach(c => {
+            const el = document.createElement('span');
+            el.className = 'chip';
+            el.textContent = c;
+            el.style.color = data.chipColor;
+            el.style.background = data.chipBg;
+            el.style.borderColor = data.chipColor + '44';
+            chipsEl.appendChild(el);
           });
 
-          showPanel(data);
-        });
+          panel.classList.add('visible');
+        }
 
-        // Hover tooltip hint
-        g.addEventListener('mouseenter', () => {
-          g.style.cursor = 'pointer';
-        });
-      });
+        function closePanel() {
+          panel.classList.remove('visible');
+        }
 
-      stage.addEventListener('click', (e) => {
-        if (e.target === stage || e.target === svg) {
+        document.getElementById('panel-close').addEventListener('click', () => {
           document.querySelectorAll('.node-group').forEach(n => n.classList.remove('active','dimmed'));
           activeNode = null;
           closePanel();
-        }
-      });
-
-      // ── PANEL ──
-      function showPanel(data) {
-        const tag = document.getElementById('panel-tag');
-        tag.textContent = data.tag;
-        tag.style.color = data.tagColor;
-        tag.style.background = data.tagBg;
-        tag.style.border = '1px solid ' + data.tagColor + '44';
-
-        document.getElementById('panel-title').textContent = data.title;
-        document.getElementById('panel-desc').textContent = data.desc;
-
-        const chipsEl = document.getElementById('panel-chips');
-        chipsEl.innerHTML = '';
-        (data.chips || []).forEach(c => {
-          const el = document.createElement('span');
-          el.className = 'chip';
-          el.textContent = c;
-          el.style.color = data.chipColor;
-          el.style.background = data.chipBg;
-          el.style.borderColor = data.chipColor + '44';
-          chipsEl.appendChild(el);
         });
 
-        panel.classList.add('visible');
-      }
+        // ── TOAST ──
+        function showToast(msg, dur = 2600) {
+          toast.textContent = msg;
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), dur);
+        }
 
-      function closePanel() {
-        panel.classList.remove('visible');
-      }
+        // ── INIT ──
+        fitToScreen();
+        window.addEventListener('resize', fitToScreen);
 
-      document.getElementById('panel-close').addEventListener('click', () => {
-        document.querySelectorAll('.node-group').forEach(n => n.classList.remove('active','dimmed'));
-        activeNode = null;
-        closePanel();
-      });
+        // Show hint toast after 800ms
+        setTimeout(() => showToast('CLICK ANY NODE FOR DETAILS'), 800);
 
-      // ── TOAST ──
-      function showToast(msg, dur = 2600) {
-        toast.textContent = msg;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), dur);
-      }
-
-      // ── INIT ──
-      fitToScreen();
-      window.addEventListener('resize', fitToScreen);
-
-      // Show hint toast after 800ms
-      setTimeout(() => showToast('CLICK ANY NODE FOR DETAILS'), 800);
-
-    })();
+      })();
     </script>
   </body>
 </html>
