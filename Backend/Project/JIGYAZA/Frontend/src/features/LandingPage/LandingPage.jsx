@@ -139,7 +139,7 @@ const LandingPage = ({ isReady = true }) => {
       
       tl.fromTo(heroElements,
         { opacity: 0, y: 40, filter: 'blur(10px)', scale: 0.95 },
-        { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, duration: 1.2, stagger: 0.2, ease: 'power4.out', clearProps: 'all' },
+        { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, duration: 1.2, stagger: 0.2, ease: 'power4.out', clearProps: 'transform,filter' },
         '-=0.8'
       );
 
@@ -160,7 +160,7 @@ const LandingPage = ({ isReady = true }) => {
               start: 'top 85%',
               toggleActions: 'play none none none' 
             },
-            clearProps: 'all'
+            clearProps: 'transform,filter'
           }
         );
       });
