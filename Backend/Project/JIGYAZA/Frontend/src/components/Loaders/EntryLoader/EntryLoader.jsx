@@ -210,7 +210,7 @@ export default function EntryLoader({ onComplete }) {
 
       {/* ── TEXT REVEAL SECTION ── */}
       <div className="entry-text-container">
-        <h1 className="entry-welcome-title" style={{ display: 'flex', gap: '0.5rem', overflow: 'hidden' }}>
+        <h1 className="entry-welcome-title" style={{ display: 'flex', gap: '0.4rem', overflow: 'hidden' }}>
           <span ref={word1Ref} className="word-welcome">WELCOME,</span>
           <span ref={word2Ref} className="word-designation">{designation}</span>
         </h1>

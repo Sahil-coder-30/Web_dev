@@ -195,3 +195,19 @@ export async function authVerifyController(req, res) {
     });
   }
 }
+
+export async function authGetMeController(req, res) {
+  try {
+    const user = await userModel.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    return res.status(200).json({ user });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      message: "Something went wrong while fetching user data.",
+      error: err.message,
+    });
+  }
+}

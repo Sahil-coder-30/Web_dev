@@ -12,12 +12,15 @@ const Register = () => {
   const otpInputs = useRef([]);
   const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
+  const [error, setError] = useState('');
+  const [verifyError, setVerifyError] = useState('');
 
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: ''
   });
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -28,9 +31,28 @@ const Register = () => {
 
   const handleRegisterSubmit = (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!formData.username || !formData.email || !formData.password) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+
+    if (!acceptedTerms) {
+      setError('You must accept the Terms and Conditions and Privacy Policy.');
+      return;
+    }
+
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
+      
+      // Mock Error simulation
+      if (formData.email === 'test@error.com') {
+        setError('An account with this email already exists.');
+        return;
+      }
+      
       setStep(2); // Proceed to OTP verification step
     }, 1500);
   };
@@ -83,10 +105,25 @@ const Register = () => {
 
   const handleVerifySubmit = (e) => {
     e.preventDefault();
+    setVerifyError('');
+    
+    const otpValue = otp.join('');
+    if (otpValue.length !== 6) {
+      setVerifyError('Please enter the full 6-digit code.');
+      return;
+    }
+
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      console.log('OTP Verified', otp.join(''));
+
+      // Mock Invalid OTP
+      if (otpValue === '000000') {
+        setVerifyError('Invalid verification code. Please try again.');
+        return;
+      }
+
+      console.log('OTP Verified', otpValue);
     }, 1500);
   };
 
@@ -101,13 +138,7 @@ const Register = () => {
     visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };
 
-  // SVGs for branding
-  const LogoSVG = () => (
-    <svg className="logo" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-      <path d="M13.8261 30.5736C16.7203 29.8826 20.2244 29.4783 24 29.4783C27.7756 29.4783 31.2797 29.8826 34.1739 30.5736C36.9144 31.2278 39.9967 32.7669 41.3563 33.8352L24.8486 7.36089C24.4571 6.73303 23.5429 6.73303 23.1514 7.36089L6.64374 33.8352C8.00331 32.7669 11.0856 31.2278 13.8261 30.5736Z" fill="currentColor"></path>
-      <path clipRule="evenodd" d="M39.998 35.764C39.9944 35.7463 39.9875 35.7155 39.9748 35.6706C39.9436 35.5601 39.8949 35.4259 39.8346 35.2825C39.8168 35.2403 39.7989 35.1993 39.7813 35.1602C38.5103 34.2887 35.9788 33.0607 33.7095 32.5189C30.9875 31.8691 27.6413 31.4783 24 31.4783C20.3587 31.4783 17.0125 31.8691 14.2905 32.5189C12.0012 33.0654 9.44505 34.3104 8.18538 35.1832C8.17384 35.2075 8.16216 35.233 8.15052 35.2592C8.09919 35.3751 8.05721 35.4886 8.02977 35.589C8.00356 35.6848 8.00039 35.7333 8.00004 35.7388C8.00004 35.739 8 35.7393 8.00004 35.7388C8.00004 35.7641 8.0104 36.0767 8.68485 36.6314C9.34546 37.1746 10.4222 37.7531 11.9291 38.2772C14.9242 39.319 19.1919 40 24 40C28.8081 40 33.0758 39.319 36.0709 38.2772C37.5778 37.7531 38.6545 37.1746 39.3151 36.6314C39.9006 36.1499 39.9857 35.8511 39.998 35.764ZM4.95178 32.7688L21.4543 6.30267C22.6288 4.4191 25.3712 4.41909 26.5457 6.30267L43.0534 32.777C43.0709 32.8052 43.0878 32.8338 43.104 32.8629L41.3563 33.8352C43.104 32.8629 43.1038 32.8626 43.104 32.8629L43.1051 32.865L43.1065 32.8675L43.1101 32.8739L43.1199 32.8918C43.1276 32.906 43.1377 32.9246 43.1497 32.9473C43.1738 32.9925 43.2062 33.0545 43.244 33.1299C43.319 33.2792 43.4196 33.489 43.5217 33.7317C43.6901 34.1321 44 34.9311 44 35.7391C44 37.4427 43.003 38.7775 41.8558 39.7209C40.6947 40.6757 39.1354 41.4464 37.385 42.0552C33.8654 43.2794 29.133 44 24 44C18.867 44 14.1346 43.2794 10.615 42.0552C8.86463 41.4464 7.30529 40.6757 6.14419 39.7209C4.99695 38.7775 3.99999 37.4427 3.99999 35.7391C3.99999 34.8725 4.29264 34.0922 4.49321 33.6393C4.60375 33.3898 4.71348 33.1804 4.79687 33.0311C4.83898 32.9556 4.87547 32.8935 4.9035 32.8471C4.91754 32.8238 4.92954 32.8043 4.93916 32.7889L4.94662 32.777L4.95178 32.7688ZM35.9868 29.004L24 9.77997L12.0131 29.004C12.4661 28.8609 12.9179 28.7342 13.3617 28.6282C16.4281 27.8961 20.0901 27.4783 24 27.4783C27.9099 27.4783 31.5719 27.8961 34.6383 28.6282C35.082 28.7342 35.5339 28.8609 35.9868 29.004Z" fill="currentColor" fillRule="evenodd"></path>
-    </svg>
-  );
+  // We natively use the Loder component for the brand logo now!
 
   return (
     <AnimatePresence mode="wait">
@@ -124,7 +155,7 @@ const Register = () => {
           <div className="left-panel">
             <div className="bg-stars star-field" />
             <motion.div className="branding-top" variants={itemVariants}>
-              <LogoSVG />
+              <Loder size={32} color="#c7621a" />
               <span className="brand-name font-display">jigyazaAi</span>
             </motion.div>
 
@@ -157,7 +188,7 @@ const Register = () => {
           {/* Right Panel: Registration Form */}
           <div className="right-panel">
             <div className="mobile-logo">
-              <LogoSVG />
+              <Loder size={28} color="#c7621a" />
               <span className="brand-name font-display">jigyazaAi</span>
             </div>
 
@@ -167,47 +198,105 @@ const Register = () => {
               </motion.h1>
               
               <motion.form onSubmit={handleRegisterSubmit} variants={containerVariants}>
-                <motion.div className="input-group" variants={itemVariants}>
-                  <label htmlFor="username">Username</label>
-                  <div className="input-container">
-                    <input 
-                      id="username" name="username" type="text"
-                      placeholder="nova_researcher"
-                      value={formData.username} onChange={handleChange}
-                      required 
-                    />
-                  </div>
-                </motion.div>
+                <AnimatePresence>
+                  {error && (
+                    <motion.div 
+                      className="error-message"
+                      initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                      animate={{ opacity: 1, height: 'auto', marginBottom: '1.5rem' }}
+                      exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                      style={{
+                        backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                        color: '#ef4444',
+                        padding: '0.875rem 1rem',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.875rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '1.125rem' }}>error</span>
+                      <span>{error}</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-                <motion.div className="input-group" variants={itemVariants}>
-                  <label htmlFor="email">Email address</label>
-                  <div className="input-container">
-                    <input 
-                      id="email" name="email" type="email"
-                      placeholder="nova@jigyaza.ai"
-                      value={formData.email} onChange={handleChange}
-                      required 
-                    />
-                  </div>
-                </motion.div>
+                {loading ? (
+                  <motion.div 
+                    className="loading-overlay"
+                    key="registration-loading-overlay"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '280px', gap: '1.25rem' }}
+                  >
+                    <Loder size={65} color="#c7621a" />
+                    <p style={{ color: '#cbd5e1', fontWeight: 500, fontSize: '0.95rem', letterSpacing: '0.025em' }}>Creating your account...</p>
+                  </motion.div>
+                ) : (
+                  <>
+                    <motion.div className="input-group" variants={itemVariants}>
+                      <label htmlFor="username">Username</label>
+                      <div className="input-container">
+                        <input 
+                          id="username" name="username" type="text"
+                          placeholder="nova_researcher"
+                          value={formData.username} onChange={handleChange}
+                          required 
+                        />
+                      </div>
+                    </motion.div>
 
-                <motion.div className="input-group" variants={itemVariants}>
-                  <label htmlFor="password">Password</label>
-                  <div className="input-container">
-                    <input 
-                      id="password" name="password" 
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      value={formData.password} onChange={handleChange}
-                      required 
-                    />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)}>
-                      <span className="material-symbols-outlined">
-                        {showPassword ? "visibility" : "visibility_off"}
-                      </span>
-                    </button>
-                  </div>
-                </motion.div>
+                    <motion.div className="input-group" variants={itemVariants}>
+                      <label htmlFor="email">Email address</label>
+                      <div className="input-container">
+                        <input 
+                          id="email" name="email" type="email"
+                          placeholder="nova@jigyaza.ai"
+                          value={formData.email} onChange={handleChange}
+                          required 
+                        />
+                      </div>
+                    </motion.div>
+
+                    <motion.div className="input-group" variants={itemVariants}>
+                      <label htmlFor="password">Password</label>
+                      <div className="input-container">
+                        <input 
+                          id="password" name="password" 
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          value={formData.password} onChange={handleChange}
+                          required 
+                        />
+                        <button type="button" onClick={() => setShowPassword(!showPassword)}>
+                          <span className="material-symbols-outlined">
+                            {showPassword ? "visibility" : "visibility_off"}
+                          </span>
+                        </button>
+                      </div>
+                    </motion.div>
+
+                    <motion.div className="input-group checkbox-group" variants={itemVariants} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: '0.75rem', marginTop: '0.5rem', marginBottom: '1.5rem' }}>
+                      <div className="custom-checkbox">
+                        <input 
+                          type="checkbox" 
+                          id="terms" 
+                          checked={acceptedTerms}
+                          onChange={(e) => setAcceptedTerms(e.target.checked)}
+                          required
+                          style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#c7621a', marginTop: '4px' }}
+                        />
+                      </div>
+                      <label htmlFor="terms" style={{ fontSize: '0.85rem', color: '#8c8279', lineHeight: '1.5', cursor: 'pointer', userSelect: 'none', fontWeight: 400, textTransform: 'none', letterSpacing: 'normal' }}>
+                        I agree to the <Link to="/terms" target="_blank" style={{ color: '#c7621a', textDecoration: 'none' }}>Terms and Conditions</Link> and <Link to="/privacy" target="_blank" style={{ color: '#c7621a', textDecoration: 'none' }}>Privacy Policy</Link>.
+                      </label>
+                    </motion.div>
+                  </>
+                )}
 
                 <motion.button 
                   type="submit" 
@@ -218,14 +307,7 @@ const Register = () => {
                   whileTap={{ scale: 0.98 }}
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                 >
-                  {loading ? (
-                    <>
-                      <Loder size={20} color="#000" />
-                      Processing...
-                    </>
-                  ) : (
-                    'Create account'
-                  )}
+                  {loading ? 'Processing...' : 'Create account'}
                 </motion.button>
               </motion.form>
 
@@ -237,7 +319,7 @@ const Register = () => {
 
             <div className="terms-footer font-display">
               <p>
-                © 2024 JIGYAZAAI — ALL RIGHTS RESERVED. <br className="hidden lg:block"/>
+                © 1 April 2026 JIGYAZAAI — ALL RIGHTS RESERVED. <br className="hidden lg:block"/>
                 <Link to="/privacy">PRIVACY POLICY</Link> • <Link to="/terms">TERMS OF SERVICE</Link>
               </p>
             </div>
@@ -262,7 +344,7 @@ const Register = () => {
 
               <motion.div className="content-z" variants={containerVariants} initial="hidden" animate="visible">
                 <motion.div className="branding-v" variants={itemVariants}>
-                  <LogoSVG />
+                  <Loder size={32} color="#c7621a" />
                   <span className="brand-name">jigyazaAi</span>
                 </motion.div>
 
@@ -291,53 +373,88 @@ const Register = () => {
 
                 <motion.div className="form-v" variants={itemVariants}>
                   <form onSubmit={handleVerifySubmit}>
-                    <div className="otp-inputs">
-                      {otp.map((data, index) => {
-                        return (
-                          <React.Fragment key={index}>
-                            <input
-                              type="text"
-                              maxLength="1"
-                              value={data}
-                              ref={(el) => (otpInputs.current[index] = el)}
-                              onChange={(e) => handleOtpChange(e, index)}
-                              onKeyDown={(e) => handleKeyDown(e, index)}
-                              onFocus={(e) => e.target.select()}
-                            />
-                            {index === 2 && <div className="dash">—</div>}
-                          </React.Fragment>
-                        );
-                      })}
-                    </div>
-
-                    <button 
-                      type="submit" 
-                      className="verify-btn font-display" 
-                      disabled={loading}
-                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                    >
-                      {loading ? (
-                        <>
-                          <Loder size={20} color="#000" />
-                          Verifying...
-                        </>
-                      ) : (
-                        'Verify code'
+                    <AnimatePresence>
+                      {verifyError && (
+                        <motion.div 
+                          className="error-message"
+                          initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                          animate={{ opacity: 1, height: 'auto', marginBottom: '1.5rem' }}
+                          exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                          style={{
+                            backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                            border: '1px solid rgba(239, 68, 68, 0.2)',
+                            color: '#ef4444',
+                            padding: '0.875rem 1rem',
+                            borderRadius: '0.5rem',
+                            fontSize: '0.875rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: '1.125rem' }}>error</span>
+                          <span>{verifyError}</span>
+                        </motion.div>
                       )}
-                    </button>
-                    
-                    <div className="resend">
-                      <p style={{ marginTop: '1.5rem', color: '#8b8a87', fontSize: '0.85rem' }}>
-                        Didn't receive a code?{' '}
-                        {canResend ? (
-                          <span onClick={handleResendOtp} style={{ color: '#c8621a', cursor: 'pointer', fontWeight: 'bold' }}>
-                            Resend →
-                          </span>
-                        ) : (
-                          <span>Resend in {timer}s</span>
-                        )}
-                      </p>
-                    </div>
+                    </AnimatePresence>
+
+                    {loading ? (
+                      <motion.div 
+                        className="loading-overlay"
+                        key="verify-loading-overlay"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '140px', gap: '1.25rem' }}
+                      >
+                        <Loder size={65} color="#c7621a" />
+                        <p style={{ color: '#cbd5e1', fontWeight: 500, fontSize: '0.95rem', letterSpacing: '0.025em' }}>Verifying identity...</p>
+                      </motion.div>
+                    ) : (
+                      <>
+                        <div className="otp-inputs">
+                          {otp.map((data, index) => {
+                            return (
+                              <React.Fragment key={index}>
+                                <input
+                                  type="text"
+                                  maxLength="1"
+                                  value={data}
+                                  ref={(el) => (otpInputs.current[index] = el)}
+                                  onChange={(e) => handleOtpChange(e, index)}
+                                  onKeyDown={(e) => handleKeyDown(e, index)}
+                                  onFocus={(e) => e.target.select()}
+                                />
+                                {index === 2 && <div className="dash">—</div>}
+                              </React.Fragment>
+                            );
+                          })}
+                        </div>
+
+                        <button 
+                          type="submit" 
+                          className="verify-btn font-display" 
+                          disabled={loading}
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                        >
+                          Verify code
+                        </button>
+                        
+                        <div className="resend">
+                          <p style={{ marginTop: '1.5rem', color: '#8b8a87', fontSize: '0.85rem' }}>
+                            Didn't receive a code?{' '}
+                            {canResend ? (
+                              <span onClick={handleResendOtp} style={{ color: '#c8621a', cursor: 'pointer', fontWeight: 'bold' }}>
+                                Resend →
+                              </span>
+                            ) : (
+                              <span>Resend in {timer}s</span>
+                            )}
+                          </p>
+                        </div>
+                      </>
+                    )}
                   </form>
                 </motion.div>
 
