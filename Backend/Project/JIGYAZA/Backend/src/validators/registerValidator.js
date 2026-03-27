@@ -8,9 +8,15 @@ const registerChecks = [
     .withMessage("username must be at least 3 characters long"),
   body("email").trim().isEmail().withMessage("a valid email is required"),
   body("password")
-    .isString()
-    .isLength({ min: 6 })
-    .withMessage("password must be at least 6 characters long"),
+  .notEmpty()
+  .withMessage("Password is required")
+  .isString()
+  .isLength({ min: 8, max: 128 })
+  .withMessage("Password must be between 8 and 128 characters long")
+  .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+  .withMessage(
+    "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+  ),
 ];
 
 export async function registerValidator(req, res, next) {

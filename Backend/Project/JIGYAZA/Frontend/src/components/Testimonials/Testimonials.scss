@@ -1,0 +1,736 @@
+// ─── Variables (mirror LandingPage tokens) ────────────────────────────────────
+$hub-black:       #0A0806;
+$hub-surface:     #141210;
+$hub-border:      #382f29;
+$hub-primary:     #c7621a;
+$hub-secondary:   #9a4c14;
+$hub-text-primary:#F0EBE3;
+$hub-text-muted:  #8c8279;
+
+$font-serif: 'Playfair Display', serif;
+$font-sans:  'DM Sans', sans-serif;
+$font-mono:  'JetBrains Mono', monospace;
+
+// ─── Keyframes ────────────────────────────────────────────────────────────────
+@keyframes tv2-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.3); }
+}
+
+@keyframes tv2-shimmer {
+  0%   { background-position: -400% 0; }
+  100% { background-position: 400% 0; }
+}
+
+@keyframes tv2-float-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(30px, -40px) scale(1.05); }
+  66%       { transform: translate(-20px, 20px) scale(0.97); }
+}
+
+@keyframes tv2-float-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%       { transform: translate(-40px, 30px) scale(1.08); }
+  70%       { transform: translate(20px, -20px) scale(0.95); }
+}
+
+@keyframes tv2-float-c {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(15px, 35px) scale(1.06); }
+}
+
+@keyframes tv2-ring-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes tv2-ring-ccw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+@keyframes tv2-card-in {
+  from {
+    opacity: 0;
+    transform: perspective(600px) rotateX(20deg) translateY(40px) scale(0.92);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(600px) rotateX(0deg) translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes tv2-scan-line {
+  0%   { top: 0; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+@keyframes tv2-dot-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.2; }
+}
+
+@keyframes tv2-metric-appear {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0% 0 0); }
+}
+
+@keyframes tv2-avatar-ring {
+  from { transform: rotate(0deg) scale(1); opacity: 0.6; }
+  to   { transform: rotate(360deg) scale(1.3); opacity: 0; }
+}
+
+// CSS marquee: replaces the JS requestAnimationFrame ticker loop
+@keyframes tv2-marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+// ─── Section Shell ────────────────────────────────────────────────────────────
+.testimonials-v2 {
+  position: relative;
+  background: $hub-black;
+  // No hard borders — section bleeds seamlessly from pricing above and footer below
+  overflow: hidden;
+  padding: 9rem 1.5rem 8rem;
+
+  // Top gradient bleed — fades pricing section into testimonials
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 220px;
+    background: linear-gradient(to bottom, $hub-black 0%, transparent 100%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  // ── Neural canvas ──
+  .testi-neural-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    // contain:strict isolates paints to this layer so the rest of the page
+    // doesn't get recomposited on every canvas frame
+    contain: strict;
+  }
+
+  // ── Glows ──
+  .tv2-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(180px);
+    pointer-events: none;
+    z-index: 0;
+
+    &--a {
+      width: 900px;
+      height: 900px;
+      top: -300px;
+      left: -200px;
+      background: radial-gradient(circle, rgba($hub-primary, 0.07) 0%, transparent 70%);
+      animation: tv2-float-a 22s ease-in-out infinite;
+      will-change: transform;
+    }
+    &--b {
+      width: 700px;
+      height: 700px;
+      bottom: -200px;
+      right: -150px;
+      background: radial-gradient(circle, rgba($hub-secondary, 0.09) 0%, transparent 70%);
+      animation: tv2-float-b 18s ease-in-out infinite;
+      will-change: transform;
+    }
+    &--c {
+      width: 500px;
+      height: 500px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba($hub-primary, 0.04) 0%, transparent 70%);
+      animation: tv2-float-c 14s ease-in-out infinite;
+      will-change: transform;
+    }
+  }
+
+  // ── Grid overlay ──
+  .tv2-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, rgba($hub-border, 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba($hub-border, 0.1) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 80% at center, black 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 80% at center, black 20%, transparent 75%);
+  }
+
+  // ── Scan line ──
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba($hub-primary, 0.25), transparent);
+    pointer-events: none;
+    z-index: 2;
+    animation: tv2-scan-line 8s linear infinite;
+  }
+
+  // ─── Inner container ──────────────────────────────────────────────────────
+  .tv2-inner {
+    position: relative;
+    z-index: 10;
+  }
+
+  // ─── Header ──────────────────────────────────────────────────────────────
+  .tv2-header {
+    text-align: center;
+    margin-bottom: 5rem;
+    max-width: 52rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .tv2-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 2rem;
+
+    &__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: $hub-primary;
+      box-shadow: 0 0 14px rgba($hub-primary, 0.9);
+      animation: tv2-pulse 2.5s ease-in-out infinite;
+    }
+
+    &__label {
+      font-family: $font-mono;
+      font-size: 0.68rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: $hub-primary;
+    }
+
+    &__line {
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(90deg, rgba($hub-primary, 0.6), transparent);
+    }
+  }
+
+  .tv2-title {
+    font-family: $font-serif;
+    font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    color: $hub-text-primary;
+
+    &__accent {
+      color: $hub-primary;
+      font-style: italic;
+      position: relative;
+      display: inline-block;
+
+      // Underline shimmer
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          $hub-primary,
+          $hub-secondary,
+          $hub-primary,
+          transparent
+        );
+        background-size: 200% 100%;
+        animation: tv2-shimmer 3s linear infinite;
+      }
+    }
+  }
+
+  .tv2-subtitle {
+    font-family: $font-mono;
+    font-size: 0.8rem;
+    color: $hub-text-muted;
+    letter-spacing: 0.06em;
+    line-height: 1.8;
+
+    &__highlight {
+      color: $hub-text-primary;
+      background: rgba($hub-primary, 0.08);
+      border: 1px solid rgba($hub-primary, 0.15);
+      border-radius: 4px;
+      padding: 2px 8px;
+    }
+  }
+
+  // ─── Stats Bar ────────────────────────────────────────────────────────────
+  .tv2-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: rgba($hub-border, 0.4);
+    border: 1px solid rgba($hub-border, 0.4);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 5rem;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .tv2-stat {
+    background: rgba($hub-surface, 0.7);
+    backdrop-filter: blur(12px);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    position: relative;
+    transition: background 0.3s;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0, rgba($hub-primary, 0.06), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    &:hover {
+      background: rgba($hub-surface, 0.9);
+      &::before { opacity: 1; }
+    }
+
+    &__value {
+      font-family: $font-serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 700;
+      color: $hub-text-primary;
+      line-height: 1;
+      margin-bottom: 0.6rem;
+      background: linear-gradient(135deg, $hub-text-primary 60%, rgba($hub-primary, 0.7));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    &__label {
+      font-family: $font-mono;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: $hub-text-muted;
+      line-height: 1.5;
+    }
+  }
+
+  // ─── Cards Grid ───────────────────────────────────────────────────────────
+  .tv2-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-bottom: 4rem;
+
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  // Card entrance wrapper — initial state set by GSAP, no CSS transition needed
+  .tv2-card-wrapper {
+    height: 100%;
+    // GSAP sets opacity/transform/filter on mount and animates them in
+  }
+
+  // ─── Testimonial Card ─────────────────────────────────────────────────────
+  .tc-card {
+    --tx: 0deg;
+    --ty: 0deg;
+    --sx: -9999px;
+    --sy: -9999px;
+    --accent: #c7621a;
+
+    position: relative;
+    background: rgba($hub-surface, 0.55);
+    border: 1px solid rgba($hub-border, 0.7);
+    border-radius: 14px;
+    padding: 2rem 2rem 1.75rem;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    backdrop-filter: blur(18px);
+    transition:
+      transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      border-color 0.3s ease,
+      box-shadow 0.3s ease;
+    transform-style: preserve-3d;
+
+    &:hover,
+    &--active {
+      transform: perspective(900px) rotateX(var(--tx)) rotateY(var(--ty)) translateZ(10px);
+      border-color: rgba(var(--accent), 0.4);
+      box-shadow:
+        0 24px 72px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba($hub-primary, 0.12) inset,
+        0 0 60px rgba($hub-primary, 0.04);
+    }
+
+    &--active {
+      border-color: rgba($hub-primary, 0.5) !important;
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba($hub-primary, 0.2) inset,
+        0 0 80px rgba($hub-primary, 0.08) !important;
+
+      .tc-card__quote {
+        color: $hub-text-primary;
+      }
+    }
+
+    // Spotlight
+    &__spotlight {
+      position: absolute;
+      top: var(--sy);
+      left: var(--sx);
+      transform: translate(-50%, -50%);
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba($hub-primary, 0.09) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    // Decorative big quote glyph
+    &__decorq {
+      position: absolute;
+      top: -0.4rem;
+      right: 1.5rem;
+      font-family: $font-serif;
+      font-size: 7rem;
+      line-height: 1;
+      color: rgba($hub-primary, 0.07);
+      pointer-events: none;
+      user-select: none;
+      font-weight: 700;
+      z-index: 0;
+      transition: color 0.4s;
+    }
+
+    &:hover .tc-card__decorq,
+    &--active .tc-card__decorq {
+      color: rgba($hub-primary, 0.14);
+    }
+
+    // Verified badge
+    &__verified {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: $font-mono;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: $hub-primary;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+
+      .material-symbols-outlined {
+        font-size: 13px;
+        color: $hub-primary;
+      }
+    }
+
+    // Quote text
+    &__quote {
+      font-family: $font-serif;
+      font-style: italic;
+      font-size: 1rem;
+      line-height: 1.75;
+      color: rgba($hub-text-primary, 0.85);
+      flex: 1;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+      transition: color 0.3s;
+    }
+
+    // Impact metric
+    &__metric {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba($hub-primary, 0.08);
+      border: 1px solid rgba($hub-primary, 0.2);
+      border-radius: 100px;
+      padding: 5px 12px;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba($hub-primary, 0.08), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.6s;
+      }
+    }
+
+    &:hover .tc-card__metric::before {
+      transform: translateX(100%);
+    }
+
+    &__metric-icon {
+      font-size: 13px;
+      color: $hub-primary;
+    }
+
+    &__metric-value {
+      font-family: $font-mono;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: $hub-primary;
+    }
+
+    // Author row
+    &__author {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      position: relative;
+      z-index: 1;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba($hub-border, 0.5);
+    }
+
+    // Avatar
+    &__avatar {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba($hub-primary, 0.25), rgba($hub-secondary, 0.15));
+      border: 1px solid rgba($hub-primary, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      span {
+        font-family: $font-mono;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: $hub-primary;
+        letter-spacing: 0.05em;
+      }
+    }
+
+    &__avatar-ring {
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 1px solid rgba($hub-primary, 0.4);
+      animation: tv2-avatar-ring 3s ease-out infinite;
+      opacity: 0;
+    }
+
+    &:hover &__avatar-ring {
+      opacity: 1;
+    }
+
+    // Author info
+    &__author-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    &__author-name {
+      font-family: $font-sans;
+      font-weight: 700;
+      font-size: 0.875rem;
+      color: $hub-text-primary;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__author-role {
+      font-family: $font-mono;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: $hub-text-muted;
+    }
+
+    &__author-org {
+      color: $hub-primary;
+    }
+  }
+
+  // ─── Infinite Ticker ──────────────────────────────────────────────────────
+  .tv2-ticker-wrap {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 4.5rem;
+    border-top: 1px solid rgba($hub-border, 0.4);
+    border-bottom: 1px solid rgba($hub-border, 0.4);
+    padding: 1rem 0;
+    background: rgba($hub-surface, 0.3);
+  }
+
+  .tv2-ticker-fade {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 120px;
+    z-index: 2;
+    pointer-events: none;
+
+    &--left {
+      left: 0;
+      background: linear-gradient(to right, $hub-black, transparent);
+    }
+    &--right {
+      right: 0;
+      background: linear-gradient(to left, $hub-black, transparent);
+    }
+  }
+
+  .tv2-ticker-track {
+    overflow: hidden;
+  }
+
+  .tv2-ticker-inner {
+    display: flex;
+    gap: 0;
+    white-space: nowrap;
+    // Default: JS-driven (will-change declared by JS)
+    will-change: transform;
+
+    // CSS-driven marquee variant (replaces JS requestAnimationFrame loop)
+    // The ticker content is duplicated 4× so 50% = 1 full set
+    &--css {
+      animation: tv2-marquee 40s linear infinite;
+    }
+  }
+
+  .tv2-ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0 2.5rem;
+    font-family: $font-mono;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $hub-text-muted;
+  }
+
+  .tv2-ticker-star {
+    font-size: 12px;
+    color: $hub-primary;
+  }
+
+  .tv2-ticker-author {
+    color: $hub-text-primary;
+    font-weight: 500;
+  }
+
+  .tv2-ticker-sep {
+    color: rgba($hub-border, 0.8);
+  }
+
+  .tv2-ticker-metric {
+    color: $hub-primary;
+  }
+
+  .tv2-ticker-org {
+    color: $hub-text-muted;
+  }
+
+  // ─── Bottom Strip ─────────────────────────────────────────────────────────
+  .tv2-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+
+    &__avatars {
+      display: flex;
+    }
+
+    &__avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba($hub-primary, 0.2), rgba($hub-secondary, 0.15));
+      border: 2px solid $hub-black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: $font-mono;
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: $hub-primary;
+      margin-left: calc(var(--i) * -10px);
+      position: relative;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        z-index: 10 !important;
+      }
+    }
+
+    &__text {
+      font-family: $font-mono;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: $hub-text-muted;
+
+      strong {
+        color: $hub-text-primary;
+        font-weight: 600;
+      }
+    }
+  }
+}

@@ -1,14 +1,18 @@
-@import '../../../features/LandingPage/LandingPage.scss'; // Reuse variables and animations
+@use "../../../features/LandingPage/LandingPage.scss" as LandingPage;
 
 .legal-page {
-  background-color: $hub-black;
-  color: $hub-text-primary;
+  background-color: LandingPage.$hub-black;
+  color: LandingPage.$hub-text-primary;
   min-height: 100vh;
-  font-family: $font-sans;
+  font-family: LandingPage.$font-sans;
 
   &.mesh-gradient-bg {
-    background-image: 
-      radial-gradient(at 50% 50%, rgba(232, 168, 56, 0.08) 0px, transparent 50%),
+    background-image:
+      radial-gradient(
+        at 50% 50%,
+        rgba(232, 168, 56, 0.08) 0px,
+        transparent 50%
+      ),
       radial-gradient(at 0% 0%, rgba(201, 106, 46, 0.05) 0px, transparent 50%);
   }
 
@@ -20,22 +24,23 @@
     position: sticky;
     top: 0;
     z-index: 50;
-    background-color: rgba($hub-black, 0.8);
+    background-color: rgba(LandingPage.$hub-black, 0.8);
+    -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid $hub-border;
+    border-bottom: 1px solid LandingPage.$hub-border;
 
     .logo {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       text-decoration: none;
-      
+
       span {
-        font-family: $font-serif;
+        font-family: LandingPage.$font-serif;
         font-weight: 700;
         font-size: 1.5rem;
         letter-spacing: -0.02em;
-        color: $hub-text-primary;
+        color: LandingPage.$hub-text-primary;
       }
     }
 
@@ -46,27 +51,27 @@
 
       a {
         text-decoration: none;
-        color: $hub-text-muted;
-        font-family: $font-mono;
+        color: LandingPage.$hub-text-muted;
+        font-family: LandingPage.$font-mono;
         font-size: 11px;
         letter-spacing: 0.1em;
         text-transform: uppercase;
         font-weight: 700;
         transition: color 0.3s;
-        
+
         &:hover {
-          color: $hub-primary;
+          color: LandingPage.$hub-primary;
         }
 
         &.back-link {
           padding: 0.5rem 1.25rem;
-          border: 1px solid rgba($hub-primary, 0.4);
+          border: 1px solid rgba(LandingPage.$hub-primary, 0.4);
           border-radius: 2px;
-          color: $hub-text-primary;
-          
+          color: LandingPage.$hub-text-primary;
+
           &:hover {
-            background-color: $hub-primary;
-            color: $hub-black;
+            background-color: LandingPage.$hub-primary;
+            color: LandingPage.$hub-black;
           }
         }
       }
@@ -81,50 +86,50 @@
 
     .legal-content {
       padding: 3rem 4rem;
-      background: rgba($hub-surface, 0.8);
-      border: 1px solid rgba($hub-border, 0.8);
+      background: rgba(LandingPage.$hub-surface, 0.8);
+      border: 1px solid rgba(LandingPage.$hub-border, 0.8);
       border-radius: 0.75rem;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-      
+
       h1 {
-        font-family: $font-serif;
+        font-family: LandingPage.$font-serif;
         font-size: 2.5rem;
         font-weight: 700;
-        color: $hub-primary;
+        color: LandingPage.$hub-primary;
         margin-bottom: 0.5rem;
         text-align: left;
       }
 
       .last-updated {
-        font-family: $font-mono;
+        font-family: LandingPage.$font-mono;
         font-size: 0.85rem;
-        color: $hub-text-muted;
+        color: LandingPage.$hub-text-muted;
         margin-bottom: 3rem;
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        border-bottom: 1px solid $hub-border;
+        border-bottom: 1px solid LandingPage.$hub-border;
         padding-bottom: 1.5rem;
       }
 
       .markdown-body {
         font-size: 1.05rem;
         line-height: 1.8;
-        color: rgba($hub-text-primary, 0.9);
+        color: rgba(LandingPage.$hub-text-primary, 0.9);
 
         h2 {
-          font-family: $font-sans;
+          font-family: LandingPage.$font-sans;
           font-size: 1.5rem;
           font-weight: 700;
-          color: $hub-text-primary;
+          color: LandingPage.$hub-text-primary;
           margin-top: 2.5rem;
           margin-bottom: 1rem;
         }
 
         h3 {
-          font-family: $font-sans;
+          font-family: LandingPage.$font-sans;
           font-size: 1.2rem;
           font-weight: 600;
-          color: rgba($hub-text-primary, 0.9);
+          color: rgba(LandingPage.$hub-text-primary, 0.9);
           margin-top: 2rem;
           margin-bottom: 0.75rem;
         }
@@ -147,13 +152,13 @@
               content: "•";
               position: absolute;
               left: 0;
-              color: $hub-primary;
+              color: LandingPage.$hub-primary;
               font-weight: bold;
             }
 
             strong {
-              color: $hub-text-primary;
-              font-family: $font-mono;
+              color: LandingPage.$hub-text-primary;
+              font-family: LandingPage.$font-mono;
               font-size: 0.9em;
               display: inline-block;
               margin-right: 0.25rem;
@@ -162,18 +167,18 @@
         }
 
         strong {
-          color: $hub-primary;
+          color: LandingPage.$hub-primary;
           font-weight: 600;
         }
 
         a {
-          color: $hub-primary;
+          color: LandingPage.$hub-primary;
           text-decoration: none;
           border-bottom: 1px solid transparent;
           transition: border-color 0.2s;
-          
+
           &:hover {
-            border-bottom-color: $hub-primary;
+            border-bottom-color: LandingPage.$hub-primary;
           }
         }
       }
@@ -183,10 +188,10 @@
   @media (max-width: 768px) {
     .legal-container {
       margin: 2rem auto;
-      
+
       .legal-content {
         padding: 2rem 1.5rem;
-        
+
         h1 {
           font-size: 2rem;
         }

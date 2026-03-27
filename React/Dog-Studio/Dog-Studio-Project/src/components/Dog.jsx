@@ -124,7 +124,7 @@ const Dog = () => {
       />
       {/* <directionalLight intensity={1000} position={[0, 3, 3]} /> */}
 
-      {/* <OrbitControls /> */}
+      <OrbitControls />
     </>
   );
 };

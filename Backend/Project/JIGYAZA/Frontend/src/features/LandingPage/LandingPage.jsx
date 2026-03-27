@@ -4,215 +4,500 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './LandingPage.scss';
 import Loder from '../../components/Loaders/loder/Loder';
+import TerminalWindow from '../../components/TerminalWindow/TerminalWindow';
+import HeroLogoBg from '../../components/HeroLogoBg/HeroLogoBg';
+import Testimonials from '../../components/Testimonials/Testimonials';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const TerminalDemo = () => {
-  const [lines, setLines] = useState([]);
-  const containerRef = useRef(null);
+// ── Perf util: wrap any callback in a RAF-throttled handler ──────
+function rafThrottle(fn) {
+  let scheduled = false;
+  return function (...args) {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      fn.apply(this, args);
+      scheduled = false;
+    });
+  };
+}
 
-  useEffect(() => {
-    const cycle = [
-      { text: "> Authenticating user session...", isPrompt: true, delay: 500 },
-      { text: "[OK] Session secured. E2E active.", delay: 300 },
-      { text: "> Initiating query sequence: Q_TRANSFORMER_04", isPrompt: true, delay: 600 },
-      { text: "Spawning Agent Swarm (n=4)", delay: 300 },
-      { text: "Agent 1: Fetching recent papers from IEEE...", delay: 400 },
-      { text: "Agent 2: Analyzing GitHub repositories for implementation trends...", delay: 500 },
-      { text: "Agent 3: Validating statistical models against known benchmarks...", delay: 600 },
-      { text: "Agent 4: Checking logical consistency of findings...", delay: 500 },
-      { text: "WARN: Conflict detected in source [MIT_Arxiv_24b]", delay: 800, isWarn: true },
-      { text: "Agent 1: Re-evaluating conflicting data...", delay: 600 },
-      { text: "Agent 4: Source flagged as unverified. Excluding from consensus.", delay: 500 },
-      { text: "[OK] Consensus aligned. Confidence score: 99.4%", isSuccess: true, delay: 400 },
-      { text: "Structuring output payload...", delay: 300 },
-      { text: "----------------------------------------", delay: 200 },
-      { text: "[SYTHESIS OUTPUT]", isSuccess: true, delay: 300 },
-      { text: "Transformer models are a type of neural network architecture that rely on self-attention mechanisms to weigh the significance of different parts of input data.", isResponse: true, delay: 800 },
-      { text: "Unlike previous sequential models, transformers process data in parallel, allowing for significant efficiency gains.", isResponse: true, delay: 800 },
-      { text: "Through global dependencies, the architecture avoids vanishing gradient problems common in RNNs, enabling the training of models with hundreds of billions of parameters.", isResponse: true, delay: 800 },
-      { text: "> SYSTEM_SLEEP (3s)", isPrompt: true, delay: 2000 },
-      { text: "CLEAR", delay: 1000 }
-    ];
+// Detect user's motion preference once at module-load time
+const prefersReducedMotion =
+  typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    let isMounted = true;
-    let index = 0;
-    
-    const runLoop = async () => {
-      while (isMounted) {
-        const line = cycle[index];
-        if (line.text === "CLEAR") {
-          await new Promise(r => setTimeout(r, line.delay || 1000));
-          if (!isMounted) break;
-          setLines([]);
-          index = 0;
-        } else {
-          setLines(prev => [...prev, line]);
-          index++;
-        }
-        
-        // Auto-scroll
-        if (containerRef.current) {
-          containerRef.current.scrollTop = containerRef.current.scrollHeight;
-        }
+// ─── Premium Pricing Section ────────────────────────────────────────────────
+const PLANS = [
+  {
+    id: 'researcher',
+    tier: 'Researcher',
+    tagline: 'For solo explorers & students',
+    monthlyPrice: 0,
+    annualPrice: 0,
+    priceNote: 'Beta Access · Free forever',
+    cta: 'Start for Free',
+    ctaVariant: 'ghost',
+    badge: null,
+    features: [
+      { icon: 'search', label: '100 queries per day', included: true },
+      { icon: 'language', label: 'Live Web Access', included: true },
+      { icon: 'smart_toy', label: 'Standard AI Reasoning', included: true },
+      { icon: 'history', label: '7-day query history', included: true },
+      { icon: 'upload_file', label: 'PDF & Document Uploads', included: false },
+      { icon: 'groups', label: 'Team Workspaces', included: false },
+      { icon: 'api', label: 'API Access', included: false },
+      { icon: 'support_agent', label: 'Priority Support', included: false },
+    ],
+  },
+  {
+    id: 'pro',
+    tier: 'Pro',
+    tagline: 'For power researchers & analysts',
+    monthlyPrice: 29,
+    annualPrice: 23,
+    priceNote: 'per seat / month',
+    cta: 'Start 14-day Free Trial',
+    ctaVariant: 'solid',
+    badge: 'Most Popular',
+    features: [
+      { icon: 'search', label: 'Unlimited daily queries', included: true },
+      { icon: 'language', label: 'Live Web Access', included: true },
+      { icon: 'psychology', label: 'Enhanced Multi-Agent Reasoning', included: true },
+      { icon: 'history', label: '90-day query history', included: true },
+      { icon: 'upload_file', label: '1,000-page PDF Uploads', included: true },
+      { icon: 'groups', label: 'Team Workspaces (up to 5)', included: true },
+      { icon: 'api', label: 'API Access (10k calls/mo)', included: false },
+      { icon: 'support_agent', label: 'Priority Support', included: false },
+    ],
+  },
+  {
+    id: 'enterprise',
+    tier: 'Enterprise',
+    tagline: 'For institutions & large teams',
+    monthlyPrice: 99,
+    annualPrice: 79,
+    priceNote: 'per seat / month',
+    cta: 'Request Demo',
+    ctaVariant: 'outline',
+    badge: null,
+    features: [
+      { icon: 'search', label: 'Unlimited daily queries', included: true },
+      { icon: 'language', label: 'Live Web Access', included: true },
+      { icon: 'psychology', label: 'Custom Multi-Agent Logic', included: true },
+      { icon: 'history', label: 'Unlimited query history', included: true },
+      { icon: 'upload_file', label: '5,000-page PDF dataset uploads', included: true },
+      { icon: 'groups', label: 'Unlimited Team Workspaces', included: true },
+      { icon: 'api', label: 'Dedicated API (no rate limit)', included: true },
+      { icon: 'support_agent', label: 'Dedicated Success Manager', included: true },
+    ],
+  },
+];
 
-        const waitTime = line.delay || 300;
-        await new Promise(r => setTimeout(r, waitTime));
-      }
-    };
-    runLoop();
-    
-    return () => { isMounted = false; };
-  }, []);
+const PricingSection = ({ navigate }) => {
+  const [annual, setAnnual] = useState(false);
+  const cardRefs = useRef([]);
+
+  // Throttle card tilt to once-per-frame to avoid layout thrashing
+  const handleCardMouseMove = rafThrottle((e, idx) => {
+    const card = cardRefs.current[idx];
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+    card.style.setProperty('--tilt-x', `${y * -8}deg`);
+    card.style.setProperty('--tilt-y', `${x * 8}deg`);
+    card.style.setProperty('--spotlight-x', `${e.clientX - rect.left}px`);
+    card.style.setProperty('--spotlight-y', `${e.clientY - rect.top}px`);
+  });
+
+  const handleCardMouseLeave = (idx) => {
+    const card = cardRefs.current[idx];
+    if (!card) return;
+    card.style.setProperty('--tilt-x', '0deg');
+    card.style.setProperty('--tilt-y', '0deg');
+    card.style.setProperty('--spotlight-x', '-9999px');
+    card.style.setProperty('--spotlight-y', '-9999px');
+  };
 
   return (
-    <div className="main-content custom-scrollbar" ref={containerRef} style={{ scrollBehavior: 'smooth' }}>
-      {lines.map((ln, i) => {
-        if (ln.isResponse) {
-           return <p key={i} style={{color: 'rgba(240, 237, 232, 0.9)', fontSize: '1.25rem', lineHeight: '1.625', marginBottom: '1.5rem', fontFamily: '"DM Sans", sans-serif'}}>{ln.text}</p>
-        }
-        if (ln.isPrompt) {
-           return (
-             <div key={i} className="prompt flex items-center mb-4 mt-2">
-                <span className="text-hub-primary mr-2 font-mono font-bold">&gt;</span>
-                <span className="prompt-text font-mono text-hub-primary font-bold text-sm tracking-wide">{ln.text}</span>
-             </div>
-           )
-        }
-        let color = '#8c8279'; // muted
-        if (ln.isWarn) color = '#eab308';
-        if (ln.isSuccess) color = '#22c55e';
-        
-        return (
-          <div key={i} className="font-mono text-xs mb-2 tracking-wide" style={{ color }}>{ln.text}</div>
-        )
-      })}
-      <div className="animate-pulse w-2 h-4 bg-hub-primary mt-2"></div>
-    </div>
+    <section className="pricing-section section">
+      {/* ── Ambient background pulses ── */}
+      <div className="pricing-bg">
+        <div className="pricing-glow pricing-glow--left" />
+        <div className="pricing-glow pricing-glow--right" />
+        <div className="pricing-grid-overlay" />
+      </div>
+
+      <div className="max-w">
+        {/* Header */}
+        <div className="pricing-header reveal">
+          <div className="pricing-eyebrow">
+            <span className="eyebrow-dot" />
+            <span className="font-mono text-hub-primary" style={{ fontSize: '0.7rem', letterSpacing: '0.25em', textTransform: 'uppercase' }}>
+              Pricing Protocols
+            </span>
+          </div>
+          <h2 className="font-serif" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontStyle: 'italic', marginBottom: '1rem', lineHeight: 1.1 }}>
+            Choose your <span className="text-hub-primary">compute level</span>
+          </h2>
+          <p className="font-sans text-hub-text-muted" style={{ maxWidth: '36rem', margin: '0 auto', lineHeight: 1.7 }}>
+            From individual researchers to enterprise institutions — every plan includes our core multi-agent truth-seeking engine.
+          </p>
+
+          {/* Billing Toggle */}
+          <div className="billing-toggle reveal">
+            <span className={`billing-label font-mono ${!annual ? 'active' : ''}`}>Monthly</span>
+            <button
+              id="billing-toggle-btn"
+              className={`toggle-pill ${annual ? 'annual' : ''}`}
+              onClick={() => setAnnual(v => !v)}
+              aria-label="Toggle annual billing"
+            >
+              <span className="toggle-thumb" />
+            </button>
+            <span className={`billing-label font-mono ${annual ? 'active' : ''}`}>
+              Annual
+              <span className="save-badge">Save 20%</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Cards */}
+        <div className="pricing-grid-3">
+          {PLANS.map((plan, idx) => {
+            const isPro = plan.id === 'pro';
+            const displayPrice = annual ? plan.annualPrice : plan.monthlyPrice;
+            return (
+              <div
+                key={plan.id}
+                id={`pricing-card-${plan.id}`}
+                ref={el => cardRefs.current[idx] = el}
+                className={`pricing-card-v2 reveal ${isPro ? 'is-pro' : ''}`}
+                onMouseMove={e => handleCardMouseMove(e, idx)}
+                onMouseLeave={() => handleCardMouseLeave(idx)}
+              >
+                {/* Animated border gradient */}
+                {isPro && <div className="card-border-glow" />}
+
+                {/* Card inner spotlight */}
+                <div className="card-spotlight" />
+
+                {/* Badge */}
+                {plan.badge && (
+                  <div className="plan-badge">
+                    <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>star</span>
+                    {plan.badge}
+                  </div>
+                )}
+
+                {/* Tier label */}
+                <div className="plan-tier font-mono">{plan.tier}</div>
+                <div className="plan-tagline font-sans text-hub-text-muted">{plan.tagline}</div>
+
+                {/* Price display */}
+                <div className="plan-price-block">
+                  <div className="plan-price font-serif">
+                    {plan.monthlyPrice === 0 ? (
+                      <span className="price-value">Free</span>
+                    ) : (
+                      <>
+                        <span className="price-dollar">$</span>
+                        <span className="price-value">{displayPrice}</span>
+                        <span className="price-period font-sans text-hub-text-muted">/mo</span>
+                      </>
+                    )}
+                  </div>
+                  {annual && plan.monthlyPrice > 0 && (
+                    <div className="price-original font-mono text-hub-text-muted">
+                      <span style={{ textDecoration: 'line-through' }}>${plan.monthlyPrice}</span>
+                      <span className="annual-saving">billed annually</span>
+                    </div>
+                  )}
+                  <p className="plan-price-note font-mono">{plan.priceNote}</p>
+                </div>
+
+                {/* Divider */}
+                <div className="plan-divider" />
+
+                {/* Features */}
+                <ul className="plan-features">
+                  {plan.features.map((f, fi) => (
+                    <li key={fi} className={`plan-feature ${f.included ? 'included' : 'excluded'}`}>
+                      <span className={`feature-icon-wrap ${f.included ? 'icon-check' : 'icon-cross'}`}>
+                        <span className="material-symbols-outlined">{f.included ? 'check' : 'close'}</span>
+                      </span>
+                      <span className="feature-label font-sans">{f.label}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* CTA Button */}
+                <button
+                  id={`plan-cta-${plan.id}`}
+                  className={`plan-cta font-mono plan-cta--${plan.ctaVariant}`}
+                  onClick={() => navigate(plan.monthlyPrice === 0 || plan.id === 'pro' ? '/register' : '/login')}
+                >
+                  <span>{plan.cta}</span>
+                  <span className="material-symbols-outlined plan-cta-icon">arrow_forward</span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Bottom trust strip */}
+        <div className="pricing-trust reveal">
+          {[
+            { icon: 'lock', text: 'SOC 2 Type II Certified' },
+            { icon: 'credit_card_off', text: 'No credit card required for Free' },
+            { icon: 'cancel', text: 'Cancel anytime' },
+            { icon: 'speed', text: '99.9% uptime SLA' },
+          ].map((item, i) => (
+            <div key={i} className="trust-item font-mono">
+              <span className="material-symbols-outlined trust-icon">{item.icon}</span>
+              <span>{item.text}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 };
-
-
+// ────────────────────────────────────────────────────────────────────────────
 
 const LandingPage = ({ isReady = true }) => {
   const navigate = useNavigate();
-  const heroRef = useRef(null);
-  const footerRef = useRef(null);
+  const heroLogoBgRef = useRef(null);
+  const navProgressRef = useRef(null);
+  const navClockRef   = useRef(null);
+  const sessionId = useRef(
+    Math.random().toString(36).substr(2, 4).toUpperCase() + '-' +
+    Math.random().toString(36).substr(2, 4).toUpperCase()
+  );
   
-  const handleFooterMouseMove = (e) => {
-    if (!footerRef.current) return;
-    const rect = footerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    footerRef.current.style.setProperty('--mouse-x', `${x}px`);
-    footerRef.current.style.setProperty('--mouse-y', `${y}px`);
-  };
+  // Scroll progress bar + navbar class toggle — direct DOM writes, zero React re-renders
+  useEffect(() => {
+    const navbar = document.querySelector('.navbar');
+    const onScroll = () => {
+      // Progress bar
+      if (navProgressRef.current) {
+        const docH = document.documentElement.scrollHeight - window.innerHeight;
+        const pct  = docH > 0 ? (window.scrollY / docH) * 100 : 0;
+        navProgressRef.current.style.width = `${pct}%`;
+      }
+      // Navbar scroll state — single class toggle drives all CSS transitions
+      if (navbar) {
+        if (window.scrollY > 40) navbar.classList.add('navbar--scrolled');
+        else                     navbar.classList.remove('navbar--scrolled');
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Live UTC clock — direct DOM write, zero React setState overhead
+  useEffect(() => {
+    const tick = () => {
+      if (!navClockRef.current) return;
+      const d = new Date();
+      const hh = String(d.getUTCHours()).padStart(2, '0');
+      const mm = String(d.getUTCMinutes()).padStart(2, '0');
+      const ss = String(d.getUTCSeconds()).padStart(2, '0');
+      navClockRef.current.textContent = `${hh}:${mm}:${ss} UTC`;
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
-    // Refined parallax for hero
-    const handleMouseMove = (e) => {
-      if (!heroRef.current) return;
-      const amount = 15;
-      const x = (e.clientX / window.innerWidth - 0.5) * amount;
-      const y = (e.clientY / window.innerHeight - 0.5) * amount;
-      heroRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-    };
+    if (!isReady) return;
 
-    window.addEventListener('mousemove', handleMouseMove);
+    // ── Double-rAF: guarantees the browser has committed the first paint to screen
+    // before GSAP starts competing with it. Without this, JS animation setup runs
+    // during the same frame as First Contentful Paint, causing visible stutter.
+    let rafId1, rafId2, timeoutId;
+    rafId1 = requestAnimationFrame(() => {
+      rafId2 = requestAnimationFrame(() => {
+        startAnimations();
+      });
+    });
 
-    // GSAP Timelines and ScrollTriggers
-    if (isReady) {
-      // 1. Hero Entrance Animations (Sequential delayed entry)
+    function startAnimations() {
+      // 1. Hero Entrance Animations
       const tl = gsap.timeline();
-      
+
       tl.fromTo('.navbar',
         { opacity: 0, y: -20 },
-        { opacity: 1, y: 0, duration: 1.2, ease: 'power4.out' }
+        { opacity: 1, y: 0, duration: 0.9, ease: 'power4.out' }
       );
-      
-      const heroElements = [
-        '.version-tag',
-        '.hero-section h1',
-        '.hero-description',
-        '.actions'
-      ];
-      
-      tl.fromTo(heroElements,
-        { opacity: 0, y: 40, filter: 'blur(10px)', scale: 0.95 },
-        { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, duration: 1.2, stagger: 0.2, ease: 'power4.out', clearProps: 'transform,filter' },
-        '-=0.8'
+      tl.fromTo('.nav-link-item',
+        { opacity: 0, y: -8 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out' },
+        '-=0.5'
+      );
+      tl.fromTo('.nav-cta-group',
+        { opacity: 0, x: 10 },
+        { opacity: 1, x: 0, duration: 0.5, ease: 'power3.out' },
+        '-=0.4'
       );
 
-      // 2. Scroll Animations using ScrollTrigger
-      const revealElements = document.querySelectorAll('.reveal');
-      revealElements.forEach(el => {
-        gsap.fromTo(el,
-          { opacity: 0, y: 60, scale: 0.95, filter: 'blur(8px)' },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            filter: 'blur(0px)',
-            duration: 1.2,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: el,
-              start: 'top 85%',
-              toggleActions: 'play none none none' 
-            },
-            clearProps: 'transform,filter'
-          }
-        );
-      });
+      // Navbar scroll: CSS class toggle (handled in scroll useEffect above).
+      // GSAP ScrollTrigger scrub removed — it ran on every scroll pixel.
 
-      // 3. Demo Terminal replaced by React Component logic
+      // Hero text entrance — add class directly to .content so the SCSS
+      // &.content--visible selector resolves correctly (no ancestor selector needed).
+      document.querySelector('.hero-section .content')?.classList.add('content--visible');
 
-      // 4. Testimonials Horizontal Scroll Animation
-      const testimonialsSection = document.querySelector('.testimonials-section');
-      const testimonialsGrid = document.querySelector('.testimonials-grid');
-      
-      if (testimonialsSection && testimonialsGrid) {
-        // Find how far we need to slide to reveal all cards
-        const getScrollAmount = () => {
-          return -(testimonialsGrid.scrollWidth - window.innerWidth + 40); // 40 is padding
-        };
+      // 2. Scroll-reveal — IntersectionObserver + CSS transition.
+      // No GSAP ScrollTrigger needed; transitions are compositor-driven like the hero fade.
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('reveal--visible');
+              revealObserver.unobserve(entry.target); // fire once, then stop watching
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      );
+      document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-        gsap.to(testimonialsGrid, {
-          x: getScrollAmount,
-          ease: "none",
-          scrollTrigger: {
-            trigger: testimonialsSection,
-            pin: true,
-            scrub: 1,
-            start: "top top",
-            end: () => `+=${testimonialsGrid.scrollWidth}`,
-            invalidateOnRefresh: true
-          }
-        });
+      // 3. Hero Logo Assembly
+      // ── Replaced huge pixel fly-ins (y:±550, x:±480) with opacity+scale+small-translate.
+      // Large positional animations require the browser to compute transform matrices on
+      // 5 elements simultaneously for 1.5s, which was the main source of initial-load jank.
+      if (heroLogoBgRef.current) {
+        gsap.set(heroLogoBgRef.current, { xPercent: -50, yPercent: -50, opacity: 0 });
+
+        // Subtle directional hints — just 40px instead of 480-550px
+        gsap.set('#hlb-l1', { y: -40,       scale: 0.85, opacity: 0 });
+        gsap.set('#hlb-l2', { x: 30, y: -30, scale: 0.85, opacity: 0 });
+        gsap.set('#hlb-l3', { x: -30, y: 30, scale: 0.85, opacity: 0 });
+        gsap.set('#hlb-l4', { y: 40,        scale: 0.85, opacity: 0 });
+        gsap.set('#hlb-l5', { scale: 0.6,   opacity: 0, transformOrigin: '50% 50%' });
+
+        const logoTl = gsap.timeline({ delay: 0.6 }); // slightly earlier since entrance is lighter
+
+        logoTl
+          .to(heroLogoBgRef.current, { opacity: 1, duration: 0.1 })
+          .to('#hlb-l1', { y: 0, scale: 1, opacity: 1, duration: 1.1, ease: 'power3.out' }, '<')
+          .to('#hlb-l2', { x: 0, y: 0, scale: 1, opacity: 1, duration: 1.1, ease: 'power3.out' }, '<0.05')
+          .to('#hlb-l3', { x: 0, y: 0, scale: 1, opacity: 1, duration: 1.1, ease: 'power3.out' }, '<')
+          .to('#hlb-l4', { y: 0, scale: 1, opacity: 1, duration: 1.1, ease: 'power3.out' }, '<0.05')
+          .to('#hlb-l5', { scale: 1, opacity: 1, duration: 0.8, ease: 'back.out(1.4)' }, '-=0.3')
+          // Brief glow-flash on lock
+          .to('#hlb-l1,#hlb-l2,#hlb-l3,#hlb-l4,#hlb-l5', { opacity: 0.85, duration: 0.12, ease: 'power2.in' })
+          .to('#hlb-l1,#hlb-l2,#hlb-l3,#hlb-l4,#hlb-l5', { opacity: 1,    duration: 0.3,  ease: 'power2.out' })
+          // After assembly: perpetual slow spin + breathe
+          .add(() => {
+            if (!prefersReducedMotion) {
+              gsap.to(heroLogoBgRef.current, { rotation: 360, transformOrigin: '50% 50%', duration: 100, repeat: -1, ease: 'none' });
+              gsap.to(heroLogoBgRef.current, { opacity: 0.07, duration: 10, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+            }
+          }, '+=0.2');
       }
     }
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(rafId1);
+      cancelAnimationFrame(rafId2);
       ScrollTrigger.getAll().forEach(t => t.kill());
     };
   }, [isReady]);
 
   return (
     <div className="landing-page">
+      {/* ═══════════════════════════════════════════
+           MISSION CONTROL NAVBAR
+      ═══════════════════════════════════════════ */}
       <nav className="navbar">
-        <div className="logo">
-          <Loder size={32} color="#c7621a" />
-          <span>Jagyaza</span>
+
+        {/* ── TOP STATUS STRIP ── */}
+        <div className="nav-strip">
+          <div className="strip-left font-mono">
+            <span className="strip-indicator">
+              <span className="strip-dot" />
+              SYSTEM ONLINE
+            </span>
+            <span className="strip-sep">│</span>
+            <span className="strip-item">MULTI-AGENT ENGINE: ACTIVE</span>
+            <span className="strip-sep">│</span>
+            <span className="strip-item">nodes: 12 / 12 ready</span>
+          </div>
+          <div className="strip-right font-mono">
+            <span className="strip-item">SESSION {sessionId.current}</span>
+            <span className="strip-sep">│</span>
+            {/* Direct DOM ref — no React setState overhead on every tick */}
+            <span className="strip-clock" ref={navClockRef} />
+            <span className="strip-sep">│</span>
+            <span className="strip-item">v2.4.1</span>
+          </div>
         </div>
-        <div className="nav-links">
-          <a href="#">Technology</a>
-          <a href="#">Manifesto</a>
-          <a href="#">Pricing</a>
+
+        {/* ── MAIN BAR ── */}
+        <div className="nav-main">
+
+          {/* Left: logo */}
+          <div className="nav-left" onClick={() => navigate('/')}>
+            <div className="logo">
+              <div className="logo-icon-wrap">
+                <Loder size={30} color="#c7621a" />
+                <div className="logo-ring" />
+              </div>
+              <div className="logo-text">
+                <span className="logo-wordmark">Jigyaza</span>
+                <span className="logo-sub font-mono">Research Engine</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Center: numbered magnetic nav links */}
+          <div className="nav-links">
+            {[
+              ['Technology', 'technology'],
+              ['Manifesto',  'manifesto'],
+              ['Pricing',    'pricing'   ],
+            ].map(([label, sectionId], i) => (
+              <a
+                key={label}
+                className="nav-link-item"
+                href={`#${sectionId}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  const target = document.getElementById(sectionId);
+                  if (!target) return;
+                  const navH = document.querySelector('.navbar')?.offsetHeight ?? 72;
+                  const top  = target.getBoundingClientRect().top + window.scrollY - navH;
+                  window.scrollTo({ top, behavior: 'smooth' });
+                }}
+              >
+                <span className="nav-num font-mono">0{i + 1}</span>
+                <span className="nav-label">{label}</span>
+                <span className="nav-underline" />
+              </a>
+            ))}
+          </div>
+
+          {/* Right: CTAs */}
+          <div className="nav-cta-group">
+            <button className="nav-btn-ghost font-mono" onClick={() => navigate('/login')}>Sign In</button>
+            <button className="nav-btn-solid font-mono" onClick={() => navigate('/register')}>
+              <span className="btn-pulse-dot" />
+              <span>Initialize Engine</span>
+              <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>rocket_launch</span>
+            </button>
+          </div>
         </div>
-        <button className="login-btn" onClick={() => navigate('/login')}>
-          Login
-        </button>
+
+        {/* ── SCROLL PROGRESS BAR ── */}
+        <div className="nav-progress-bar">
+          <div className="nav-progress-fill" ref={navProgressRef} />
+        </div>
+
       </nav>
 
       <section className="hero-section mesh-gradient">
@@ -220,6 +505,10 @@ const LandingPage = ({ isReady = true }) => {
           <div className="glow"></div>
           <div className="dots"></div>
           <div className="grid-overlay"></div>
+          {/* ── Hero logo: 5 layers fly in from different directions then spin ── */}
+          <div className="hero-logo-bg" ref={heroLogoBgRef}>
+            <HeroLogoBg />
+          </div>
           <div className="sparkle-container">
             {/* Random stars/sparkles similar to login */}
             <div className="sparkle-dot" style={{ top: '20%', left: '15%', width: '4px', height: '4px', animationDelay: '0s' }}></div>
@@ -237,11 +526,11 @@ const LandingPage = ({ isReady = true }) => {
             <span className="sparkle-icon material-symbols-outlined" style={{ top: '20%', left: '90%', animationDelay: '0.5s' }}>emergency</span>
           </div>
         </div>
-        <div className="content" ref={heroRef}>
+        <div className="content">
           <div className="version-tag">SYSTEM ONLINE // v.2.4.1</div>
           <h1 className="font-serif hover-glow">
             The internet knows the answer. <br/>
-            <span className="text-hub-primary" style={{fontStyle: 'italic'}}>Jagyaza</span> computes it for you.
+            <span className="text-hub-primary" style={{fontStyle: 'italic'}}>Jigyaza</span> computes it for you.
           </h1>
           <p className="hero-description text-hub-text-muted">
             The world's first autonomous AI research engine that doesn't just synthesize text, but formally proves it via live multi-agent truth-seeking algorithms.
@@ -256,166 +545,39 @@ const LandingPage = ({ isReady = true }) => {
         </div>
       </section>
 
-      <section className="demo-section">
-        <div className="max-w reveal glass-card demo-card">
-          <div className="card-header">
-            <div className="dot red"></div>
-            <div className="dot yellow"></div>
-            <div className="dot green"></div>
-            <div className="title">jagyaza_research_environment v1.02</div>
-          </div>
-          <div className="card-body">
-            <TerminalDemo />
-            <div className="sidebar">
-              <h4 className="sidebar-title">Verified Sources (12)</h4>
-              <div className="source-list">
-                <div className="source-item">
-                  <div className="domain">ARXIV.ORG</div>
-                  <div className="title">Attention Is All You Need</div>
-                </div>
-                <div className="source-item">
-                  <div className="domain">NATURE.COM</div>
-                  <div className="title">Deep Learning Evolution</div>
-                </div>
-                <div className="source-item">
-                  <div className="domain">MIT.EDU</div>
-                  <div className="title">Neural Architecture 2024</div>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Technology: AI demo terminal — id used by navbar anchor */}
+      <section id="technology" className="demo-section">
+        <div className="max-w reveal">
+          <TerminalWindow />
         </div>
       </section>
 
-      <section className="pricing-section section">
-        <div className="max-w">
-          <div className="section-header text-center reveal">
-            <h2 className="font-serif italic text-4xl mb-4 text-hub-primary">Pricing protocols</h2>
-            <p className="text-hub-text-muted font-mono text-sm tracking-widest uppercase mb-16">Select your computing power</p>
-          </div>
-          
-          <div className="pricing-grid">
-            <div className="pricing-card glass-card reveal">
-              <div className="card-header border-b border-hub-border pb-6 mb-6">
-                <h3 className="font-mono text-lg uppercase tracking-wider text-hub-text-muted mb-2">Researcher</h3>
-                <div className="price font-serif text-5xl mb-2">$0 <span className="text-lg text-hub-text-muted font-sans line-through opacity-50 ml-2">$29</span></div>
-                <p className="font-sans text-sm text-hub-text-muted tracking-wide">Beta Access (Limited time)</p>
-              </div>
-              <ul className="features-list flex flex-col gap-4 font-sans text-sm text-hub-text-primary mb-8" style={{ padding: 0 }}>
-                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-hub-primary text-sm">check</span> 100 queries per day</li>
-                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-hub-primary text-sm">check</span> Live Web Access</li>
-                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-hub-primary text-sm">check</span> Standard multi-agent reasoning</li>
-                <li className="flex items-center gap-3 text-hub-text-muted"><span className="material-symbols-outlined text-sm">close</span> PDF Uploads</li>
-              </ul>
-              <button className="w-full py-3 px-4 border border-hub-primary text-hub-primary rounded font-mono text-xs uppercase tracking-wider hover:bg-hub-primary hover:text-hub-black transition-colors" onClick={() => navigate('/register')}>Start Free Trial</button>
-            </div>
-            
-            <div className="pricing-card glass-card reveal premium">
-              <div className="absolute top-0 left-0 w-full h-1 bg-hub-primary"></div>
-              <div className="card-header border-b border-hub-border pb-6 mb-6">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-mono text-lg uppercase tracking-wider text-hub-primary">Enterprise</h3>
-                  <span className="text-[10px] font-mono uppercase tracking-widest bg-[rgba(199,98,26,0.1)] text-hub-primary px-2 py-1 rounded">Recommended</span>
-                </div>
-                <div className="price font-serif text-5xl mb-2">$99<span className="text-lg text-hub-text-muted font-sans">/mo</span></div>
-                <p className="font-sans text-sm text-hub-text-muted tracking-wide">For advanced research teams.</p>
-              </div>
-              <ul className="features-list flex flex-col gap-4 font-sans text-sm text-hub-text-primary mb-8" style={{ padding: 0 }}>
-                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-hub-primary text-sm">check</span> Unlimited queries</li>
-                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-hub-primary text-sm">check</span> 5,000 page PDF dataset uploads</li>
-                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-hub-primary text-sm">check</span> Enhanced custom multi-agent logic</li>
-                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-hub-primary text-sm">check</span> Priority API Access</li>
-              </ul>
-              <button className="w-full py-3 px-4 bg-hub-primary text-hub-black rounded font-mono text-xs uppercase tracking-wider hover:bg-hub-secondary transition-colors" onClick={() => navigate('/register')}>Upgrade to Enterprise</button>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Pricing section — id used by navbar anchor */}
+      <div id="pricing">
+        <PricingSection navigate={navigate} />
+      </div>
 
-      <section className="testimonials-section section">
-        <div className="max-w">
-          <div className="section-header text-center">
-            <h2 className="font-serif italic text-4xl mb-4">Trusted by researchers</h2>
-            <p className="text-hub-text-muted font-mono text-sm tracking-widest uppercase mb-16">Verified Data Processing</p>
-          </div>
-        </div>
-        
-        {/* Full-width container mapped for horizontal scroll */}
-        <div className="testimonials-grid">
-          <div className="testimonial-card glass-card">
-            <div className="quote-icon material-symbols-outlined">format_quote</div>
-            <p className="quote-text font-serif italic">Jagyaza doesn't hallucinate. It either provides the exact source, or admits the data isn't available. It's fundamentally changed our R&D cycle.</p>
-            <div className="author-info flex gap-4 mt-8 pt-6 border-t border-hub-border">
-              <div className="avatar bg-hub-surface flex items-center justify-center rounded-full w-10 h-10 border border-hub-border overflow-hidden">
-                <span className="text-hub-primary font-mono text-xs">A.D</span>
-              </div>
-              <div>
-                <h4 className="font-sans font-bold text-sm">Dr. Arthur Densmoore</h4>
-                <p className="font-mono text-xs text-hub-text-muted mt-1 uppercase tracking-wider">Lead Researcher</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="testimonial-card glass-card">
-            <div className="quote-icon material-symbols-outlined absolute right-8 text-hub-border text-5xl">format_quote</div>
-            <p className="quote-text font-serif italic">The Multi-Agent reasoning feature acts like having a board of PhDs arguing the nuances of my query in real-time before giving me the synthesis.</p>
-            <div className="author-info flex gap-4 mt-8 pt-6 border-t border-hub-border">
-              <div className="avatar bg-hub-surface flex items-center justify-center rounded-full w-10 h-10 border border-hub-border overflow-hidden">
-                <span className="text-hub-primary font-mono text-xs">S.M</span>
-              </div>
-              <div>
-                <h4 className="font-sans font-bold text-sm">Sarah Mitchell</h4>
-                <p className="font-mono text-xs text-hub-text-muted mt-1 uppercase tracking-wider">Data Science Director</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="testimonial-card glass-card">
-            <div className="quote-icon material-symbols-outlined absolute right-8 text-hub-border text-5xl">format_quote</div>
-            <p className="quote-text font-serif italic">Integrating Jagyaza into our workflow cut down preliminary research times by 60%. The multi-agent processing is incredibly robust.</p>
-            <div className="author-info flex gap-4 mt-8 pt-6 border-t border-hub-border">
-              <div className="avatar bg-hub-surface flex items-center justify-center rounded-full w-10 h-10 border border-hub-border overflow-hidden">
-                <span className="text-hub-primary font-mono text-xs">J.K</span>
-              </div>
-              <div>
-                <h4 className="font-sans font-bold text-sm">James K.</h4>
-                <p className="font-mono text-xs text-hub-text-muted mt-1 uppercase tracking-wider">VP Engineering</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="testimonial-card glass-card">
-            <div className="quote-icon material-symbols-outlined">format_quote</div>
-            <p className="quote-text font-serif italic">The absolute precision with references makes this an indispensable tool. It completely outclasses legacy search platforms for academic queries.</p>
-            <div className="author-info flex gap-4 mt-8 pt-6 border-t border-hub-border">
-              <div className="avatar bg-hub-surface flex items-center justify-center rounded-full w-10 h-10 border border-hub-border overflow-hidden">
-                <span className="text-hub-primary font-mono text-xs">E.R</span>
-              </div>
-              <div>
-                <h4 className="font-sans font-bold text-sm">Elena Rostova</h4>
-                <p className="font-mono text-xs text-hub-text-muted mt-1 uppercase tracking-wider">Chief Scientist</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
+      {/* Manifesto: testimonials / mission intelligence — id used by navbar anchor */}
+      {/* Negative margin pulls it up into the pricing section's gradient fade */}
+      <div id="manifesto" style={{ marginTop: '-80px', position: 'relative', zIndex: 1 }}>
+        <Testimonials />
+      </div>
 
       {/* Removed features, grid, architecture, stats, comparison, cta sections */}
 
-      <footer className="footer" ref={footerRef} onMouseMove={handleFooterMouseMove}>
+      <footer className="footer">
         <div className="max-w footer-grid">
           <div className="brand-col">
             <div className="logo mb-6">
               <Loder size={32} color="#c7621a" />
-              <span className="font-serif font-bold text-2xl ml-2">Jagyaza</span>
+              <span className="font-serif font-bold text-2xl ml-2">Jigyaza</span>
             </div>
             <p>The next generation of computational research. Built for precision.</p>
           </div>
           <div className="links-col">
             <h5>Product</h5>
             <ul>
-              <li><a href="#">Pricing</a></li>
+              <li><a href="#pricing" onClick={(e) => { e.preventDefault(); const t = document.getElementById('pricing'); const navH = document.querySelector('.navbar')?.offsetHeight ?? 72; if(t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - navH, behavior: 'smooth' }); }}>Pricing</a></li>
               <li><a href="#">API Access</a></li>
               <li><a href="#">Enterprise</a></li>
             </ul>

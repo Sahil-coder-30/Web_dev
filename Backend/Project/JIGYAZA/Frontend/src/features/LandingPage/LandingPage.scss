@@ -28,6 +28,26 @@ $font-mono: 'JetBrains Mono', monospace;
   to { transform: rotate(360deg); }
 }
 
+@keyframes spin-hero-bg {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes spin-hero-bg-ccw {
+  from { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+  to   { transform: translate(-50%, -50%) rotate(-360deg) scale(1.04); }
+}
+
+@keyframes hero-logo-enter {
+  0%   { opacity: 0; }
+  100% { opacity: 0.13; }
+}
+
+@keyframes hero-logo-breathe {
+  0%, 100% { opacity: 0.08; }
+  50%       { opacity: 0.18; }
+}
+
 @keyframes marquee {
   0% { transform: translateX(0%); }
   100% { transform: translateX(-50%); }
@@ -45,8 +65,26 @@ $font-mono: 'JetBrains Mono', monospace;
   }
 
   @keyframes sparkleFade {
-    0%, 100% { opacity: 0.1; transform: scale(0.8); }
-    50% { opacity: 1; transform: scale(1.2); }
+    0%, 100% { opacity: 0; }
+    50%       { opacity: 0.8; }
+  }
+
+  // Hero text fade-in — runs 100% on the CSS compositor thread.
+  // JS only adds .hero--visible once; the browser animates every frame natively.
+  @keyframes heroFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  // Scroll-reveal base — hidden until IntersectionObserver adds .reveal--visible
+  .reveal {
+    opacity: 0;
+    transition: opacity 0.65s ease;
+    &.reveal--visible { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1 !important; transition: none !important; }
   }
 
   a {
@@ -103,6 +141,7 @@ $font-mono: 'JetBrains Mono', monospace;
   // Initial visibility states for GSAP
   .reveal { opacity: 0; }
   .navbar, .version-tag, .hero-section h1, .hero-description, .actions { opacity: 0; }
+  .nav-link-item, .nav-status, .nav-cta-group { opacity: 0; }
 
   .laser-line {
     height: 2px;
@@ -115,90 +154,365 @@ $font-mono: 'JetBrains Mono', monospace;
     box-shadow: 0 0 30px rgba(232, 168, 56, 0.12);
   }
 
-  /* Navbar */
+  /* ─────────────────────────────────────────────────────────
+     MISSION CONTROL NAVBAR
+  ───────────────────────────────────────────────────────── */
+
+  @keyframes stripDotBlink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0.2; }
+  }
+  @keyframes btnDotPulse {
+    0%   { transform: scale(1);   box-shadow: 0 0 0 0   rgba($hub-primary, 0.7); }
+    60%  { transform: scale(1.2); box-shadow: 0 0 0 6px rgba($hub-primary, 0); }
+    100% { transform: scale(1);   box-shadow: 0 0 0 0   rgba($hub-primary, 0); }
+  }
+  @keyframes progressGlow {
+    0%, 100% { box-shadow: 0 0 6px rgba($hub-primary, 0.6); }
+    50%       { box-shadow: 0 0 14px rgba($hub-primary, 1); }
+  }
+
   .navbar {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 50;
-    padding: 1.5rem;
+    z-index: 100;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: rgba($hub-black, 0.8);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid $hub-border;
+    flex-direction: column;
+    background: rgba($hub-black, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba($hub-border, 0.4);
+    overflow: hidden;
+    will-change: transform; // own GPU layer — transitions don't repaint siblings
+    // Single CSS transitions instead of GSAP scrub:
+    // These fire ONCE at the scroll threshold, not on every scroll pixel.
+    transition:
+      background-color 0.35s ease,
+      box-shadow       0.35s ease,
+      border-color     0.35s ease;
 
-    .logo {
+    // Scrolled state — toggled by JS scroll listener via classList.add/remove
+    &.navbar--scrolled {
+      background: rgba(10, 8, 6, 0.97);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.65);
+      border-bottom-color: rgba($hub-primary, 0.22);
+
+      .nav-strip {
+        max-height: 0;
+        opacity: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        pointer-events: none;
+      }
+
+      .nav-main {
+        padding-top: 0.45rem;
+        padding-bottom: 0.45rem;
+      }
+    }
+
+    // ── TOP STATUS STRIP ──────────────────────────────────
+    .nav-strip {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 0.5rem;
-      
-      .icon {
-        width: 2rem;
-        height: 2rem;
-        background-color: $hub-primary;
-        border-radius: 2px;
-        transform: rotate(45deg);
+      max-height: 36px;  // CSS transitions max-height — no per-frame reflow
+      padding: 0.22rem 2rem;
+      background: rgba($hub-primary, 0.04);
+      border-bottom: 1px solid rgba($hub-border, 0.3);
+      overflow: hidden;
+      // Transitions fire once at threshold — vastly cheaper than GSAP scrub
+      transition:
+        max-height 0.35s ease,
+        opacity    0.25s ease,
+        padding    0.3s  ease;
+
+      .strip-left, .strip-right {
         display: flex;
         align-items: center;
-        justify-content: center;
-
-        .inner {
-          width: 1rem;
-          height: 1rem;
-          background-color: $hub-black;
-          transform: rotate(45deg);
-        }
+        gap: 0.6rem;
+        font-size: 0.58rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba($hub-text-muted, 0.6);
       }
-      
-      span {
-        font-family: $font-serif;
+
+      .strip-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: $hub-primary;
         font-weight: 700;
-        font-size: 1.5rem;
-        letter-spacing: -0.02em;
+      }
+
+      .strip-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: $hub-primary;
+        animation: stripDotBlink 1.2s step-end infinite;
+        box-shadow: 0 0 6px rgba($hub-primary, 0.8);
+      }
+
+      .strip-sep {
+        opacity: 0.25;
+        user-select: none;
+      }
+
+      .strip-clock {
+        color: $hub-text-primary;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .strip-item {
+        opacity: 0.7;
+      }
+
+      // Hide all but clock on small screens
+      @media (max-width: 860px) {
+        .strip-left { display: none; }
       }
     }
 
+    // ── MAIN BAR ─────────────────────────────────────────
+    .nav-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 2rem;
+      transition: padding 0.4s ease;
+
+      .scrolled & { padding: 0.6rem 2rem; }
+    }
+
+    // ── Logo ──────────────────────────────────────────────
+    .nav-left {
+      cursor: pointer;
+      
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .logo-icon-wrap {
+          position: relative;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          // Orbital bloom ring around the Loder icon
+          .logo-ring {
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 1px solid rgba($hub-primary, 0.2);
+            transition: border-color 0.35s, box-shadow 0.35s;
+          }
+        }
+
+        .logo-text {
+          display: flex;
+          flex-direction: column;
+          gap: 0.05rem;
+          line-height: 1;
+
+          .logo-wordmark {
+            font-family: $font-serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: -0.02em;
+            transition: color 0.25s;
+          }
+          .logo-sub {
+            font-size: 0.52rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: rgba($hub-primary, 0.55);
+            display: none;
+            @media (min-width: 640px) { display: block; }
+          }
+        }
+
+        &:hover {
+          .logo-ring {
+            border-color: rgba($hub-primary, 0.55);
+            box-shadow: 0 0 16px rgba($hub-primary, 0.2);
+          }
+          .logo-wordmark { color: $hub-primary; }
+        }
+      }
+    }
+
+    // ── Center nav links ─────────────────────────────────
     .nav-links {
       display: none;
-      
+
       @media (min-width: 768px) {
         display: flex;
-        gap: 2.5rem;
-        font-size: 11px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        font-weight: 700;
-        
-        a {
-          transition: color 0.3s;
-          &:hover { color: $hub-primary; }
+        gap: 0.15rem;
+        align-items: center;
+      }
+
+      .nav-link-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.45rem 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        cursor: pointer;
+        // Magnetic: JS sets transform, CSS provides smooth reset
+        transition: background 0.25s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+        &:hover { background: rgba($hub-primary, 0.07); }
+
+        .nav-num {
+          font-family: $font-mono;
+          font-size: 0.55rem;
+          color: rgba($hub-primary, 0.4);
+          font-weight: 700;
+          transition: color 0.25s;
+        }
+        .nav-label {
+          font-size: 0.7rem;
+          font-weight: 700;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: $hub-text-muted;
+          transition: color 0.25s;
+        }
+
+        // Sweep underline
+        .nav-underline {
+          position: absolute;
+          bottom: 5px;
+          left: 1rem;
+          right: 1rem;
+          height: 1px;
+          background: linear-gradient(90deg, $hub-primary, $hub-secondary);
+          transform: scaleX(0);
+          transform-origin: left;
+          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+          border-radius: 1px;
+        }
+
+        &:hover {
+          .nav-num     { color: $hub-primary; }
+          .nav-label   { color: $hub-text-primary; }
+          .nav-underline { transform: scaleX(1); }
         }
       }
     }
 
-    .login-btn {
-      padding: 0.5rem 1.5rem;
-      border: 1px solid rgba($hub-primary, 0.4);
-      border-radius: 2px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      background: transparent;
-      color: $hub-text-primary;
-      transition: all 0.3s;
-      cursor: pointer;
+    // ── Right CTA group ───────────────────────────────────
+    .nav-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
 
-      &:hover {
-        background-color: $hub-primary;
+      .nav-btn-ghost {
+        display: none;
+        padding: 0.42rem 1rem;
+        background: transparent;
+        border: 1px solid rgba($hub-border, 0.7);
+        border-radius: 7px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: $hub-text-muted;
+        cursor: pointer;
+        transition: all 0.25s;
+
+        @media (min-width: 640px) { display: block; }
+
+        &:hover {
+          border-color: rgba($hub-primary, 0.5);
+          color: $hub-text-primary;
+          background: rgba($hub-primary, 0.04);
+        }
+      }
+
+      .nav-btn-solid {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.48rem 1.1rem 0.48rem 0.9rem;
+        background: linear-gradient(135deg, $hub-primary 0%, $hub-secondary 100%);
+        border: none;
+        border-radius: 7px;
+        font-family: $font-mono;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
         color: $hub-black;
+        cursor: pointer;
+        transition: transform 0.25s, box-shadow 0.3s;
+        box-shadow: 0 2px 16px rgba($hub-primary, 0.35);
+
+        // Pulsing live-indicator dot
+        .btn-pulse-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: rgba($hub-black, 0.5);
+          flex-shrink: 0;
+          animation: btnDotPulse 2s ease-out infinite;
+        }
+
+        // Shimmer on hover
+        &::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.18) 50%, transparent 80%);
+          transform: translateX(-110%);
+          transition: transform 0.6s ease;
+        }
+        &:hover::after { transform: translateX(110%); }
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba($hub-primary, 0.5);
+        }
+        &:active { transform: translateY(0); }
+      }
+    }
+
+    // ── Scroll Progress Bar ──────────────────────────────
+    .nav-progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba($hub-border, 0.3);
+
+      .nav-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, $hub-secondary, $hub-primary, #f0a060);
+        border-radius: 0 2px 2px 0;
+        transition: width 0.15s linear;
+        animation: progressGlow 3s ease-in-out infinite;
+        max-width: 100%;
       }
     }
   }
 
+
+
+
   /* Hero Section */
+
   .hero-section {
     position: relative;
     height: 100vh;
@@ -212,7 +526,11 @@ $font-mono: 'JetBrains Mono', monospace;
       position: absolute;
       inset: 0;
       z-index: 0;
-      
+      // Pre-promoted to GPU layer — parallax translate3d writes are free (no repaint)
+      will-change: transform;
+      // contain:layout prevents bg transforms from invalidating text layout above
+      contain: layout;
+
       .glow {
         position: absolute;
         top: 50%;
@@ -222,8 +540,11 @@ $font-mono: 'JetBrains Mono', monospace;
         height: 800px;
         background-color: rgba($hub-primary, 0.1);
         border-radius: 50%;
-        filter: blur(160px);
-        animation: pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        // Static opacity — animating a large blurred element triggers expensive
+        // paint+composite every frame. The static blur already reads as "glowing".
+        filter: blur(120px);
+        opacity: 0.12;
+        will-change: transform;
       }
       
       .dots {
@@ -245,23 +566,52 @@ $font-mono: 'JetBrains Mono', monospace;
         -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
         pointer-events: none;
       }
+
+      /* ── Hero logo background: GSAP controls all transforms/opacity ── */
+      .hero-logo-bg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        /* No CSS transform here — GSAP sets xPercent:-50, yPercent:-50 + rotation */
+        width: 900px;
+        height: 900px;
+        pointer-events: none;
+        z-index: 1;
+        opacity: 0; /* GSAP reveals it during assembly */
+        // Composite to own GPU layer so rotation doesn't repaint siblings
+        will-change: transform, opacity;
+
+        /* Radial mask — crisp at center, fades toward edges */
+        -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black 35%, transparent 85%);
+        mask-image:         radial-gradient(ellipse 60% 60% at 50% 50%, black 35%, transparent 85%);
+
+        /* Layer divs stack inside here — NO filter on SVGs */
+        /* SVG drop-shadow filters force CPU rasterisation on EVERY rotation frame.
+           The ambient glow is already provided by the .glow div above. */
+        > div {
+          svg { overflow: hidden; } // clip to element bounds → smaller repaint region
+        }
+      }
       .sparkle-container {
         position: absolute;
         inset: 0;
         pointer-events: none;
-        opacity: 0.35;
+        opacity: 0.25; // reduced
 
         .sparkle-dot {
           position: absolute;
           background-color: $hub-primary;
           border-radius: 50%;
-          animation: sparkleFade 3s ease-in-out infinite;
+          // opacity-only fade — no scale transform, avoids stacked composite layers
+          animation: sparkleFade 4s ease-in-out infinite;
+          will-change: opacity;
         }
         .sparkle-icon {
           position: absolute;
-          color: rgba($hub-primary, 0.5);
+          color: rgba($hub-primary, 0.4);
           font-size: 10px;
-          animation: sparkleFade 4s ease-in-out infinite;
+          animation: sparkleFade 5s ease-in-out infinite;
+          will-change: opacity;
         }
       }
     }
@@ -273,7 +623,22 @@ $font-mono: 'JetBrains Mono', monospace;
       padding: 0 1rem;
       max-width: 72rem;
       margin: 0 auto;
-      
+
+      // All text children start invisible; JS adds .content--visible after first paint
+      // triggering compositor-driven CSS @keyframes — zero JS per animation frame.
+      .version-tag, h1, .hero-description, .actions { opacity: 0; }
+
+      // Simple &.content--visible resolves correctly to .content.content--visible
+      &.content--visible {
+        .version-tag      { animation: heroFadeIn 0.7s ease-out 0.05s forwards; }
+        h1                { animation: heroFadeIn 0.7s ease-out 0.20s forwards; }
+        .hero-description { animation: heroFadeIn 0.7s ease-out 0.38s forwards; }
+        .actions          { animation: heroFadeIn 0.7s ease-out 0.52s forwards; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .version-tag, h1, .hero-description, .actions { opacity: 1 !important; animation: none !important; }
+      }
       .version-tag {
         display: inline-block;
         padding: 0.25rem 0.75rem;
@@ -295,13 +660,18 @@ $font-mono: 'JetBrains Mono', monospace;
         font-weight: 700;
         letter-spacing: -0.02em;
         position: relative;
-        text-shadow: 0 0 40px rgba(0,0,0,0.5);
+        text-shadow:
+          0 0 40px rgba(0, 0, 0, 0.7),
+          0 0 80px rgba(0, 0, 0, 0.4),
+          0 2px 4px rgba(0, 0, 0, 0.8);
         
         @media (min-width: 768px) { font-size: 4.5rem; }
         @media (min-width: 1024px) { font-size: 5.5rem; }
         
         &.hover-glow:hover {
-          text-shadow: 0 0 60px rgba($hub-primary, 0.3);
+          text-shadow:
+            0 0 60px rgba($hub-primary, 0.3),
+            0 0 40px rgba(0, 0, 0, 0.7);
           transition: text-shadow 0.5s ease;
         }
       }
@@ -571,69 +941,527 @@ $font-mono: 'JetBrains Mono', monospace;
     }
   }
 
-  /* Pricing Section */
+  /* ── Premium Pricing Section v2 ── */
   .pricing-section {
     background-color: $hub-black;
     position: relative;
-    
-    .pricing-grid {
+    overflow: hidden;
+
+    // Bottom gradient bleed — softens the edge between pricing and testimonials
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      background: linear-gradient(to bottom, transparent 0%, $hub-black 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    // Ambient background
+    .pricing-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+
+      .pricing-glow {
+        position: absolute;
+        width: 700px;
+        height: 700px;
+        border-radius: 50%;
+        // Reduced blur (large blurs are expensive paint ops)
+        filter: blur(140px);
+        opacity: 0.12;
+        will-change: transform;
+
+        &--left {
+          top: -100px;
+          left: -200px;
+          background: $hub-primary;
+        }
+        &--right {
+          bottom: -100px;
+          right: -200px;
+          background: $hub-secondary;
+        }
+      }
+
+      .pricing-grid-overlay {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(to right, rgba($hub-border, 0.15) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba($hub-border, 0.15) 1px, transparent 1px);
+        background-size: 5rem 5rem;
+        mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+        -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+      }
+    }
+
+    .max-w { position: relative; z-index: 1; }
+
+    // ── Section header ──
+    .pricing-header {
+      text-align: center;
+      margin-bottom: 4rem;
+
+      .pricing-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 1.5rem;
+
+        .eyebrow-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: $hub-primary;
+          box-shadow: 0 0 12px rgba($hub-primary, 0.8);
+          animation: pulse-slow 3s ease-in-out infinite;
+        }
+      }
+    }
+
+    // ── Billing toggle ──
+    .billing-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba($hub-surface, 0.6);
+      border: 1px solid $hub-border;
+      border-radius: 100px;
+      backdrop-filter: blur(8px);
+
+      .billing-label {
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: $hub-text-muted;
+        transition: color 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        &.active { color: $hub-text-primary; }
+
+        .save-badge {
+          background: linear-gradient(135deg, $hub-primary, $hub-secondary);
+          color: $hub-black;
+          font-size: 0.6rem;
+          padding: 2px 7px;
+          border-radius: 100px;
+          font-weight: 700;
+          letter-spacing: 0.05em;
+        }
+      }
+
+      .toggle-pill {
+        width: 44px;
+        height: 24px;
+        border-radius: 100px;
+        background: rgba($hub-border, 0.8);
+        border: 1px solid $hub-border;
+        cursor: pointer;
+        position: relative;
+        transition: background 0.35s, border-color 0.35s;
+
+        .toggle-thumb {
+          position: absolute;
+          top: 3px;
+          left: 3px;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: $hub-text-muted;
+          transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.35s;
+        }
+
+        &.annual {
+          background: rgba($hub-primary, 0.2);
+          border-color: $hub-primary;
+
+          .toggle-thumb {
+            left: calc(100% - 19px);
+            background: $hub-primary;
+            box-shadow: 0 0 8px rgba($hub-primary, 0.6);
+          }
+        }
+      }
+    }
+
+    // ── Card grid ──
+    .pricing-grid-3 {
       display: grid;
-      gap: 3rem;
-      max-width: 65rem;
-      margin: 0 auto;
-      perspective: 1000px;
-      
-      @media (min-width: 768px) { grid-template-columns: 1fr 1fr; }
-      
-      .pricing-card {
-        padding: 3.5rem;
+      gap: 1.5rem;
+      grid-template-columns: 1fr;
+      align-items: stretch;
+      margin-bottom: 4rem;
+
+      @media (min-width: 900px) {
+        grid-template-columns: repeat(3, 1fr);
+        align-items: start;
+      }
+    }
+
+    // ── Individual Card ──
+    @keyframes borderSpin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba($hub-primary, 0.4); }
+      50%       { box-shadow: 0 0 0 8px rgba($hub-primary, 0); }
+    }
+
+    .pricing-card-v2 {
+      --tilt-x: 0deg;
+      --tilt-y: 0deg;
+      --spotlight-x: -9999px;
+      --spotlight-y: -9999px;
+
+      position: relative;
+      padding: 2.2rem 2rem;
+      border-radius: 12px;
+      border: 1px solid rgba($hub-border, 0.7);
+      background: rgba($hub-surface, 0.5);
+      backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      transition:
+        transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.4s ease,
+        border-color 0.3s;
+      transform-style: preserve-3d;
+      will-change: transform;
+      overflow: hidden;
+
+      &:hover {
+        transform: perspective(800px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateZ(12px);
+        border-color: rgba($hub-primary, 0.35);
+        box-shadow:
+          0 24px 64px rgba(0, 0, 0, 0.6),
+          0 0 0 1px rgba($hub-primary, 0.1) inset;
+      }
+
+      // Mouse spotlight
+      &::after {
+        content: '';
+        position: absolute;
+        top: var(--spotlight-y);
+        left: var(--spotlight-x);
+        transform: translate(-50%, -50%);
+        width: 350px;
+        height: 350px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba($hub-primary, 0.07) 0%, transparent 70%);
+        pointer-events: none;
+        transition: opacity 0.3s;
+      }
+
+      // Card spotlight (separate element)
+      .card-spotlight {
+        position: absolute;
+        top: var(--spotlight-y);
+        left: var(--spotlight-x);
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba($hub-primary, 0.06) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      // ── Pro / Featured card ──
+      &.is-pro {
+        border: 1px solid rgba($hub-primary, 0.4);
+        background: linear-gradient(160deg, rgba(#1e1510, 0.95) 0%, rgba($hub-black, 1) 60%);
+        box-shadow:
+          0 0 0 1px rgba($hub-primary, 0.2),
+          0 20px 60px rgba(0, 0, 0, 0.8),
+          0 0 80px rgba($hub-primary, 0.06);
+
+        @media (min-width: 900px) {
+          transform: translateY(-12px);
+          
+          &:hover {
+            transform: perspective(800px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(-20px) translateZ(12px);
+          }
+        }
+
+        // Animated border glow
+        .card-border-glow {
+          position: absolute;
+          inset: -1px;
+          border-radius: inherit;
+          padding: 1px;
+          background: conic-gradient(
+            from 0deg,
+            transparent 0%,
+            $hub-primary 20%,
+            transparent 40%
+          );
+          -webkit-mask: 
+            linear-gradient(#fff 0 0) content-box, 
+            linear-gradient(#fff 0 0);
+          mask: 
+            linear-gradient(#fff 0 0) content-box, 
+            linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          animation: borderSpin 4s linear infinite;
+          z-index: -1;
+          opacity: 0.5;
+        }
+      }
+
+      // ── Badge ──
+      .plan-badge {
+        position: absolute;
+        top: -1px;
+        right: 1.5rem;
+        background: linear-gradient(135deg, $hub-primary, $hub-secondary);
+        color: $hub-black;
+        font-family: $font-mono;
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 5px 12px 5px 8px;
+        border-radius: 0 0 8px 8px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        animation: badgePulse 2.5s ease-in-out infinite;
+        z-index: 10;
+      }
+
+      // ── Tier & tagline ──
+      .plan-tier {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: $hub-primary;
+        margin-bottom: 0.4rem;
+      }
+      .plan-tagline {
+        font-size: 0.85rem;
+        margin-bottom: 1.75rem;
+        line-height: 1.5;
+      }
+
+      // ── Price block ──
+      .plan-price-block {
+        margin-bottom: 0.75rem;
+
+        .plan-price {
+          display: flex;
+          align-items: baseline;
+          gap: 4px;
+          line-height: 1;
+          margin-bottom: 0.4rem;
+
+          .price-dollar {
+            font-size: 1.4rem;
+            color: $hub-text-muted;
+            align-self: flex-start;
+            margin-top: 0.5rem;
+          }
+          .price-value {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: $hub-text-primary;
+          }
+          .price-period {
+            font-size: 0.85rem;
+          }
+        }
+
+        .price-original {
+          font-size: 0.72rem;
+          display: flex;
+          gap: 0.5rem;
+          align-items: center;
+          margin-bottom: 0.35rem;
+
+          .annual-saving {
+            color: $hub-primary;
+            font-size: 0.65rem;
+          }
+        }
+
+        .plan-price-note {
+          font-size: 0.65rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: $hub-text-muted;
+        }
+      }
+
+      // ── Divider ──
+      .plan-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba($hub-border, 0.8), transparent);
+        margin: 1.5rem 0;
+      }
+
+      // ── Feature list ──
+      .plan-features {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 2rem 0;
+        flex: 1;
         display: flex;
         flex-direction: column;
-        background: rgba($hub-surface, 0.4);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba($hub-border, 0.6);
-        border-radius: 6px;
-        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease, border-color 0.4s;
-        
-        &:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-          border-color: rgba($hub-primary, 0.4);
-        }
+        gap: 0.85rem;
 
-        &.premium {
-          border-color: rgba($hub-primary, 0.5);
-          background: linear-gradient(145deg, rgba($hub-surface, 0.8) 0%, rgba($hub-black, 1) 100%);
-          box-shadow: 0 10px 40px rgba($hub-primary, 0.1);
-          position: relative;
-          z-index: 1;
-          transform: translateY(-4px) scale(1.02);
-          
-          &::before {
-            content: '';
-            position: absolute;
-            inset: -1px;
-            background: linear-gradient(135deg, $hub-primary, transparent 60%);
-            z-index: -1;
-            border-radius: inherit;
-            opacity: 0.5;
-            transition: opacity 0.5s;
+        .plan-feature {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          font-size: 0.875rem;
+          transition: transform 0.2s;
+
+          &:hover { transform: translateX(3px); }
+
+          &.excluded {
+            opacity: 0.35;
           }
 
-          &:hover {
-            transform: translateY(-12px) scale(1.03);
-            box-shadow: 0 20px 50px rgba($hub-primary, 0.25);
-            border-color: rgba($hub-primary, 0.8);
-            
-            &::before {
-              opacity: 1;
+          .feature-icon-wrap {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            .material-symbols-outlined { font-size: 14px; }
+
+            &.icon-check {
+              background: rgba($hub-primary, 0.15);
+              color: $hub-primary;
+              border: 1px solid rgba($hub-primary, 0.3);
+            }
+            &.icon-cross {
+              background: rgba($hub-border, 0.3);
+              color: $hub-text-muted;
+              border: 1px solid rgba($hub-border, 0.5);
             }
           }
+
+          .feature-label {
+            color: $hub-text-primary;
+            line-height: 1.4;
+          }
         }
-        
-        .features-list li {
-          margin-bottom: 0.875rem;
-          font-size: 0.95rem;
+      }
+
+      // ── CTA Button ──
+      .plan-cta {
+        width: 100%;
+        padding: 0.85rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+          transform: translateX(-100%);
+          transition: transform 0.5s;
+        }
+
+        &:hover::before { transform: translateX(100%); }
+
+        .plan-cta-icon {
+          font-size: 16px;
+          transition: transform 0.3s;
+        }
+        &:hover .plan-cta-icon { transform: translateX(4px); }
+
+        // Variants
+        &--solid {
+          background: linear-gradient(135deg, $hub-primary, $hub-secondary);
+          color: $hub-black;
+          border: 1px solid transparent;
+          box-shadow: 0 4px 20px rgba($hub-primary, 0.35);
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba($hub-primary, 0.5);
+          }
+        }
+        &--ghost {
+          background: transparent;
+          color: $hub-text-primary;
+          border: 1px solid rgba($hub-border, 0.8);
+
+          &:hover {
+            background: rgba($hub-surface, 0.8);
+            border-color: rgba($hub-primary, 0.4);
+            transform: translateY(-2px);
+          }
+        }
+        &--outline {
+          background: transparent;
+          color: $hub-primary;
+          border: 1px solid rgba($hub-primary, 0.5);
+
+          &:hover {
+            background: rgba($hub-primary, 0.1);
+            border-color: $hub-primary;
+            transform: translateY(-2px);
+          }
+        }
+      }
+    }
+
+    // ── Trust strip ──
+    .pricing-trust {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      padding-top: 3rem;
+      border-top: 1px solid rgba($hub-border, 0.4);
+
+      .trust-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: $hub-text-muted;
+        transition: color 0.3s;
+
+        &:hover { color: $hub-text-primary; }
+
+        .trust-icon {
+          font-size: 16px;
+          color: $hub-primary;
         }
       }
     }
@@ -643,7 +1471,12 @@ $font-mono: 'JetBrains Mono', monospace;
 
   /* Footer */
   .footer {
-    padding: 6rem 1.5rem;
+    padding: 3.5rem 1.25rem 3rem;
+    
+    @media (min-width: 768px) {
+      padding: 6rem 1.5rem;
+    }
+
     border-top: 1px solid rgba($hub-border, 0.6);
     background-color: rgba($hub-surface, 0.4);
     backdrop-filter: blur(20px);
@@ -675,10 +1508,28 @@ $font-mono: 'JetBrains Mono', monospace;
       position: relative;
       z-index: 10;
       display: grid;
-      gap: 4rem;
+      gap: 2.5rem;
+
+      // Mobile: brand full-width, links in 3 equal columns below
+      grid-template-columns: 1fr;
+      
+      @media (min-width: 480px) {
+        // brand takes full row, then 3 link cols
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: auto auto;
+
+        .brand-col {
+          grid-column: 1 / -1; // full width on first row
+        }
+      }
       
       @media (min-width: 768px) {
         grid-template-columns: repeat(4, 1fr);
+        gap: 4rem;
+
+        .brand-col {
+          grid-column: auto; // reset to normal flow
+        }
       }
       
       .brand-col {
@@ -686,7 +1537,11 @@ $font-mono: 'JetBrains Mono', monospace;
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          margin-bottom: 2.5rem;
+          margin-bottom: 1.25rem;
+          
+          @media (min-width: 768px) {
+            margin-bottom: 2.5rem;
+          }
           
           .icon {
             width: 1.5rem;
@@ -710,6 +1565,7 @@ $font-mono: 'JetBrains Mono', monospace;
           line-height: 2;
           text-transform: uppercase;
           letter-spacing: 0.1em;
+          max-width: 32ch;
         }
       }
       
@@ -720,8 +1576,12 @@ $font-mono: 'JetBrains Mono', monospace;
           text-transform: uppercase;
           color: $hub-secondary;
           font-weight: 700;
-          margin-bottom: 2rem;
+          margin-bottom: 1.25rem;
           letter-spacing: 0.2em;
+
+          @media (min-width: 768px) {
+            margin-bottom: 2rem;
+          }
         }
         
         ul {
@@ -729,7 +1589,11 @@ $font-mono: 'JetBrains Mono', monospace;
           padding: 0;
           
           li {
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
+
+            @media (min-width: 768px) {
+              margin-bottom: 1rem;
+            }
             
             a {
               font-size: 13px;
@@ -750,27 +1614,37 @@ $font-mono: 'JetBrains Mono', monospace;
     .footer-bottom {
       position: relative;
       z-index: 10;
-      margin-top: 6rem;
-      padding-top: 3rem;
+      margin-top: 3rem;
+      padding-top: 2rem;
       border-top: 1px solid rgba($hub-border, 0.6);
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1rem;
       justify-content: space-between;
       align-items: center;
+      text-align: center;
       font-size: 10px;
       font-family: $font-mono;
       color: $hub-text-muted;
       text-transform: uppercase;
-      letter-spacing: 0.3em;
+      letter-spacing: 0.2em;
       
       @media (min-width: 768px) {
         flex-direction: row;
+        margin-top: 6rem;
+        padding-top: 3rem;
+        gap: 1.5rem;
+        text-align: left;
+        letter-spacing: 0.3em;
       }
       
       .socials {
         display: flex;
-        gap: 2.5rem;
+        gap: 2rem;
+
+        @media (min-width: 768px) {
+          gap: 2.5rem;
+        }
         
         a {
           transition: color 0.3s;
@@ -778,5 +1652,28 @@ $font-mono: 'JetBrains Mono', monospace;
         }
       }
     }
+  }
+}
+
+// ── Global reduced-motion overrides ──────────────────────────────────────────
+// For users who prefer reduced motion (accessibility + battery life)
+@media (prefers-reduced-motion: reduce) {
+  .landing-page {
+    // Kill expensive decorative animations; keep transitions for UX feedback
+    .strip-dot      { animation: none !important; }
+    .btn-pulse-dot  { animation: none !important; }
+    .nav-progress-fill { animation: none !important; }
+    .glow           { animation: none !important; }
+    .sparkle-dot,
+    .sparkle-icon   { animation: none !important; }
+    .eyebrow-dot    { animation: none !important; }
+  }
+  .testimonials-v2 {
+    .tv2-glow       { animation: none !important; }
+    .tv2-eyebrow__dot { animation: none !important; }
+    .tv2-title__accent::after { animation: none !important; }
+    .tc-card__avatar-ring { animation: none !important; }
+    &::after        { animation: none !important; } // scan line
+    .tv2-ticker-inner--css { animation-play-state: paused !important; }
   }
 }

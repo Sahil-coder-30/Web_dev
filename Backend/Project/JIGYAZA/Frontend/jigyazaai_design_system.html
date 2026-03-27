@@ -1,0 +1,335 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0A0806;}
+.ds{padding:24px 0;display:flex;flex-direction:column;gap:32px;font-family:'Plus Jakarta Sans',sans-serif;}
+.section-label{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;text-transform:uppercase;letter-spacing:0.16em;margin-bottom:14px;}
+.card{background:#0F0D0B;border:1px solid #1E1B18;border-radius:10px;padding:20px 24px;}
+
+/* COLORS */
+.color-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.color-swatch{border-radius:6px;overflow:hidden;}
+.swatch-block{height:56px;}
+.swatch-info{padding:8px;background:#0A0806;}
+.swatch-hex{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#F0EBE3;display:block;}
+.swatch-name{font-size:10px;color:#4A4440;display:block;margin-top:2px;}
+
+/* TYPOGRAPHY */
+.type-row{padding:16px 0;border-bottom:1px solid #1A1714;display:flex;flex-direction:column;gap:4px;}
+.type-row:last-child{border-bottom:none;}
+.type-meta{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;text-transform:uppercase;letter-spacing:0.1em;}
+.type-sample-display{font-family:'DM Serif Display',serif;font-style:italic;color:#F0EBE3;}
+.type-sample-body{font-family:'Plus Jakarta Sans',sans-serif;font-weight:300;color:#F0EBE3;}
+.type-sample-label{font-family:'IBM Plex Mono',monospace;color:#C8621A;text-transform:uppercase;letter-spacing:0.14em;}
+
+/* COMPONENTS */
+.comp-grid{display:flex;flex-direction:column;gap:12px;}
+.input-demo{width:100%;height:48px;background:#1C1916;border:1.5px solid #2A2520;border-radius:6px;padding:0 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;color:#F0EBE3;outline:none;}
+.input-demo::placeholder{color:#4A4440;}
+.input-focus{border-color:#C8621A;box-shadow:0 0 0 3px rgba(200,98,26,0.15);}
+.btn-primary{width:100%;height:48px;background:#C8621A;border:none;border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:14px;color:#fff;letter-spacing:0.02em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-ghost{width:100%;height:48px;background:#1C1916;border:1.5px solid #2A2520;border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;font-size:13px;color:#F0EBE3;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#C8621A;background:#1C1510;border:1px solid #2A1E14;border-radius:100px;padding:3px 10px;text-transform:uppercase;letter-spacing:0.08em;}
+.divider-demo{display:flex;align-items:center;gap:12px;margin:4px 0;}
+.divider-line{flex:1;height:1px;background:#1E1B18;}
+.divider-text{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#4A4440;text-transform:uppercase;letter-spacing:0.1em;}
+
+/* SPACING */
+.space-row{display:flex;align-items:center;gap:16px;padding:8px 0;border-bottom:1px solid #1A1714;}
+.space-row:last-child{border-bottom:none;}
+.space-block{background:#C8621A;height:12px;border-radius:2px;opacity:0.7;}
+.space-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#4A4440;min-width:80px;}
+.space-value{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#F0EBE3;}
+
+/* ANIMATION TOKENS */
+.anim-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1A1714;}
+.anim-row:last-child{border-bottom:none;}
+.anim-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;font-size:12px;color:#F0EBE3;}
+.anim-value{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#4A4440;}
+
+/* STATES */
+.state-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.state-card{padding:12px 14px;border-radius:6px;border:1.5px solid;}
+.state-label{font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;}
+.state-value{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:300;}
+</style>
+
+<div class="ds">
+
+  <div class="card">
+    <div class="section-label">01 — Color Tokens</div>
+    <div class="color-grid">
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#0A0806;border:1px solid #1E1B18;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#0A0806</span><span class="swatch-name">BG Primary (Left)</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#141210;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#141210</span><span class="swatch-name">BG Secondary (Right)</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#1C1916;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#1C1916</span><span class="swatch-name">Surface / Input</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#211E1A;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#211E1A</span><span class="swatch-name">Surface Hover</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#2A2520;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#2A2520</span><span class="swatch-name">Border Default</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#3D3630;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#3D3630</span><span class="swatch-name">Border Hover</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#1E1B18;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#1E1B18</span><span class="swatch-name">Divider</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#C8621A;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#C8621A</span><span class="swatch-name">Accent Primary</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#E0722A;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#E0722A</span><span class="swatch-name">Accent Hover</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#A84E15;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#A84E15</span><span class="swatch-name">Accent Pressed</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#1C1510;border:1px solid #2A1E14;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#1C1510</span><span class="swatch-name">Badge BG</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#F0EBE3;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#F0EBE3</span><span class="swatch-name">Text Primary</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#7A7068;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#7A7068</span><span class="swatch-name">Text Secondary</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#4A4440;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#4A4440</span><span class="swatch-name">Text Muted</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#3A3430;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#3A3430</span><span class="swatch-name">Text Ghost</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#E05555;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#E05555</span><span class="swatch-name">Error</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#2A1515;border:1px solid #E05555;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#2A1515</span><span class="swatch-name">Error Surface</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#4CAF7D;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#4CAF7D</span><span class="swatch-name">Success</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#F5C9A0;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#F5C9A0</span><span class="swatch-name">Sage Skin</span></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#2A1F14;"></div>
+        <div class="swatch-info"><span class="swatch-hex">#2A1F14</span><span class="swatch-name">Sage Hair</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">02 — Typography Scale</div>
+    <div class="type-row">
+      <span class="type-meta">Display Hero · DM Serif Display Italic · 56px · #F0EBE3</span>
+      <div class="type-sample-display" style="font-size:40px;line-height:1.0;">Research without <span style="color:#C8621A;">limits.</span></div>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">Display Large · DM Serif Display Italic · 40px · #F0EBE3</span>
+      <div class="type-sample-display" style="font-size:30px;line-height:1.0;">Good to see you.</div>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">Display Medium · DM Serif Display Italic · 28px · #F0EBE3</span>
+      <div class="type-sample-display" style="font-size:22px;">Section headline here</div>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">Body Regular · Plus Jakarta Sans 300 · 15px · #7A7068</span>
+      <div class="type-sample-body" style="font-size:14px;color:#7A7068;">Continue your research where you left off.</div>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">Label · Plus Jakarta Sans 500 · 13px · #F0EBE3</span>
+      <div class="type-sample-body" style="font-size:13px;font-weight:500;">Email address</div>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">Eyebrow · IBM Plex Mono 400 · 9–10px · #C8621A · UPPERCASE</span>
+      <div class="type-sample-label" style="font-size:10px;">Your Research Companion</div>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">Stat Number · DM Serif Display Italic · 28px · #F0EBE3</span>
+      <div class="type-sample-display" style="font-size:28px;">98.6%</div>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">Stat Label · IBM Plex Mono · 9px · #3A3430 · UPPERCASE</span>
+      <div class="type-sample-label" style="font-size:9px;color:#3A3430;">Accuracy Rate</div>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">Fine Print · IBM Plex Mono · 10px · #3A3430</span>
+      <div class="type-sample-label" style="font-size:10px;color:#3A3430;">© 2025 JIGYAZAAI · PRIVACY · TERMS</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">03 — Core Components</div>
+    <div class="comp-grid">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Input — Default</div>
+        <input class="input-demo" placeholder="Email address" readonly>
+      </div>
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Input — Focus State</div>
+        <input class="input-demo input-focus" placeholder="Email address" readonly>
+      </div>
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Primary CTA Button</div>
+        <button class="btn-primary">Sign in to account →</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn-ghost">Google</button>
+        <button class="btn-ghost">GitHub</button>
+      </div>
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Divider</div>
+        <div class="divider-demo">
+          <div class="divider-line"></div>
+          <span class="divider-text">Or continue with email</span>
+          <div class="divider-line"></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Badge Pills</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="badge">Natural Language</span>
+          <span class="badge">Live Web Access</span>
+          <span class="badge">Zero Hallucination</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">04 — Spacing Scale</div>
+    <div class="space-row"><span class="space-label">space-1</span><div class="space-block" style="width:4px;"></div><span class="space-value">4px</span></div>
+    <div class="space-row"><span class="space-label">space-2</span><div class="space-block" style="width:8px;"></div><span class="space-value">8px</span></div>
+    <div class="space-row"><span class="space-label">space-3</span><div class="space-block" style="width:12px;"></div><span class="space-value">12px</span></div>
+    <div class="space-row"><span class="space-label">space-4</span><div class="space-block" style="width:16px;"></div><span class="space-value">16px — Component gap</span></div>
+    <div class="space-row"><span class="space-label">space-6</span><div class="space-block" style="width:24px;"></div><span class="space-value">24px — Section inner</span></div>
+    <div class="space-row"><span class="space-label">space-8</span><div class="space-block" style="width:32px;"></div><span class="space-value">32px — Between groups</span></div>
+    <div class="space-row"><span class="space-label">space-10</span><div class="space-block" style="width:40px;"></div><span class="space-value">40px — Welcome → form</span></div>
+    <div class="space-row"><span class="space-label">space-12</span><div class="space-block" style="width:48px;"></div><span class="space-value">48px — Panel padding</span></div>
+    <div class="space-row"><span class="space-label">space-16</span><div class="space-block" style="width:64px;"></div><span class="space-value">64px — Page padding</span></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">05 — Border Radius</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;">
+      <div style="text-align:center;">
+        <div style="width:40px;height:40px;background:#C8621A;border-radius:6px;margin:0 auto 8px;"></div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;">6px<br>Inputs/Btn</span>
+      </div>
+      <div style="text-align:center;">
+        <div style="width:40px;height:40px;background:#C8621A;border-radius:8px;margin:0 auto 8px;"></div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;">8px<br>Cards</span>
+      </div>
+      <div style="text-align:center;">
+        <div style="width:40px;height:40px;background:#C8621A;border-radius:10px;margin:0 auto 8px;"></div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;">10px<br>Panels</span>
+      </div>
+      <div style="text-align:center;">
+        <div style="width:64px;height:24px;background:#C8621A;border-radius:100px;margin:0 auto 8px;"></div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;">100px<br>Badges/Chips</span>
+      </div>
+      <div style="text-align:center;">
+        <div style="width:40px;height:40px;background:#C8621A;border-radius:50%;margin:0 auto 8px;"></div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;">50%<br>Avatars</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">06 — Animation Tokens</div>
+    <div class="anim-row"><span class="anim-name">Transition Default</span><span class="anim-value">all 0.18s ease</span></div>
+    <div class="anim-row"><span class="anim-name">Transition Focus</span><span class="anim-value">all 0.15s ease</span></div>
+    <div class="anim-row"><span class="anim-name">Page Load Stagger</span><span class="anim-value">0.1s increments, max 0.8s</span></div>
+    <div class="anim-row"><span class="anim-name">Reveal Animation</span><span class="anim-value">opacity 0→1 + translateY 10px→0, 0.45s cubic-bezier(0.16,1,0.3,1)</span></div>
+    <div class="anim-row"><span class="anim-name">Sage Float (Idle)</span><span class="anim-value">translateY 0→-8px→0, 4s infinite ease-in-out</span></div>
+    <div class="anim-row"><span class="anim-name">Orb Pulse</span><span class="anim-value">scale 1.0→1.06→1.0, 2s infinite ease-in-out</span></div>
+    <div class="anim-row"><span class="anim-name">Sparkle Fade</span><span class="anim-value">opacity 0.4→1.0, 1.5–2.5s infinite alternate</span></div>
+    <div class="anim-row"><span class="anim-name">Fragment Float</span><span class="anim-value">translateY 0→-4px→0, 3–5s infinite ease-in-out</span></div>
+    <div class="anim-row"><span class="anim-name">Error Shake</span><span class="anim-value">translateX -4→4→-3→3→0px, 0.4s</span></div>
+    <div class="anim-row"><span class="anim-name">CTA Hover Lift</span><span class="anim-value">translateY -1px, box-shadow 0 4px 24px rgba(200,98,26,0.3)</span></div>
+    <div class="anim-row"><span class="anim-name">Reduced Motion</span><span class="anim-value">prefers-reduced-motion: reduce — all animations off</span></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">07 — Component States</div>
+    <div class="state-grid">
+      <div class="state-card" style="background:#1C1916;border-color:#2A2520;">
+        <div class="state-label" style="color:#4A4440;">Input Default</div>
+        <div class="state-value" style="color:#4A4440;">bg #1C1916 · border #2A2520</div>
+      </div>
+      <div class="state-card" style="background:#211E1A;border-color:#3D3630;">
+        <div class="state-label" style="color:#4A4440;">Input Hover</div>
+        <div class="state-value" style="color:#7A7068;">bg #211E1A · border #3D3630</div>
+      </div>
+      <div class="state-card" style="background:#1C1916;border-color:#C8621A;box-shadow:0 0 0 3px rgba(200,98,26,0.15);">
+        <div class="state-label" style="color:#C8621A;">Input Focus</div>
+        <div class="state-value" style="color:#F0EBE3;">border #C8621A · amber ring</div>
+      </div>
+      <div class="state-card" style="background:#2A1515;border-color:#E05555;">
+        <div class="state-label" style="color:#E05555;">Input Error</div>
+        <div class="state-value" style="color:#E05555;">bg #2A1515 · border #E05555</div>
+      </div>
+      <div class="state-card" style="background:#C8621A;border-color:#C8621A;">
+        <div class="state-label" style="color:rgba(255,255,255,0.6);">Button Default</div>
+        <div class="state-value" style="color:#fff;">bg #C8621A</div>
+      </div>
+      <div class="state-card" style="background:#E0722A;border-color:#E0722A;transform:translateY(-1px);">
+        <div class="state-label" style="color:rgba(255,255,255,0.6);">Button Hover</div>
+        <div class="state-value" style="color:#fff;">bg #E0722A · lift -1px</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">08 — Mascot "Sage" Color Palette</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div style="text-align:center;">
+        <div style="width:48px;height:48px;background:#F5C9A0;border-radius:50%;margin:0 auto 6px;"></div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;">Skin<br>#F5C9A0</span>
+      </div>
+      <div style="text-align:center;">
+        <div style="width:48px;height:48px;background:#2A1F14;border-radius:50%;margin:0 auto 6px;"></div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;">Hair<br>#2A1F14</span>
+      </div>
+      <div style="text-align:center;">
+        <div style="width:48px;height:48px;background:#C8621A;border-radius:50%;margin:0 auto 6px;"></div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;">Hoodie<br>#C8621A</span>
+      </div>
+      <div style="text-align:center;">
+        <div style="width:48px;height:48px;background:#92400E;border-radius:50%;margin:0 auto 6px;"></div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;">Shadow<br>#92400E</span>
+      </div>
+      <div style="text-align:center;">
+        <div style="width:48px;height:48px;background:#1A1410;border-radius:50%;margin:0 auto 6px;border:1px solid #2A2520;"></div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#4A4440;">Outline<br>#1A1410</span>
+      </div>
+    </div>
+  </div>
+
+</div>

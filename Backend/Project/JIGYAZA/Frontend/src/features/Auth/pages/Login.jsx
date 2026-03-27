@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState , useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Loder from '../../../components/Loaders/loder/Loder';
 import '../styles/Login.scss';
+import { useAuth } from '../hook/useAuth';
+import { useDispatch, useSelector } from 'react-redux';
+import { setLoading } from '../auth.slice';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,10 +13,17 @@ const Login = () => {
     password: '',
     remember: false
   });
+  
+  const authUserPayload = useSelector(state => state.auth.user);
+  const isAuthLoading = useSelector(state => state.auth.loading);
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { loginUser } = useAuth();
+  const navigate = useNavigate();
 
+  
+  
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -25,24 +35,22 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(''); // Clear previous errors
-
     if (!formData.email || !formData.password) {
       setError('Please fill in all required fields.');
       return;
     }
-
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      
-      // Mock Error simulation for testing
-      if (formData.email === 'test@error.com') {
-        setError('Invalid email or password. Please try again.');
-        return;
-      }
-      
-      console.log('Login submitted:', formData);
-    }, 1500);
+    dispatch(setLoading(true));
+    try {
+      await loginUser(formData.email, formData.password);
+      navigate('/'); // Redirect to home page after successful login
+      dispatch(setLoading(false));
+    } catch (error) {
+      // Use optional chaining to prevent TypeError if the backend error structure varies
+      // Fallback to error.message for standard JS Errors, then generic string.
+      setError(error?.errors?.[0]?.msg || error?.message || "Login failed");
+    } finally {
+      dispatch(setLoading(false));
+    }
   };
 
   const containerVariants = {
@@ -96,6 +104,12 @@ const Login = () => {
     { top: "3%", left: "82%", size: 1, delay: 1.3 },
     { top: "68%", left: "2%", size: 0.5, delay: 0.1 },
   ];
+
+  useEffect(() => {
+    if (authUserPayload && !isAuthLoading) {
+      navigate('/');
+    }
+  }, [authUserPayload, isAuthLoading, navigate]);
 
   return (
     <div className="login-container">
@@ -267,7 +281,7 @@ const Login = () => {
               )}
             </AnimatePresence>
 
-            {loading ? (
+            {isAuthLoading ? (
               <motion.div 
                 className="loading-overlay"
                 key="loading-overlay"
@@ -333,7 +347,7 @@ const Login = () => {
                     />
                     <label htmlFor="remember">Remember me</label>
                   </div>
-                  <Link to="#" className="forgot-password">Forgot password?</Link>
+                  <Link to="/forgot-password" className="forgot-password">Forgot password?</Link>
                 </motion.div>
               </>
             )}
@@ -341,13 +355,13 @@ const Login = () => {
             <motion.button 
               type="submit" 
               className="submit-btn font-display" 
-              disabled={loading}
+              disabled={isAuthLoading}
               variants={itemVariants}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
             >
               <span className="content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                {loading ? 'Signing in...' : (
+                {isAuthLoading ? 'Signing in...' : (
                   <>
                     Sign in to account
                     <span className="material-symbols-outlined">arrow_forward</span>

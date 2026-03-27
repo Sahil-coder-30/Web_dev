@@ -41,6 +41,8 @@ export default function EntryLoader({ onComplete }) {
   const middleRef     = useRef(null);
   const innerArcsRef  = useRef(null);
   const orbitCoreRef  = useRef(null);
+  const progressTrackRef = useRef(null);
+  const progressBarRef   = useRef(null);
   
   const [designation] = useState(() => DESIGNATIONS[Math.floor(Math.random() * DESIGNATIONS.length)]);
   
@@ -70,6 +72,8 @@ export default function EntryLoader({ onComplete }) {
       [word1Ref.current, word2Ref.current],
       { yPercent: 120 }
     );
+    gsap.set(progressTrackRef.current, { opacity: 0, y: 10 });
+    gsap.set(progressBarRef.current, { scaleX: 0, transformOrigin: 'left center' });
 
     tl.to(svg, { opacity: 1, duration: 0.01 });
 
@@ -79,50 +83,67 @@ export default function EntryLoader({ onComplete }) {
         {
           opacity: 1,
           scale: 1,
-          duration: 1.6, // Slower, more elegant entry
-          ease: 'power3.out', // Smooth deceleration, not bouncy
+          duration: 1.0, // Sped up from 1.6 (snappier, still elegant)
+          ease: 'power3.out',
           svgOrigin: '110 110',
           onComplete: () => {
-            // Hand control back to CSS loop animations
             gsap.set(layer, { clearProps: 'transform,opacity' });
             layer.classList.add('is-active');
           },
         },
-        i * 0.45  // much wider stagger offset for a distinct sequence
+        i * 0.3  // Faster stagger (0.3 down from 0.45)
       );
     });
 
-    // Reveal Text word-by-word after loader starts (around 1.6s)
+    // Reveal Text faster (around 1.2s instead of 1.6s)
     tl.to(
       [word1Ref.current, word2Ref.current],
-      { yPercent: 0, duration: 1.2, ease: 'power4.out', stagger: 0.15 },
-      1.6
+      { yPercent: 0, duration: 0.8, ease: 'power4.out', stagger: 0.1 },
+      1.2
+    );
+
+    // Reveal progress track alongside text
+    tl.to(
+      progressTrackRef.current,
+      { opacity: 1, y: 0, duration: 0.8, ease: 'power4.out' },
+      1.3
+    );
+
+    // Animate progress bar filling up to 100% (finish exactly at exitStart)
+    tl.to(
+      progressBarRef.current,
+      { scaleX: 1, duration: 1.8, ease: 'power2.inOut' },
+      1.4
     );
 
     // --- EXIT SEQUENCE ---
-    // Hold the full loader for a moment, then reverse
-    
-    // 1. Hide the text
+    // At exactly 3.3s (after a snappy entrance) the exit sequence begins
+    tl.add('exitStart', 3.3);
+
+    // 1. Hide the text and progress track
     tl.to(
       [word2Ref.current, word1Ref.current], // reverse order
-      { yPercent: 120, duration: 0.8, ease: 'power3.in', stagger: 0.1 },
-      '+=1.5' // Hold for 1.5 seconds after entrance finishes
+      { yPercent: 120, duration: 0.5, ease: 'power3.in', stagger: 0.05 },
+      'exitStart'
+    );
+    tl.to(
+      progressTrackRef.current,
+      { opacity: 0, y: 10, duration: 0.5, ease: 'power3.in' },
+      'exitStart+=0.05'
     );
 
-    // 2. Hide the layers in reverse order. We DO NOT remove 'is-active' here,
-    // so the SVG elements continue their beautiful CSS rotations while 
-    // GSAP seamlessly scales their parent <g> container down to 0!
+    // 2. Hide the layers in reverse order.
     tl.to(
       [...layers].reverse(),
       {
         opacity: 0,
         scale: 0.4,
-        duration: 0.8,
+        duration: 0.6,
         ease: 'power3.inOut',
         svgOrigin: '110 110',
-        stagger: 0.15
+        stagger: 0.1
       },
-      '-=0.4' // Overlap slightly with the text exiting
+      'exitStart+=0.3' // Snappy overlap with text exiting
     );
 
     return () => tl.kill();
@@ -214,6 +235,9 @@ export default function EntryLoader({ onComplete }) {
           <span ref={word1Ref} className="word-welcome">WELCOME,</span>
           <span ref={word2Ref} className="word-designation">{designation}</span>
         </h1>
+        <div className="entry-progress-track" ref={progressTrackRef}>
+          <div className="entry-progress-bar" ref={progressBarRef} />
+        </div>
       </div>
     </div>
   );
