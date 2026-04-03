@@ -1,0 +1,81 @@
+.chat-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    width: 100%;
+    animation: skeleton-fade-in 0.35s ease forwards;
+
+    @keyframes skeleton-fade-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    // Shared shimmer animation
+    @keyframes shimmer {
+        0% { background-position: -800px 0; }
+        100% { background-position: 800px 0; }
+    }
+
+    %shimmer-base {
+        background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.04) 0%,
+            rgba(255, 255, 255, 0.09) 40%,
+            rgba(229, 110, 37, 0.08) 50%,
+            rgba(255, 255, 255, 0.09) 60%,
+            rgba(255, 255, 255, 0.04) 100%
+        );
+        background-size: 800px 100%;
+        animation: shimmer 1.8s infinite linear;
+        border-radius: 8px;
+    }
+
+    .skeleton-pair {
+        display: flex;
+        flex-direction: column;
+        gap: 1.75rem;
+
+        // --- User bubble (right side) ---
+        .skeleton-user-row {
+            display: flex;
+            justify-content: flex-end;
+
+            .skeleton-bubble.user {
+                @extend %shimmer-base;
+                height: 44px;
+                border-radius: 20px 20px 4px 20px;
+                max-width: 70%;
+            }
+        }
+
+        // --- AI response (left side) ---
+        .skeleton-ai-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.875rem;
+
+            .skeleton-avatar {
+                @extend %shimmer-base;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                flex-shrink: 0;
+                margin-top: 2px;
+            }
+
+            .skeleton-ai-lines {
+                display: flex;
+                flex-direction: column;
+                gap: 0.65rem;
+                flex: 1;
+                padding-top: 0.25rem;
+
+                .skeleton-line {
+                    @extend %shimmer-base;
+                    height: 14px;
+                    border-radius: 6px;
+                }
+            }
+        }
+    }
+}
