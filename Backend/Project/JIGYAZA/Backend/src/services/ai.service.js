@@ -1,6 +1,9 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatMistralAI } from "@langchain/mistralai";
-import { HumanMessage, SystemMessage , AIMessage } from "langchain";
+import { HumanMessage, SystemMessage, AIMessage, ToolMessage } from "@langchain/core/messages";
+import { tool } from "@langchain/core/tools";
+import { z } from "zod";
+import { searchInternet } from "./internet.service.js";
 
 const geminiModel = new ChatGoogleGenerativeAI({
   model: "gemini-2.5-flash",
@@ -12,13 +15,49 @@ const mistralModel = new ChatMistralAI({
   apiKey: process.env.MISTRAL_API_KEY,
 });
 
+const tavilySearchTool = tool(
+  async ({ query }) => {
+    try {
+      const results = await searchInternet({ query });
+      return results;
+    } catch (e) {
+      return "Error searching the internet";
+    }
+  },
+  {
+    name: "internet_search",
+    description: "Search the internet for up-to-date and real-time information. Use this whenever the user asks for current events or information you are unsure about.",
+    schema: z.object({
+      query: z.string().describe("The specific search query to look up"),
+    }),
+  }
+);
+
+const geminiModelWithTools = geminiModel.bindTools([tavilySearchTool]);
+
 export const generateResponse = async (messages) => {
   const formatted = messages.map((msg) => {
     if (msg.role === "user") return new HumanMessage(msg.content);
-    if (msg.role === "ai") return new AIMessage(msg.content);
+    if (msg.role === "ai" || msg.role === "assistant" || msg.role === "model") return new AIMessage(msg.content);
   }).filter(Boolean); // guard against unexpected roles
 
-  const res = await geminiModel.invoke(formatted);
+  let res = await geminiModelWithTools.invoke(formatted);
+
+  if (res.tool_calls && res.tool_calls.length > 0) {
+    formatted.push(res);
+    for (const toolCall of res.tool_calls) {
+      if (toolCall.name === "internet_search") {
+        const toolResult = await tavilySearchTool.invoke(toolCall);
+        formatted.push(new ToolMessage({
+          tool_call_id: toolCall.id,
+          content: toolResult
+        }));
+      }
+    }
+    // Re-invoke to let the AI formulate the final answer with the search context
+    res = await geminiModelWithTools.invoke(formatted);
+  }
+
   return res.content;
 };
 

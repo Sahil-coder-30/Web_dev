@@ -16,6 +16,7 @@
     "@langchain/google-genai": "^2.1.26",
     "@langchain/mistralai": "^1.0.7",
     "@reduxjs/toolkit": "^2.11.2",
+    "@tavily/core": "^0.7.2",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -31,6 +32,7 @@
     "nodemon": "^3.1.14",
     "react-redux": "^9.2.0",
     "socket": "^1.1.74",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "zod": "^4.3.6"
   }
 }
