@@ -1,7 +1,17 @@
-import { StateGraph, StateSchema, type GraphNode } from "@langchain/langgraph";
+import {
+  END,
+  START,
+  StateGraph,
+  StateSchema,
+  type GraphNode,
+} from "@langchain/langgraph";
 import * as z from "zod";
-import { OpenAIModel, GeminiModel, MistralModel } from "../service/ai.service.js";
-
+import {
+  CohereModel,
+  GeminiModel,
+  MistralModel,
+} from "../service/ai.service.js";
+import { createAgent, HumanMessage, toolStrategy } from "langchain";
 /**
  * Schema for the graph, defining the structure of nodes and edges.
  * This is a simple example where each node has a 'name' and 'description'.
@@ -46,24 +56,70 @@ const state = new StateSchema({
  */
 
 const solutionNode: GraphNode<typeof state> = async (state) => {
-  const [openaiResponse, geminiResponse] = await Promise.all([
-    OpenAIModel.invoke(state.problem),
+  const [cohereResponse, geminiResponse] = await Promise.all([
+    CohereModel.invoke(state.problem),
     GeminiModel.invoke(state.problem),
   ]);
 
   return {
-    solution_1: openaiResponse.text,
+    solution_1: cohereResponse.text,
     solution_2: geminiResponse.text,
   };
 };
 
 const judgeNode: GraphNode<typeof state> = async (state) => {
-  const judgePrompt = `Problem: ${state.problem}
-Solution 1: ${state.solution_1}
-Solution 2: ${state.solution_2}
+  const judge = createAgent({
+    model: MistralModel,
+    responseFormat: toolStrategy(
+      z.object({
+        solution_1_score: z.number().min(0).max(10),
+        solution_2_score: z.number().min(0).max(10),
+        solution_1_reason: z.string(),
+        solution_2_reason: z.string(),
+      }),
+    ),
+    systemPrompt: `You are a judge tasked with evaluating two solutions provided for a given problem. Your goal is to assess the quality of each solution based on its effectiveness, creativity, and feasibility. You will assign a score between 0 and 10 for each solution, where 0 indicates a poor solution and 10 indicates an excellent solution. Additionally, you will provide a reason for the score assigned to each solution, explaining the strengths and weaknesses of each one.`,
+  });
 
-Please evaluate the two solutions and provide a score out of 10 for each, along with a reason for your evaluation.`;
+  const judgeRes = await judge.invoke({
+    messages: [
+      new HumanMessage(`
+                Problem: ${state.problem}
+                Solution 1: ${state.solution_1}
+                Solution 2: ${state.solution_2}
+                Please evaluate the two solutions and provide scores and reasons for each.`),
+    ],
+  });
 
-    const judgeResponse = await MistralModel.invoke(judgePrompt);
-    
+  const {
+    solution_1_score,
+    solution_2_score,
+    solution_1_reason,
+    solution_2_reason,
+  } = judgeRes.structuredResponse;
+
+  return {
+    judge: {
+      solution_1_score,
+      solution_2_score,
+      solution_1_reason,
+      solution_2_reason,
+    },
+  };
 };
+
+const graph = new StateGraph(state)
+  .addNode("solutionNode", solutionNode)
+  .addNode("judgeNode", judgeNode)
+  .addEdge(START, "solutionNode")
+  .addEdge("solutionNode", "judgeNode")
+  .addEdge("judgeNode", END)
+  .compile();
+
+export default async function runGraph(problem: string): Promise<unknown> {
+  const result = await graph.invoke({
+    problem: problem,
+  });
+
+  return result;
+}
