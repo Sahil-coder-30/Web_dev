@@ -3,6 +3,7 @@ import authRouter from "../routes/auth.routes.js";
 import battleRouter from "../routes/battle.routes.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
 
 const app = express();
 
@@ -15,7 +16,7 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
+app.use(morgan("dev"))
 app.use(express.json());
 app.use(cookieParser());          // parse incoming cookies
 
