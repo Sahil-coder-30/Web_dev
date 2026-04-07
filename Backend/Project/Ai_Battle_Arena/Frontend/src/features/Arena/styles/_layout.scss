@@ -1,0 +1,86 @@
+@use 'variables' as *;
+
+// ─── Layout wrapper ────────────────────────────────────────────
+.arena-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: transparent;
+}
+
+// ─── Mobile Hamburger Button ──────────────────────────────────
+.mobile-menu-btn {
+  display: none;
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 30;
+  background: rgba(8,8,14,0.92);
+  border: 1px solid var(--outline-variant);
+  color: var(--on-surface);
+  cursor: pointer;
+  padding: 7px;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.15s, border-color 0.15s;
+
+  .material-icons { font-size: 1.25rem; line-height: 1; }
+
+  &:hover {
+    background: rgba(79,156,255,0.12);
+    border-color: var(--primary);
+  }
+
+  @media (max-width: $mobile-breakpoint) { display: flex; }
+}
+
+// ─── Main Content Area ────────────────────────────────────────
+// margin-left is driven by the CSS variable --sidebar-w set by SidebarContext
+.arena-main {
+  flex: 1;
+  margin-left: var(--sidebar-w, #{$sidebar-w});
+  max-width: calc(100vw - var(--sidebar-w, #{$sidebar-w}));
+  transition: $main-transition;
+  height: 100vh;
+  overflow: hidden;
+  padding: 24px 40px 0;
+  display: flex;
+  flex-direction: column;
+
+  // Home page: viewport-locked compact centred layout
+  &.arena-home-main {
+    overflow-y: auto;
+    padding: 28px 40px 28px;
+    flex-direction: column;
+
+    .home-content-wrapper {
+      margin: auto;
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  // History / Leaderboard pages that DO need scrolling
+  &.scrollable {
+    overflow-y: auto;
+    padding: 40px 48px 48px;
+  }
+
+  // Mobile: full width (sidebar is overlay, not in document flow)
+  @media (max-width: $mobile-breakpoint) {
+    margin-left: 0 !important;
+    max-width: 100vw !important;
+    padding: 20px 20px 0;
+    padding-top: 60px; // room for floating hamburger button
+  }
+
+  @media (max-width: 480px) {
+    padding: 14px 14px 0;
+    padding-top: 60px;
+  }
+}

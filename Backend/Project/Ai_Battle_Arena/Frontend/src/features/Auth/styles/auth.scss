@@ -1,0 +1,194 @@
+// src/features/Auth/styles/auth.scss
+
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  background: transparent;
+  position: relative;
+  z-index: 1;
+}
+
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(15,15,21,0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--outline-variant);
+  padding: 48px 40px;
+  position: relative;
+  z-index: 1;
+  animation: scale-in 0.5s cubic-bezier(0.16,1,0.3,1) both;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: -1px;
+    width: 24px; height: 24px;
+    border-top: 2px solid var(--primary);
+    border-left: 2px solid var(--primary);
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; right: -1px;
+    width: 24px; height: 24px;
+    border-bottom: 2px solid var(--secondary);
+    border-right: 2px solid var(--secondary);
+  }
+
+  @media (max-width: 460px) { padding: 36px 24px; }
+}
+
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 36px;
+  animation: fade-up 0.4s 0.1s both;
+
+  .logo-title {
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 8px;
+    color: var(--on-surface);
+  }
+
+  .logo-tagline {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--on-surface-faint);
+    letter-spacing: 0.04em;
+  }
+}
+
+.auth-tabs {
+  display: flex;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--outline-variant);
+  animation: fade-up 0.4s 0.15s both;
+
+  .tab-btn {
+    flex: 1;
+    padding: 0 0 12px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid transparent;
+    margin-bottom: -1px;
+    color: var(--on-surface-faint);
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: color 0.12s, border-color 0.12s;
+    text-decoration: none;
+    text-align: center;
+
+    &.active {
+      color: var(--on-surface);
+      border-bottom-color: var(--primary);
+    }
+    &:hover:not(.active) { color: var(--on-surface-muted); }
+  }
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fade-up 0.4s 0.2s both;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--on-surface-muted);
+    letter-spacing: 0.01em;
+  }
+
+  input {
+    width: 100%;
+    padding: 11px 13px;
+    background: var(--surface-low);
+    border: 1px solid var(--outline-variant);
+    color: var(--on-surface);
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    transition: border-color 0.12s;
+    outline: none;
+
+    &::placeholder { color: var(--on-surface-faint); }
+    &:focus { border-color: var(--outline); }
+  }
+}
+
+.form-error {
+  padding: 10px 13px;
+  background: rgba(255,113,108,0.05);
+  border: 1px solid rgba(255,113,108,0.2);
+  color: var(--error);
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  animation: fade-up 0.2s ease both;
+}
+
+.auth-submit {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  background: var(--primary);
+  color: var(--bg);
+  border: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+  transition: background 0.15s, box-shadow 0.15s, transform 0.12s;
+
+  &:hover {
+    background: #71b3ff;
+    box-shadow: 0 0 20px rgba(79,156,255,0.35);
+    transform: translateY(-1px);
+  }
+  &:active  { transform: translateY(0); box-shadow: none; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+}
+
+
+.auth-footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--on-surface-muted);
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--outline-variant);
+  animation: fade-in 0.4s 0.35s both;
+
+  a {
+    color: var(--on-surface);
+    border-bottom: 1px solid var(--outline-variant);
+    margin-left: 4px;
+    font-weight: 600;
+    transition: color 0.12s, border-color 0.12s;
+
+    &:hover {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+  }
+}

@@ -1,0 +1,472 @@
+// src/features/Arena/styles/results.scss
+// Styles specific to BattleResults.jsx — full-viewport no-scroll layout
+
+.results-page {
+  display: flex;
+  flex-direction: column;
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 12px 0 48px;
+
+  // Back nav link shown on detail page
+  .detail-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: var(--on-surface-faint);
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 28px;
+    transition: color 0.12s;
+
+    .material-icons { font-size: 1rem; }
+    &:hover { color: var(--on-surface); }
+  }
+
+
+  .results-header {
+    text-align: center;
+    // Compact — no large margins
+    flex-shrink: 0;
+    padding: 12px 0 8px;
+    border-bottom: 1px solid var(--outline-variant);
+    margin-bottom: 0;
+
+    .winner-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 12px;
+      border: 1px solid rgba(79,156,255,0.35);
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--primary);
+      margin-bottom: 6px;
+
+      &.tie {
+        border-color: rgba(255,69,96,0.35);
+        color: var(--secondary);
+      }
+
+      .winner-icon { font-size: 0.85rem; }
+    }
+
+    .page-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      margin-bottom: 4px;
+      line-height: 1.1;
+    }
+
+    .challenge-preview {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--on-surface-faint);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  // ─── Scores Row ──────────────────────────────────────
+  .scores-row {
+    display: grid;
+    grid-template-columns: 1fr 28px 1fr;
+    gap: 0;
+    margin: 24px 0;
+    align-items: stretch;
+
+    @media (max-width: 680px) {
+      grid-template-columns: 1fr;
+      .scores-divider { display: none; }
+    }
+  }
+
+  .scores-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0;
+    gap: 8px;
+
+    .divider-line {
+      width: 1px;
+      flex: 1;
+      background: var(--outline-variant);
+      min-height: 20px;
+    }
+    .divider-vs {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--on-surface-faint);
+    }
+  }
+
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--outline-variant);
+    transition: border-color 0.2s;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%; // Stretches to match the height of the row
+    max-height: 550px; // Constraint to prevent massive cards
+
+    &.winner-card {
+      border-color: rgba(79,156,255,0.3);
+      box-shadow: 0 0 32px rgba(79,156,255,0.05);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px 10px;
+      border-bottom: 1px solid var(--outline-variant);
+      flex-shrink: 0;
+
+      .model-label {
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        color: var(--on-surface-faint);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+
+      .model-name {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--on-surface);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .badge {
+          display: inline-block;
+          padding: 1px 8px;
+          background: rgba(79,156,255,0.12);
+          border: 1px solid rgba(79,156,255,0.3);
+          color: var(--primary);
+          font-size: 0.6rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+
+          &.badge-red {
+            background: rgba(255,69,96,0.12);
+            border-color: rgba(255,69,96,0.3);
+            color: var(--secondary);
+          }
+        }
+      }
+
+      // Wrapper grouping expand btn + score ring
+      .card-top-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+
+      // Expand to full-screen button
+      .expand-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        background: transparent;
+        border: 1px solid var(--outline-variant);
+        color: var(--on-surface-faint);
+        cursor: pointer;
+        transition: color 0.12s, background 0.12s, border-color 0.12s, box-shadow 0.12s;
+
+        .material-icons { font-size: 0.9rem; }
+
+        &:hover {
+          color: var(--primary);
+          border-color: var(--primary);
+          background: rgba(79,156,255,0.08);
+          box-shadow: 0 0 10px rgba(79,156,255,0.15);
+        }
+
+        // Red variant (Gemini card)
+        &.expand-btn--red:hover {
+          color: var(--secondary);
+          border-color: var(--secondary);
+          background: rgba(255,69,96,0.08);
+          box-shadow: 0 0 10px rgba(255,69,96,0.15);
+        }
+      }
+    }
+
+    // Score block — used both standalone and inside .card-top-right
+    .score-block,
+    .card-top-right .score-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+
+      .score-ring {
+        flex-shrink: 0;
+        position: relative;
+        width: 72px;
+        height: 72px;
+
+        svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .ring-score {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: var(--font-display);
+          font-size: 1.1rem;
+          font-weight: 700;
+          animation: count-up 0.5s 0.3s both;
+        }
+      }
+
+      .score-meta {
+        .score-large {
+          font-family: var(--font-display);
+          font-size: 1.5rem;
+          font-weight: 700;
+          line-height: 1;
+          margin-bottom: 2px;
+          animation: count-up 0.5s 0.4s both;
+          .score-denom { font-size: 0.7rem; color: var(--on-surface-faint); font-weight: 400; }
+        }
+        .score-grade {
+          font-family: var(--font-display);
+          font-size: 0.6rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          animation: fade-in 0.4s 0.5s both;
+        }
+      }
+    }
+
+    // Markdown solution viewer
+    .solution-body {
+      padding: 10px 16px 12px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0; // Allows inner md-content flex child to handle scrolling
+
+      .solution-label {
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--on-surface-faint);
+        margin-bottom: 8px;
+        flex-shrink: 0;
+      }
+
+      .md-content {
+        font-family: var(--font-body);
+        font-size: 0.82rem;
+        color: var(--on-surface-muted);
+        line-height: 1.65;
+        // Allow text to scroll internally when max-height is reached
+        overflow-y: auto;
+        overflow-x: hidden;
+        word-break: break-word;
+        min-width: 0;
+
+        p  { margin-bottom: 10px; &:last-child { margin-bottom: 0; } }
+        h1,h2,h3 { color: var(--on-surface); font-size: 0.95rem; margin: 14px 0 6px; letter-spacing: -0.01em; }
+        strong { color: var(--on-surface); font-weight: 600; }
+        em     { color: var(--on-surface-muted); font-style: italic; }
+        ul, ol { padding-left: 20px; margin: 8px 0; }
+        li     { margin-bottom: 4px; }
+        blockquote {
+          border-left: 2px solid var(--outline);
+          padding-left: 12px;
+          color: var(--on-surface-faint);
+          margin: 8px 0;
+        }
+
+        // Inline code
+        .md-inline-code {
+          font-family: var(--font-mono);
+          font-size: 0.78rem;
+          background: var(--surface-mid);
+          padding: 1px 6px;
+          color: var(--primary);
+          border: 1px solid var(--outline-variant);
+        }
+
+        // Fenced code block
+        .code-block-wrap {
+          margin: 12px 0;
+          background: var(--surface-low);
+          border: 1px solid var(--outline-variant);
+          // Don't hide overflow here — let the pre inside scroll horizontally
+          overflow: visible;
+          // But contain width to card
+          max-width: 100%;
+          min-width: 0;
+
+          .code-block-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 12px;
+            background: var(--surface-mid);
+            border-bottom: 1px solid var(--outline-variant);
+
+            .code-lang {
+              font-family: var(--font-mono);
+              font-size: 0.62rem;
+              letter-spacing: 0.1em;
+              text-transform: uppercase;
+              color: var(--primary);
+              font-weight: 700;
+            }
+
+            .code-copy-btn {
+              display: flex;
+              align-items: center;
+              background: none;
+              border: none;
+              cursor: pointer;
+              color: var(--on-surface-faint);
+              padding: 0;
+              transition: color 0.12s;
+
+              .material-icons { font-size: 0.9rem; }
+              &:hover { color: var(--on-surface); }
+            }
+          }
+
+          // Allow horizontal scroll on wide code — this is the key fix
+          pre, > div, > div > pre {
+            margin: 0 !important;
+            background: transparent !important;
+            overflow-x: auto !important;
+            max-width: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  // ─── Judge Verdict Bar — compact fixed-height ribbon ────────
+  .judge-verdict-bar {
+    background: var(--surface);
+    border: 1px solid var(--outline-variant);
+    border-top: 2px solid var(--outline);
+    flex-shrink: 0;
+    // No margin-bottom — sits between cards and actions
+
+    .jvb-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-bottom: 1px solid var(--outline-variant);
+      background: var(--surface-low);
+
+      .jvb-icon {
+        font-size: 0.9rem;
+        color: var(--on-surface-muted);
+      }
+      .jvb-title {
+        font-family: var(--font-display);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--on-surface);
+        flex: 1;
+      }
+      .jvb-model {
+        font-family: var(--font-mono);
+        font-size: 0.58rem;
+        color: var(--on-surface-faint);
+        letter-spacing: 0.06em;
+      }
+    }
+
+    .jvb-grid {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+
+      @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+        .jvb-sep { display: none; }
+      }
+    }
+
+    .jvb-sep {
+      background: var(--outline-variant);
+      align-self: stretch;
+    }
+
+    .jvb-cell {
+      padding: 8px 16px;
+
+      .jvb-cell-head {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--font-display);
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--on-surface-muted);
+        margin-bottom: 4px;
+
+        .jvb-dot {
+          width: 5px;
+          height: 5px;
+          flex-shrink: 0;
+        }
+      }
+
+      .jvb-text {
+        font-family: var(--font-body);
+        font-size: 0.76rem;
+        color: var(--on-surface-muted);
+        line-height: 1.5;
+        // Removed truncation to allow full judge reason to be visible
+        white-space: pre-wrap;
+      }
+    }
+  }
+
+  // ─── Actions — pinned to bottom of viewport ──────────
+  .results-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    padding: 10px 0 12px;
+    border-top: 1px solid var(--outline-variant);
+  }
+}

@@ -1,0 +1,10 @@
+// ─── Arena Feature — Style Index ──────────────────────────────
+// Import order matters: variables first, then animations (keyframes),
+// then structural partials that reference them.
+
+@use 'variables';     // SCSS tokens: sidebar widths, transitions
+@use 'animations';   // @keyframe definitions shared across the feature
+@use 'layout';       // .arena-layout, .mobile-menu-btn, .arena-main
+@use 'sidebar';      // .arena-sidebar — collapsible + mobile overlay
+@use 'home';         // ArenaHome split-panel + BattleForm styles
+@use 'battle';       // BattleProgress + BattleResults page styles
