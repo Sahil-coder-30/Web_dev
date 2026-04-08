@@ -12,7 +12,7 @@ app.set("trust proxy", 1);
 // CORS — dynamically allow frontend URL based on environment
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: "https://ai-battle-arena-sigma.vercel.app",
     credentials: true,           // allow cookies to be sent cross-origin
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
