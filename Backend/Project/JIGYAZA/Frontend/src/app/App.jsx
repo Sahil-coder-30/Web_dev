@@ -77,8 +77,9 @@ function App() {
 
       {/* Render the actual App Routes underneath */}
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route
-          path="/"
+          path="/dashboard"
           element={
             <Protected>
              <Dashboard/>
@@ -93,7 +94,6 @@ function App() {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/loader" element={<LoaderDemo />} />
-        <Route path="/landingPage" element = {<LandingPage/>}/>
       </Routes>
     </BrowserRouter>
   );

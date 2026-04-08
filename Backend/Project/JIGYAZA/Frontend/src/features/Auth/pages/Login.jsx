@@ -42,7 +42,7 @@ const Login = () => {
     dispatch(setLoading(true));
     try {
       await loginUser(formData.email, formData.password);
-      navigate('/'); // Redirect to home page after successful login
+      navigate('/dashboard'); // Redirect to dashboard after successful login
       dispatch(setLoading(false));
     } catch (error) {
       // Use optional chaining to prevent TypeError if the backend error structure varies
@@ -107,7 +107,7 @@ const Login = () => {
 
   useEffect(() => {
     if (authUserPayload && !isAuthLoading) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [authUserPayload, isAuthLoading, navigate]);
 
