@@ -6,10 +6,10 @@ import User from "../models/user.model.js";
 const JWT_SECRET = process.env.JWT_SECRET || "super_secret_arena_key";
 
 const COOKIE_OPTIONS = {
-  httpOnly: true,       // JS cannot read the cookie — prevents XSS token theft
-  secure: process.env.NODE_ENV === "production",  // HTTPS only in prod
-  sameSite: "lax" as const,  // lax works for same-site navigation; use "none" if deployed cross-site
-  maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+  httpOnly: true,       
+  secure: true,         // MUST be true for cross-site (Vercel is HTTPS)
+  sameSite: "none" as const, // MUST be 'none' for cross-domain cookies
+  maxAge: 24 * 60 * 60 * 1000, 
 };
 
 export const registerUser = async (req: Request, res: Response) => {

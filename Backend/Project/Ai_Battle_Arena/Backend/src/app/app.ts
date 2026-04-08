@@ -7,6 +7,8 @@ import morgan from "morgan";
 
 const app = express();
 
+// Trust reverse proxy (Vercel) so secure cookies can be set correctly
+app.set("trust proxy", 1);
 // CORS — dynamically allow frontend URL based on environment
 app.use(
   cors({
