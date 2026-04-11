@@ -1,0 +1,56 @@
+sequenceDiagram
+    %% CHAT & AI FLOW
+    %% Copy and paste this directly into mermaid.live
+
+    actor U as User
+    participant FE as Chat.jsx
+    participant UC as useChat.js
+    participant API as chat.api.js
+    participant CC as chatController
+    participant DB as MongoDB
+    participant AI as ai.service.js
+    participant GEM as Gemini 2.5 Flash
+    participant TAV as Tavily Search
+    participant MIS as Mistral Large
+
+    U->>FE: Type message + Enter
+    FE->>FE: setOptimisticMessage (instant UI)
+    FE->>UC: handelSendMessage({ messages, chatId })
+    UC->>API: POST /api/chats/messages
+
+    alt New Chat (no chatId)
+        API->>CC: { messages, chatId: undefined }
+        CC->>MIS: createChatTitle(firstMessage)
+        MIS-->>CC: "Descriptive Title"
+        CC->>DB: chatModel.create({ user, title })
+        DB-->>CC: newChat._id
+    else Existing Chat
+        API->>CC: { messages, chatId }
+        CC->>DB: chatModel.findById(chatId)
+    end
+
+    CC->>DB: messageModel.create({ role: "user", content })
+    CC->>DB: messageModel.find({ chat: chatId }).sort(createdAt)
+    DB-->>CC: Full message history array
+
+    CC->>AI: generateResponse(allMessages)
+    AI->>AI: Map DB msgs → LangChain\nHumanMessage / AIMessage
+
+    AI->>GEM: agent.invoke({ messages })
+
+    opt Agent needs web data
+        GEM->>AI: ToolCall: internet_search
+        AI->>TAV: tavily.search(query, maxResults:5)
+        TAV-->>AI: Search results JSON
+        AI->>GEM: ToolMessage with results
+    end
+
+    GEM-->>AI: Final text response
+    AI-->>CC: responseContent string
+    CC->>DB: messageModel.create({ role: "ai", content })
+    DB-->>CC: Aimessage doc
+    CC-->>API: { chat?, Aimessage }
+    API-->>UC: data
+    UC->>UC: dispatch(createNewChat?) + dispatch(createNewMessage x2)
+    UC-->>FE: setOptimisticMessage(null)
+    FE->>U: Render AI response (ReactMarkdown)
