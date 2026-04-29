@@ -10,6 +10,8 @@ const imagekit = new ImageKit({
   privateKey: process.env.IMAGEKIT_PRIVATEKEY,
 });
 
+
+
 async function createPostController(req, res) {
   console.log(req.file);
   

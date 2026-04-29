@@ -6,6 +6,14 @@ const redis = new Redis({
   host: process.env.REDIS_HOST,
   port: process.env.REDIS_PORT,
   password: process.env.REDIS_PASSWORD,
+  maxRetriesPerRequest: 3,
+  retryStrategy(times) {
+    if (times > 5) {
+      console.warn("⚠️  Redis: max retries reached, stopping reconnection attempts");
+      return null; // Stop retrying
+    }
+    return Math.min(times * 500, 3000); // Exponential backoff, max 3s
+  },
 });
 
 redis.on("connect", () => {

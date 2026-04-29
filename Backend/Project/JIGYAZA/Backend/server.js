@@ -11,31 +11,27 @@ connectToDb();
 const httpServer = http.createServer(app);
 initSocket(httpServer);
 
-// Wait for Redis connection with timeout
+// Wait for Redis connection with timeout (non-blocking)
 const waitForRedis = async (timeoutMs = 10000) => {
   if (redis.status === "ready") {
-    return; // Already connected
+    console.log("Redis already connected");
+    return;
   }
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const timeout = setTimeout(() => {
-      reject(new Error("Redis connection timeout"));
+      console.warn("⚠️  Redis connection timeout — server starting without Redis. Caching/OTP features may be unavailable.");
+      redis.removeListener("ready", onReady);
+      resolve();
     }, timeoutMs);
 
     const onReady = () => {
       clearTimeout(timeout);
-      redis.removeListener("error", onError);
+      console.log("Redis connected successfully");
       resolve();
     };
 
-    const onError = (err) => {
-      clearTimeout(timeout);
-      redis.removeListener("ready", onReady);
-      reject(err);
-    };
-
     redis.once("ready", onReady);
-    redis.once("error", onError);
   });
 };
 
