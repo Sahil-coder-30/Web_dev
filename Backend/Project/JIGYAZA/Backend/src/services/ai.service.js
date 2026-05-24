@@ -1,13 +1,16 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatMistralAI } from "@langchain/mistralai";
+import { ChatOllama } from "@langchain/ollama"; // ✅ ADD THIS
 import { HumanMessage, SystemMessage, AIMessage, ToolMessage } from "@langchain/core/messages";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { searchInternet } from "./internet.service.js";
 import { createAgent } from "langchain";
-const geminiModel = new ChatGoogleGenerativeAI({
-  model: "gemini-2.5-flash",
-  apiKey: process.env.GOOGLE_GEMINI_API_KEY,
+
+// ✅ SWAPPED - was ChatGoogleGenerativeAI, now local Ollama
+const geminiModel = new ChatOllama({
+  model: "qwen2.5-coder:7b",
+  baseUrl: "http://localhost:11434",
 });
 
 const mistralModel = new ChatMistralAI({
@@ -37,16 +40,13 @@ const agent = createAgent({
   model: geminiModel,
   tools: [tavilySearchTool],
   systemMessage: "You are a helpful assistant. and you have the access to the internet using the tavilySearchTool. Use it when you need to search the internet for up-to-date and real-time information.",
-
 })
-
-
 
 export const generateResponse = async (messages) => {
   const formatted = messages.map((msg) => {
     if (msg.role === "user") return new HumanMessage(msg.content);
     if (msg.role === "ai") return new AIMessage(msg.content);
-  }).filter(Boolean); // guard against unexpected roles
+  }).filter(Boolean);
   console.log(messages);
   const res = await agent.invoke({ messages: formatted });
   const lastMessage = res.messages[res.messages.length - 1];
@@ -70,7 +70,7 @@ export const createChatTitle = async (message) => {
       new HumanMessage(message),
     ]);
 
-    return res.content.trim(); // ✅ .content not .text
+    return res.content.trim();
   } catch (error) {
     console.error("Failed to generate chat title, falling back:", error);
     return "New Research";
