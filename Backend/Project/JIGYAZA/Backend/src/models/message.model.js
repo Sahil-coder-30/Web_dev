@@ -9,12 +9,16 @@ const messageSchema = new mongoose.Schema({
     },
     content : {
          type : String,
-         required : true
+         default : ""
+    },
+    thinking : {
+         type : String,
+         default : ""
     },
     role : {
-        type : String ,
-        enum : ["user" , "ai"],
-        required : true
+         type : String ,
+         enum : ["user" , "ai"],
+         required : true
     }
 } , {timestamps : true})
 

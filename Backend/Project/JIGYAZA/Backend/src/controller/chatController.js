@@ -1,59 +1,147 @@
-import { createChatTitle, generateResponse } from "../services/ai.service.js";
+import { createChatTitle, generateResponse, generateStreamResponse } from "../services/ai.service.js";
 import chatModel from "../models/chat.model.js";
 import messageModel from "../models/message.model.js";
+import { getId } from "../sockets/server.socket.js";
+import mongoose from "mongoose";
 
 export const chatMessageController = async (req, res, next) => {
-  const { messages, chatId } = req.body;
+  const { messages, chatId, socketId } = req.body;
 
   try {
-    if (!chatId) {
-      const title = await createChatTitle(messages);
-      const chat = await chatModel.create({ user: req.user.id, title });
-      const newChatId = chat._id;
+    let chat;
+    let targetChatId = chatId;
+    let title;
 
-      await messageModel.create({
-        chat: newChatId,
-        content: messages,
-        role: "user",
-      });
-
-      const allMsg = await messageModel.find({ chat: newChatId });
-      const gemResponse = await generateResponse(allMsg);
-
-      const Aimessage = await messageModel.create({
-        chat: newChatId,
-        content: gemResponse,
-        role: "ai",
-      });
-
-      return res.status(201).json({ chat, Aimessage });
+    if (!targetChatId) {
+      title = await createChatTitle(messages);
+      chat = await chatModel.create({ user: req.user.id, title });
+      targetChatId = chat._id;
+    } else {
+      chat = await chatModel.findById(targetChatId);
+      if (!chat) {
+        return res
+          .status(404)
+          .json({ message: "No chat exists with this chat id." });
+      }
     }
 
-    const chat = await chatModel.findById(chatId); // ✅ returns document, not array
-    if (!chat) {
-      return res
-        .status(404)
-        .json({ message: "No chat exists with this chat id." });
-    }
-
-    await messageModel.create({
-      chat: chat._id,
+    // Save User message
+    const userMessage = await messageModel.create({
+      chat: targetChatId,
       content: messages,
       role: "user",
     });
 
-    const Allmsg = await messageModel
-      .find({ chat: chatId })
+    // Fetch all messages for context (including the newly added user message)
+    const allMsg = await messageModel
+      .find({ chat: targetChatId })
       .sort({ createdAt: 1 });
-    const gemResponse = await generateResponse(Allmsg);
 
+    // Handle Streaming if socketId is provided
+    if (socketId) {
+      // Create a temporary, unsaved AI message details object
+      const tempMessageId = new mongoose.Types.ObjectId();
+      const tempAimessage = {
+        _id: tempMessageId,
+        chat: targetChatId,
+        content: "",
+        role: "ai",
+      };
+
+      // Respond immediately with the chat and temporary AI message details
+      res.status(201).json({ chat, Aimessage: tempAimessage });
+
+      // Run streaming in the background without blocking the HTTP response
+      (async () => {
+        try {
+          const io = getId();
+          const eventStream = await generateStreamResponse(allMsg);
+          let fullResponse = "";
+          let currentThinking = "";
+
+          for await (const event of eventStream) {
+            if (event.event === "on_tool_start") {
+              const toolName = event.name;
+              const toolInput = event.data?.input;
+              // Format a user-friendly thinking token
+              const thinkingMsg = `[Searching: ${toolName}...]\n`;
+              currentThinking += thinkingMsg;
+              
+              // Emit tool invocation event to client
+              io.to(socketId).emit("chat_thinking", {
+                chatId: targetChatId,
+                messageId: tempMessageId,
+                thinking: currentThinking,
+              });
+            } else if (event.event === "on_tool_end") {
+              const toolName = event.name;
+              const thinkingMsg = `[Found information from ${toolName}]\n\n`;
+              currentThinking += thinkingMsg;
+              
+              // Emit tool completion event to client
+              io.to(socketId).emit("chat_thinking", {
+                chatId: targetChatId,
+                messageId: tempMessageId,
+                thinking: currentThinking,
+              });
+            } else if (event.event === "on_chat_model_stream") {
+              const token = event.data.chunk.content;
+              if (token) {
+                fullResponse += token;
+                // Emit the token chunk to the specific socket connection
+                io.to(socketId).emit("chat_chunk", {
+                  chatId: targetChatId,
+                  messageId: tempMessageId,
+                  token,
+                });
+              }
+            }
+          }
+
+          // Save the completed AI response to the database now that generation is finished
+          const savedAimessage = await messageModel.create({
+            _id: tempMessageId,
+            chat: targetChatId,
+            content: fullResponse,
+            thinking: currentThinking,
+            role: "ai",
+          });
+
+          // Notify the client that the stream is complete
+          io.to(socketId).emit("chat_done", {
+            chatId: targetChatId,
+            messageId: savedAimessage._id,
+            content: fullResponse,
+            thinking: currentThinking,
+          });
+
+        } catch (streamError) {
+          console.error("Error during streaming generation:", streamError);
+          try {
+            const io = getId();
+            io.to(socketId).emit("chat_error", {
+              chatId: targetChatId,
+              messageId: tempMessageId,
+              error: "Failed to generate complete response",
+            });
+          } catch (e) {}
+        }
+      })();
+
+      return;
+    }
+
+    // Fallback: Non-streaming response if socketId is not provided
+    const gemResponse = await generateResponse(allMsg);
     const Aimessage = await messageModel.create({
-      chat: chat._id,
+      chat: targetChatId,
       content: gemResponse,
       role: "ai",
     });
 
-    return res.status(200).json({ Allmsg, Aimessage }); // ✅ include AI reply
+    const updatedMessages = await messageModel.find({ chat: targetChatId }).sort({ createdAt: 1 });
+
+    return res.status(200).json({ chat, Aimessage, Allmsg: updatedMessages });
   } catch (err) {
     next(err);
   }

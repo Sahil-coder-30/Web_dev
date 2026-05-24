@@ -11,6 +11,9 @@ import {
   setisLoading,
   createNewChat,
   createNewMessage,
+  appendTokenToLastMessage,
+  updateLastMessageThinking,
+  updateLastMessageContent,
   setMessagesForChat,
   removeChat
 } from "../chat.slice";
@@ -21,13 +24,45 @@ import { setLoading } from "../../Auth/auth.slice";
 export const useChat = () => {
   const dispatch = useDispatch();
 
+  function setupSocketListeners(socketInstance) {
+    if (!socketInstance) return;
+
+    // Unsubscribe from any previous listeners to prevent duplicates
+    socketInstance.off("chat_chunk");
+    socketInstance.off("chat_thinking");
+    socketInstance.off("chat_done");
+    socketInstance.off("chat_error");
+
+    socketInstance.on("chat_thinking", ({ chatId, thinking }) => {
+      dispatch(updateLastMessageThinking({ chatId, thinking }));
+    });
+
+    socketInstance.on("chat_chunk", ({ chatId, token }) => {
+      dispatch(appendTokenToLastMessage({ chatId, token }));
+    });
+
+    socketInstance.on("chat_done", ({ chatId, content, thinking }) => {
+      dispatch(updateLastMessageContent({ chatId, message: content, thinking }));
+      dispatch(setisLoading(false));
+    });
+
+    socketInstance.on("chat_error", ({ chatId, error }) => {
+      console.error("Socket chat error:", error);
+      dispatch(appendTokenToLastMessage({ chatId, token: "\n\n⚠️ Error generating response." }));
+      dispatch(setisLoading(false));
+    });
+  }
+
   async function handelSendMessage({ messages, chatId }) {
+    const activeSocket = inializeSocketConnection();
+    const socketId = activeSocket?.id;
+
     dispatch(setisLoading(true));
     try {
-      const data = await sendMessage({ messages, chatId });
+      const data = await sendMessage({ messages, chatId, socketId });
       const { chat, Aimessage } = data;
       
-      // If it's a new chat, the backend creates it and returns the true ID. On existing, it just returns Aimessage, Allmsg.
+      // If it's a new chat, the backend creates it and returns the true ID. On existing, it just returns Aimessage.
       const targetChatId = chatId || (chat ? chat._id : null);
 
       if (!chatId && chat) {
@@ -39,6 +74,7 @@ export const useChat = () => {
         );
       }
       
+      // Save User Message
       dispatch(
         createNewMessage({
           chatId: targetChatId,
@@ -46,18 +82,27 @@ export const useChat = () => {
           role: "user",
         }),
       );
+
+      // Save Placeholder AI Message
       dispatch(
         createNewMessage({
           chatId: targetChatId,
-          message: Aimessage.content,
-          role: Aimessage.role,
+          message: "",
+          role: "ai",
         }),
       );
+
       dispatch(setcurrentChatId(targetChatId));
+
+      // If no socketId, fall back to synchronous completion
+      if (!socketId) {
+        dispatch(updateLastMessageContent({ chatId: targetChatId, message: Aimessage.content }));
+        dispatch(setisLoading(false));
+      }
+      // Note: If socketId is present, the loading state will be set to false by the "chat_done" or "chat_error" event handlers.
     } catch (error) {
        console.error("Failed to send message:", error);
-    } finally {
-      dispatch(setisLoading(false));
+       dispatch(setisLoading(false));
     }
   }
 
@@ -122,6 +167,7 @@ export const useChat = () => {
 
   return {
     inializeSocketConnection,
+    setupSocketListeners,
     handelSendMessage,
     fetchChats,
     fetchChatMessages,

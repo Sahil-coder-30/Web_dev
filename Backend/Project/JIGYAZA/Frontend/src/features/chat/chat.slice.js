@@ -21,8 +21,41 @@ const chatSlice = createSlice({
             state.currentChatId = chatId;
         },
         createNewMessage : (state , action) =>{
-            const {chatId , message , role} = action.payload;
-            state.chats[chatId].message.push({message , role});
+            const {chatId , message, thinking , role} = action.payload;
+            state.chats[chatId].message.push({message , thinking: thinking || "", role});
+        },
+        appendTokenToLastMessage : (state, action) => {
+            const { chatId, token } = action.payload;
+            if (state.chats[chatId] && state.chats[chatId].message.length > 0) {
+                const messageList = state.chats[chatId].message;
+                const lastMsg = messageList[messageList.length - 1];
+                if (lastMsg.role === "ai") {
+                    lastMsg.message = (lastMsg.message || "") + token;
+                }
+            }
+        },
+        updateLastMessageThinking : (state, action) => {
+            const { chatId, thinking } = action.payload;
+            if (state.chats[chatId] && state.chats[chatId].message.length > 0) {
+                const messageList = state.chats[chatId].message;
+                const lastMsg = messageList[messageList.length - 1];
+                if (lastMsg.role === "ai") {
+                    lastMsg.thinking = thinking;
+                }
+            }
+        },
+        updateLastMessageContent : (state, action) => {
+            const { chatId, message, thinking } = action.payload;
+            if (state.chats[chatId] && state.chats[chatId].message.length > 0) {
+                const messageList = state.chats[chatId].message;
+                const lastMsg = messageList[messageList.length - 1];
+                if (lastMsg.role === "ai") {
+                    lastMsg.message = message;
+                    if (thinking !== undefined) {
+                        lastMsg.thinking = thinking;
+                    }
+                }
+            }
         },
         setMessagesForChat : (state, action) => {
             const { chatId, messages } = action.payload;
@@ -54,5 +87,5 @@ const chatSlice = createSlice({
     }
 })
 
-export const {setchats , setcurrentChatId , setisLoading , seterror ,createNewChat , createNewMessage, setMessagesForChat, removeChat } = chatSlice.actions;
+export const {setchats , setcurrentChatId , setisLoading , seterror ,createNewChat , createNewMessage, appendTokenToLastMessage, updateLastMessageThinking, updateLastMessageContent, setMessagesForChat, removeChat } = chatSlice.actions;
 export default chatSlice.reducer

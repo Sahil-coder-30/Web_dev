@@ -27,7 +27,10 @@ const Dashboard = () => {
     useEffect(() => {
         const initChat = async () => {
             if (chat && chat.inializeSocketConnection) {
-                chat.inializeSocketConnection();
+                const s = chat.inializeSocketConnection();
+                if (chat.setupSocketListeners) {
+                    chat.setupSocketListeners(s);
+                }
             }
             if (chat && chat.fetchChats) {
                 await chat.fetchChats();
@@ -73,7 +76,11 @@ const Dashboard = () => {
 
     // Derived states
     const currentChat = activeChatId ? chats[activeChatId] : null;
-    const messages = currentChat && currentChat.message ? currentChat.message.map(m => ({ role: m.role, content: m.message || m.content })) : [];
+    const messages = currentChat && currentChat.message ? currentChat.message.map(m => ({ 
+        role: m.role, 
+        content: m.message || m.content,
+        thinking: m.thinking || "" 
+    })) : [];
     const chatTitle = currentChat ? currentChat.title : "New Research";
 
     // Derived History directly from Redux Mapping

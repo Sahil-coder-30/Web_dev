@@ -40,6 +40,125 @@ const CodeBlock = ({ node, inline, className, children, ...props }) => {
     return <code className={className} {...props}>{children}</code>;
 };
 
+const AIMessageRow = React.memo(({ msg, isLast, isChatLoading }) => {
+    const [displayedContent, setDisplayedContent] = useState("");
+    const [isExpanded, setIsExpanded] = useState(true);
+    const bufferRef = useRef("");
+    const animationFrameRef = useRef(null);
+
+    const targetContent = msg.content || "";
+    const hasThinking = !!msg.thinking;
+    const isThinkingDone = !isChatLoading || !!targetContent;
+
+    // Automatically manage collapsible state of thinking block
+    useEffect(() => {
+        if (isThinkingDone) {
+            setIsExpanded(false); // Collapse when done
+        } else if (hasThinking) {
+            setIsExpanded(true); // Keep open when actively thinking/searching
+        }
+    }, [isThinkingDone, hasThinking]);
+
+    // Handle token buffer & smooth typing animation
+    useEffect(() => {
+        // If not active message, or not loading, or if the animation caught up, display full content immediately
+        if (!isLast || !isChatLoading) {
+            setDisplayedContent(targetContent);
+            return;
+        }
+
+        bufferRef.current = targetContent;
+
+        const tick = () => {
+            setDisplayedContent((prev) => {
+                const target = bufferRef.current;
+                if (prev.length >= target.length) {
+                    return prev;
+                }
+                // Add tokens smoothly
+                const diff = target.length - prev.length;
+                const step = Math.max(1, Math.min(3, Math.ceil(diff / 4)));
+                return prev + target.slice(prev.length, prev.length + step);
+            });
+
+            animationFrameRef.current = requestAnimationFrame(tick);
+        };
+
+        animationFrameRef.current = requestAnimationFrame(tick);
+
+        return () => {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
+        };
+    }, [targetContent, isLast, isChatLoading]);
+
+    return (
+        <div className="ai-message-row message-reveal">
+            <div className="ai-content">
+                {hasThinking && (
+                    <div className="thinking-block">
+                        <div 
+                            className="thinking-header" 
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            {!isThinkingDone ? (
+                                <div className="thinking-spinner"></div>
+                            ) : (
+                                <span className="material-symbols-outlined check-icon">check_circle</span>
+                            )}
+                            <span className="thinking-title">
+                                {!isThinkingDone ? "Searching & Analyzing..." : "Search & Thought Process"}
+                            </span>
+                            <span className="material-symbols-outlined arrow-icon" style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}>
+                                keyboard_arrow_down
+                            </span>
+                        </div>
+                        {isExpanded && (
+                            <div className="thinking-details">
+                                {msg.thinking}
+                            </div>
+                        )}
+                    </div>
+                )}
+                {displayedContent ? (
+                    <div className="msg-text-blocks markdown-body">
+                        <ReactMarkdown 
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                                code: CodeBlock
+                            }}
+                        >
+                            {displayedContent}
+                        </ReactMarkdown>
+                    </div>
+                ) : (
+                    // Show formulating response while loader is spinning AND we aren't doing thinking actions
+                    isChatLoading && isLast && !hasThinking && (
+                        <div className="typing-indicator-row" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', margin: 0 }}>
+                            <Loder size={20} color="#c7621a" />
+                            <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>Formulating response...</span>
+                        </div>
+                    )
+                )}
+                {displayedContent && (
+                    <div className="ai-actions">
+                        <button aria-label="Copy"><span className="material-symbols-outlined">content_copy</span></button>
+                        <button aria-label="Like"><span className="material-symbols-outlined">thumb_up</span></button>
+                        <button aria-label="Regenerate"><span className="material-symbols-outlined">refresh</span></button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}, (prevProps, nextProps) => {
+    return prevProps.msg.content === nextProps.msg.content &&
+           prevProps.msg.thinking === nextProps.msg.thinking &&
+           prevProps.isLast === nextProps.isLast &&
+           prevProps.isChatLoading === nextProps.isChatLoading;
+});
+
 const Chat = ({ isSidebarOpen, toggleSidebar, userName, messages, chatTitle, onNewChat, activeChatId, isChatLoading, handelSendMessage }) => {
     const [inputValue, setInputValue] = useState("");
     const [optimisticMessage, setOptimisticMessage] = useState(null);
@@ -60,7 +179,7 @@ const Chat = ({ isSidebarOpen, toggleSidebar, userName, messages, chatTitle, onN
     };
 
     const handleSend = async () => {
-        if (!inputValue.trim()) return;
+        if (!inputValue.trim() || isChatLoading) return;
         
         const inputPayload = inputValue;
         setInputValue("");
@@ -77,7 +196,9 @@ const Chat = ({ isSidebarOpen, toggleSidebar, userName, messages, chatTitle, onN
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            handleSend();
+            if (!isChatLoading) {
+                handleSend();
+            }
         }
     };
 
@@ -126,25 +247,12 @@ const Chat = ({ isSidebarOpen, toggleSidebar, userName, messages, chatTitle, onN
                                         <h3 className="prompt-text">{msg.content}</h3>
                                     </div>
                                 ) : (
-                                    <div key={index} className="ai-message-row message-reveal">
-                                        <div className="ai-content">
-                                            <div className="msg-text-blocks markdown-body">
-                                                <ReactMarkdown 
-                                                    remarkPlugins={[remarkGfm]}
-                                                    components={{
-                                                        code: CodeBlock
-                                                    }}
-                                                >
-                                                    {msg.content}
-                                                </ReactMarkdown>
-                                            </div>
-                                            <div className="ai-actions">
-                                                <button aria-label="Copy"><span className="material-symbols-outlined">content_copy</span></button>
-                                                <button aria-label="Like"><span className="material-symbols-outlined">thumb_up</span></button>
-                                                <button aria-label="Regenerate"><span className="material-symbols-outlined">refresh</span></button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <AIMessageRow 
+                                        key={index}
+                                        msg={msg}
+                                        isLast={index === messages.length - 1}
+                                        isChatLoading={isChatLoading}
+                                    />
                                 )
                             ))}
 
@@ -152,14 +260,6 @@ const Chat = ({ isSidebarOpen, toggleSidebar, userName, messages, chatTitle, onN
                             {optimisticMessage && (
                                 <div className="user-message-row message-reveal">
                                     <h3 className="prompt-text">{optimisticMessage}</h3>
-                                </div>
-                            )}
-
-                            {/* Typing Indicator */}
-                            {isChatLoading && (
-                                <div className="typing-indicator-row message-reveal" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                                    <Loder size={24} color="#c7621a" />
-                                    <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>Extracting insights...</span>
                                 </div>
                             )}
                             
@@ -186,7 +286,7 @@ const Chat = ({ isSidebarOpen, toggleSidebar, userName, messages, chatTitle, onN
                     {/* Textarea Area */}
                     <div className="textarea-container">
                         <textarea 
-                            placeholder="Continue the research..." 
+                            placeholder={isChatLoading ? "AI is formulating a response..." : "Continue the research..."} 
                             rows="2"
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
@@ -205,9 +305,10 @@ const Chat = ({ isSidebarOpen, toggleSidebar, userName, messages, chatTitle, onN
                         {/* Send button (Activating if input is present) */}
                         <button 
                             type="button"
-                            className={`send-button ${inputValue.trim() ? 'active' : ''}`} 
+                            className={`send-button ${inputValue.trim() && !isChatLoading ? 'active' : ''}`} 
                             aria-label="Send Message"
                             onClick={handleSend}
+                            disabled={isChatLoading || !inputValue.trim()}
                         >
                             <span className="material-symbols-outlined">north</span>
                         </button>

@@ -1,16 +1,14 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatMistralAI } from "@langchain/mistralai";
-import { ChatOllama } from "@langchain/ollama"; // ✅ ADD THIS
 import { HumanMessage, SystemMessage, AIMessage, ToolMessage } from "@langchain/core/messages";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { searchInternet } from "./internet.service.js";
 import { createAgent } from "langchain";
 
-// ✅ SWAPPED - was ChatGoogleGenerativeAI, now local Ollama
-const geminiModel = new ChatOllama({
-  model: "qwen2.5-coder:7b",
-  baseUrl: "http://localhost:11434",
+export const geminiModel = new ChatGoogleGenerativeAI({
+  model: "gemini-2.5-flash",
+  apiKey: process.env.GOOGLE_GEMINI_API_KEY,
 });
 
 const mistralModel = new ChatMistralAI({
@@ -18,7 +16,7 @@ const mistralModel = new ChatMistralAI({
   apiKey: process.env.MISTRAL_API_KEY,
 });
 
-const tavilySearchTool = tool(
+export const tavilySearchTool = tool(
   async ({ query }) => {
     try {
       const results = await searchInternet({ query });
@@ -36,21 +34,51 @@ const tavilySearchTool = tool(
   }
 );
 
-const agent = createAgent({
+export const agent = createAgent({
   model: geminiModel,
   tools: [tavilySearchTool],
   systemMessage: "You are a helpful assistant. and you have the access to the internet using the tavilySearchTool. Use it when you need to search the internet for up-to-date and real-time information.",
 })
 
 export const generateResponse = async (messages) => {
-  const formatted = messages.map((msg) => {
-    if (msg.role === "user") return new HumanMessage(msg.content);
-    if (msg.role === "ai") return new AIMessage(msg.content);
-  }).filter(Boolean);
+  const systemPrompt = new SystemMessage(
+    `You are a helpful assistant. You have access to the internet using the tavilySearchTool (named internet_search). Use it when you need to search the internet for up-to-date and real-time information.
+Current Date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+Current Time: ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`
+  );
+
+  const formatted = [
+    systemPrompt,
+    ...messages.map((msg) => {
+      if (msg.role === "user") return new HumanMessage(msg.content);
+      if (msg.role === "ai") return new AIMessage(msg.content);
+    }).filter(Boolean)
+  ];
   console.log(messages);
   const res = await agent.invoke({ messages: formatted });
   const lastMessage = res.messages[res.messages.length - 1];
   return lastMessage.content;
+};
+
+export const generateStreamResponse = async (messages) => {
+  const systemPrompt = new SystemMessage(
+    `You are a helpful assistant. You have access to the internet using the tavilySearchTool (named internet_search). Use it when you need to search the internet for up-to-date and real-time information.
+Current Date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+Current Time: ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`
+  );
+
+  const formatted = [
+    systemPrompt,
+    ...messages.map((msg) => {
+      if (msg.role === "user") return new HumanMessage(msg.content);
+      if (msg.role === "ai") return new AIMessage(msg.content);
+    }).filter(Boolean)
+  ];
+  
+  return agent.streamEvents(
+    { messages: formatted },
+    { version: "v2" }
+  );
 };
 
 export const createChatTitle = async (message) => {
