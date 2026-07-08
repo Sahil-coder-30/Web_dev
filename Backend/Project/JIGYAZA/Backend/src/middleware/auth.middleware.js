@@ -3,14 +3,14 @@ import redis from '../config/dgCache.js';
 
 export const identifyUser =async  (req, res, next) => {
   const token = req.cookies.token;
-  const blacklistedToken = await redis.get(`blacklist:${token}`);
-  if (blacklistedToken) {
-    const err = new Error("blacklisted token");
+  if (!token) {
+    const err = new Error("token is required");
     err.statusCode = 401;
     return next(err);
   }
-  if (!token) {
-    const err = new Error("token is required");
+  const blacklistedToken = await redis.get(`blacklist:${token}`);
+  if (blacklistedToken) {
+    const err = new Error("blacklisted token");
     err.statusCode = 401;
     return next(err);
   }

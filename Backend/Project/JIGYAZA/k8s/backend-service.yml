@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name:  backend-service 
+  labels:
+    name:  backend-service
+spec:
+  selector:
+    app:  jigyaza
+  type:  ClusterIP
+  ports:
+  - name:  backend-port
+    port:  80
+    targetPort:  3000

@@ -1,0 +1,133 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  backend-deployment
+  labels:
+    name:  backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jigyaza
+  template:
+    metadata:
+      labels:
+        app: jigyaza
+    spec:
+      containers:
+      - image:  jigyaza
+        imagePullPolicy: IfNotPresent
+        name:  backend-container
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /status/healthz
+            port: 3000
+          initialDelaySeconds: 90
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /status/readyz
+            port: 3000
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+        env:
+          - name: MONGO_URI
+            valueFrom:
+              secretKeyRef:
+                name: database
+                key: MONGO_URI
+          - name: PORT
+            valueFrom:
+              secretKeyRef:
+                name: database
+                key: PORT
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database
+                key: REDIS_PASSWORD
+          - name: REDIS_HOST
+            valueFrom:
+              secretKeyRef:
+                name: database
+                key: REDIS_HOST
+          - name: REDIS_PORT
+            valueFrom:
+              secretKeyRef:
+                name: database
+                key: REDIS_PORT
+          - name: GOOGLE_CLIENT_ID
+            valueFrom: 
+              secretKeyRef:
+                name: google
+                key: GOOGLE_CLIENT_ID
+          - name: GOOGLE_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: google
+                key: GOOGLE_CLIENT_SECRET
+          - name: GOOGLE_REFRESH_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: google
+                key: GOOGLE_REFRESH_TOKEN
+          - name: GOOGLE_USER
+            valueFrom:
+              secretKeyRef:
+                name: google
+                key: GOOGLE_USER
+          - name: GOOGLE_ACCESS_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: google
+                key: GOOGLE_ACCESS_TOKEN
+          - name: GOOGLE_APP_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: google
+                key: GOOGLE_APP_PASSWORD
+          - name: GOOGLE_AUTH_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: google
+                key: GOOGLE_AUTH_CLIENT_ID
+          - name: GOOGLE_AUTH_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: google
+                key: GOOGLE_AUTH_CLIENT_SECRET
+          - name: MISTRAL_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: ai
+                key: MISTRAL_API_KEY
+          - name: TAVILY_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: ai
+                key: TAVILY_API_KEY
+          - name: GOOGLE_GEMINI_API
+            valueFrom:
+              secretKeyRef:
+                name: ai
+                key: GOOGLE_GEMINI_API
+          - name: GOOGLE_GEMINI_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: ai
+                key: GOOGLE_GEMINI_API_KEY
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: jwt
+                key: JWT_SECRET
+        ports:
+        - containerPort:  3000
+          name:  backend-port

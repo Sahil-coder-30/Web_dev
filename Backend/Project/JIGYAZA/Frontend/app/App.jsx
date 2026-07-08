@@ -5,8 +5,9 @@ import LandingPage from "../features/LandingPage/LandingPage.jsx";
 import Login from "../features/Auth/pages/Login.jsx";
 import Register from "../features/Auth/pages/Register.jsx";
 import LoaderDemo from "../components/Loaders/loder/LoaderDemo.jsx";
-import PrivacyPolicy from "../features/Legal/pages/PrivacyPolicy.jsx";
+import PrivacyInfo from "../features/Legal/pages/PrivacyInfo.jsx";
 import TermsAndConditions from "../features/Legal/pages/TermsAndConditions.jsx";
+import CreatePassword from "../features/Auth/pages/CreatePassword.jsx";
 
 function App() {
   const [showEntryLoader, setShowEntryLoader] = useState(
@@ -66,8 +67,9 @@ function App() {
         <Route path="/" element={<LandingPage isReady={!showEntryLoader} />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/privacy" element={<PrivacyInfo />} />
         <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/create-password" element={<CreatePassword />} />
         <Route path="/loader" element={<LoaderDemo />} />
       </Routes>
     </BrowserRouter>

@@ -1,11 +1,10 @@
+import "dotenv/config";
 import app from "./src/app.js";
-import dotenv from "dotenv";
 import connectToDb from "./src/config/db.js";
 import redis from "./src/config/dgCache.js";
 import http from 'http';
 import { initSocket } from "./src/sockets/server.socket.js";
 
-dotenv.config();
 connectToDb();
 
 const httpServer = http.createServer(app);

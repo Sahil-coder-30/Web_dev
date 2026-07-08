@@ -4,7 +4,7 @@ export let socket = null;
 
 export const inializeSocketConnection = () => {
     if (!socket) {
-        socket = io("http://localhost:3000", {
+        socket = io("/", {
             withCredentials: true,
             autoConnect: true,
         });

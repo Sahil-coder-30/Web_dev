@@ -18,7 +18,20 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       minlength: 6,
-      required: [true, "password is required to create a user..."],
+      required: function () {
+        return !this.googleId;
+      },
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    displayName: {
+      type: String,
+    },
+    avatar: {
+      type: String,
     },
     verified: {
       type: Boolean,

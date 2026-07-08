@@ -1,0 +1,22 @@
+apiVersion: skaffold/v4beta2
+kind: Config
+
+build:
+  tagPolicy:
+    sha256: {}
+  artifacts:
+    - image: jigyaza
+      context: Backend
+      docker:
+        dockerfile: dockerfile
+        sync:
+          infer:
+            - "*.js"
+            - "package.json"
+
+manifests:
+  rawYaml:
+    - k8s/backend-deployment.yml
+    - k8s/backend-service.yml
+    - k8s/ingress.yml
+    - k8s/secrets.yml

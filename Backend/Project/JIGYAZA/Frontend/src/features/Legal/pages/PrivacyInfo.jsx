@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Loder from '../../../components/Loaders/loder/Loder';
 import '../styles/Legal.scss';
 
-const PrivacyPolicy = () => {
+const PrivacyInfo = () => {
   return (
     <div className="legal-page mesh-gradient-bg">
       <nav className="legal-navbar">
@@ -131,4 +131,4 @@ const PrivacyPolicy = () => {
   );
 };
 
-export default PrivacyPolicy;
+export default PrivacyInfo;

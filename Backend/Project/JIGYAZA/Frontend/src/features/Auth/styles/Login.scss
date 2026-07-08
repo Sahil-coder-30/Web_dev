@@ -355,6 +355,32 @@ $border-color: #382f29;
         }
       }
 
+      .or-separator {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: $text-muted;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 1.5rem 0;
+
+        &::before,
+        &::after {
+          content: '';
+          flex: 1;
+          border-bottom: 1px solid $border-color;
+        }
+
+        &::before {
+          margin-right: .5em;
+        }
+
+        &::after {
+          margin-left: .5em;
+        }
+      }
+
       form {
         display: flex;
         flex-direction: column;

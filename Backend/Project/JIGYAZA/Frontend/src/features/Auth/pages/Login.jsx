@@ -22,8 +22,14 @@ const Login = () => {
   const { loginUser } = useAuth();
   const navigate = useNavigate();
 
-  
-  
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const errorParam = params.get("error");
+    if (errorParam) {
+      setError(errorParam);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -41,7 +47,11 @@ const Login = () => {
     }
     dispatch(setLoading(true));
     try {
-      await loginUser(formData.email, formData.password);
+      const response = await loginUser(formData.email, formData.password);
+      if (response && response.redirect) {
+        navigate(`${response.redirect}?email=${encodeURIComponent(response.email)}&message=${encodeURIComponent(response.message)}`);
+        return;
+      }
       navigate('/dashboard'); // Redirect to dashboard after successful login
       dispatch(setLoading(false));
     } catch (error) {
@@ -252,7 +262,31 @@ const Login = () => {
             <p>Please enter your details to sign in to your account.</p>
           </motion.div>
 
+          <motion.div className="social-login-group" variants={itemVariants}>
+            <button
+              type="button"
+              className="social-btn"
+              disabled={isAuthLoading}
+              onClick={() => {
+                dispatch(setLoading(true));
+                setTimeout(() => {
+                  window.location.href = "/api/auth/google";
+                }, 400);
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 18 18">
+                <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84a4.14 4.14 0 0 1-1.8 2.71v2.26h2.91c1.7-1.57 2.69-3.88 2.69-6.6z"/>
+                <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.2l-2.91-2.26c-.8.54-1.85.86-3.05.86-2.34 0-4.33-1.58-5.04-3.7H.95v2.33A9 9 0 0 0 9 18z"/>
+                <path fill="#FBBC05" d="M3.96 10.7a5.4 5.4 0 0 1 0-3.4V4.97H.95a9 9 0 0 0 0 8.06l3.01-2.33z"/>
+                <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.1A9 9 0 0 0 .95 4.97l3.01 2.33c.7-2.12 2.7-3.72 5.04-3.72z"/>
+              </svg>
+              <span>Sign in with Google</span>
+            </button>
+          </motion.div>
 
+          <motion.div className="or-separator" variants={itemVariants}>
+            or
+          </motion.div>
 
           <motion.form onSubmit={handleSubmit} variants={containerVariants}>
             <AnimatePresence>

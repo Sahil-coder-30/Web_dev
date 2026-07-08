@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { setUser, setLoading, setError } from "../auth.slice";
-import { login, register, getMe, verifyOtp, resendOtp, forgetPassword, resetPassword, logout, checkAutoVerify as checkAutoVerifyApi, verifyEmailLink } from "../services/auth.api";
+import { login, register, getMe, verifyOtp, resendOtp, forgetPassword, resetPassword, logout, checkAutoVerify as checkAutoVerifyApi, verifyEmailLink, sendCreatePasswordOtp, createPassword } from "../services/auth.api";
 
 export const useAuth = () => {
   const dispatch = useDispatch();
@@ -24,10 +24,14 @@ export const useAuth = () => {
   const loginUser = async (email, password) => {
     try {
       dispatch(setLoading(true));
-      const user = await login(email, password);
-      dispatch(setUser(user));
+      const response = await login(email, password);
+      if (response && response.redirect) {
+        dispatch(setLoading(false));
+        return response; // Return early for redirect logic
+      }
+      dispatch(setUser(response));
       dispatch(setLoading(false));
-      return user; // Return user on success
+      return response; // Return user on success
     } catch (err) {
       dispatch(setError(err.message || "Login failed"));
       dispatch(setLoading(false));
@@ -151,6 +155,39 @@ export const useAuth = () => {
     }
   };
 
+  const sendCreatePasswordOtpUser = async (email) => {
+    try {
+      dispatch(setLoading(true));
+      const res = await sendCreatePasswordOtp(email);
+      dispatch(setLoading(false));
+      return res;
+    } catch (err) {
+      dispatch(setError(err.message || "Failed to send verification code"));
+      dispatch(setLoading(false));
+      throw err;
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+  const createPasswordUser = async (email, otp, password) => {
+    try {
+      dispatch(setLoading(true));
+      const response = await createPassword(email, otp, password);
+      if (response && response.user) {
+        dispatch(setUser(response.user));
+      }
+      dispatch(setLoading(false));
+      return response;
+    } catch (err) {
+      dispatch(setError(err.message || "Failed to create password"));
+      dispatch(setLoading(false));
+      throw err;
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
   return { 
     registerUser,   
     loginUser, 
@@ -160,6 +197,8 @@ export const useAuth = () => {
     resetUserPassword,
     logoutUser,
     checkUserAutoVerify,
-    verifyDirectEmailLink
+    verifyDirectEmailLink,
+    sendCreatePasswordOtpUser,
+    createPasswordUser
   };
 };

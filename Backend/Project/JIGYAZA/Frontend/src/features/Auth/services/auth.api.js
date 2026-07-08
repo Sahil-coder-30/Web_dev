@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api =axios.create({
-    baseURL: 'http://localhost:3000/api/auth',
+    baseURL: '/api/auth',
     withCredentials : true
 })
 
@@ -89,6 +89,24 @@ export const checkAutoVerify = async (email) => {
 export const verifyEmailLink = async (token) => {
     try {
         const res = await api.get(`/verify?token=${token}`);
+        return res.data;
+    } catch (error) {
+        throw error.response ? error.response.data : new Error('Network Error');
+    }
+}
+
+export const sendCreatePasswordOtp = async (email) => {
+    try {
+        const res = await api.post("/send-create-password-otp", { email });
+        return res.data;
+    } catch (error) {
+        throw error.response ? error.response.data : new Error('Network Error');
+    }
+}
+
+export const createPassword = async (email, otp, password) => {
+    try {
+        const res = await api.post("/create-password", { email, otp, password });
         return res.data;
     } catch (error) {
         throw error.response ? error.response.data : new Error('Network Error');

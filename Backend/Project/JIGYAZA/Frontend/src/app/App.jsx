@@ -6,8 +6,10 @@ import Login from "../features/Auth/pages/Login.jsx";
 import Register from "../features/Auth/pages/Register.jsx";
 import VerifyEmail from "../features/Auth/pages/VerifyEmail.jsx";
 import ForgotPassword from "../features/Auth/pages/ForgotPassword.jsx";
+import CreatePassword from "../features/Auth/pages/CreatePassword.jsx";
 import LoaderDemo from "../components/Loaders/loder/LoaderDemo.jsx";
-import PrivacyPolicy from "../features/Legal/pages/PrivacyPolicy.jsx";
+import Loder from "../components/Loaders/loder/Loder.jsx";
+import PrivacyInfo from "../features/Legal/pages/PrivacyInfo.jsx";
 import TermsAndConditions from "../features/Legal/pages/TermsAndConditions.jsx";
 import { useAuth } from "../features/Auth/hook/useAuth.js";
 import Protected from "../components/Protected/Protected.jsx";
@@ -52,7 +54,31 @@ function App() {
     checkAuthStatus();
   }, [auth]);
 
-  if (init) return null; // Prevent flash of content before checking storage
+  if (init) {
+    return (
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "#0A0806",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "1.25rem",
+          zIndex: 9999,
+        }}
+      >
+        <Loder size={65} color="#c7621a" />
+        <p style={{ color: '#cbd5e1', fontWeight: 500, fontSize: '0.95rem', letterSpacing: '0.025em', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+          Loading your experience...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <BrowserRouter>
@@ -91,7 +117,8 @@ function App() {
         <Route path="/verify" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ForgotPassword />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/create-password" element={<CreatePassword />} />
+        <Route path="/privacy" element={<PrivacyInfo />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/loader" element={<LoaderDemo />} />
       </Routes>

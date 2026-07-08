@@ -570,6 +570,14 @@ export async function authLoginController(req, res, next) {
       return next(err);
     }
 
+    if (!user.password) {
+      return res.status(200).json({
+        redirect: "/create-password",
+        email: user.email,
+        message: "Your account does not have a password. Please verify your email to create a password."
+      });
+    }
+
     const passwordMatch = await user.comparePassword(password);
     if (!passwordMatch) {
       const err = new Error("Wrong Password Entered...");
@@ -725,12 +733,13 @@ export async function authLogoutController(req, res, next) {
       err.statusCode = 400;
       return next(err);
     }
-    redis.set(`blacklist:${token}`, "true", "EX", 24 * 60 * 60 * 7); // blacklist token for 7 days
+    await redis.set(`blacklist:${token}`, "true", "EX", 24 * 60 * 60 * 7); // blacklist token for 7 days
 
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      path: "/",
     });
     return res.status(200).json({ message: "Logout successful." });
   } catch (err) {
@@ -1564,5 +1573,166 @@ export async function authCheckAutoVerifyController(req, res, next) {
   }
 }
 
+export async function googleCallbackController(req, res, next) {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.redirect("http://localhost:5173/login?error=Google authentication failed");
+    }
+
+    const token = jsonwebtoken.sign(
+      { id: user._id, username: user.username },
+      process.env.JWT_SECRET || "default_secret",
+      { expiresIn: "1d" },
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    return res.redirect("http://localhost:5173/dashboard");
+  } catch (err) {
+    console.error("Google OAuth callback error:", err);
+    return res.redirect("http://localhost:5173/login?error=Google authentication failed");
+  }
+}
+
+export async function sendCreatePasswordOtpController(req, res, next) {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      const err = new Error("Email is required.");
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      const err = new Error("No account found with this email address.");
+      err.statusCode = 404;
+      return next(err);
+    }
+
+    if (user.password) {
+      const err = new Error("A password is already set for this account. Use Forgot Password to reset it.");
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    await redis.setex(`otp:create-password:${email}`, 300, otp); // 5 min expiry
+
+    await sendEmail({
+      to: email,
+      subject: "Create Password Verification Code — jigyazaAi",
+      text: `jigyazaAi — Research Engine
+
+Hey ${user.username || "there"},
+
+Use the code below to verify your email and create a password for your account:
+
+  ${otp.split("").join("  ")}
+
+This code expires in 5 minutes.
+
+— The jigyazaAi Team
+      `.trim(),
+      html: `
+<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; background-color: #070709; color: #7A7068; padding: 20px;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #0F0D0B; border: 1px solid #1E1B18; padding: 30px; border-radius: 8px;">
+    <h2 style="color: #F0EBE3; text-align: center; margin-bottom: 20px;">Create Password Verification Code</h2>
+    <p style="font-size: 16px; margin-bottom: 20px;">Hey ${user.username || "there"},</p>
+    <p style="font-size: 16px; margin-bottom: 25px;">Use the code below to verify your email and set up a password for your account:</p>
+    <div style="background-color: #1C1916; border: 1px solid #2A2520; padding: 15px; text-align: center; border-radius: 6px; margin-bottom: 25px;">
+      <span style="font-family: monospace; font-size: 32px; font-weight: bold; color: #C8621A; letter-spacing: 5px;">${otp}</span>
+    </div>
+    <p style="font-size: 14px; color: #4A4440; text-align: center;">This code expires in 5 minutes.</p>
+  </div>
+</body>
+</html>
+      `
+    });
+
+    return res.status(200).json({
+      message: "Verification code sent successfully to your email."
+    });
+  } catch (err) {
+    console.error(err);
+    err.statusCode = err.statusCode || 500;
+    err.message = err.message || "Something went wrong while sending verification code.";
+    return next(err);
+  }
+}
+
+export async function createPasswordController(req, res, next) {
+  try {
+    const { email, otp, password } = req.body;
+
+    if (!email || !otp || !password) {
+      const err = new Error("Email, verification code and new password are required.");
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    const storedOtp = await redis.get(`otp:create-password:${email}`);
+    if (!storedOtp || storedOtp != otp) {
+      const err = new Error("Invalid or expired verification code.");
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      const err = new Error("No account found with this email address.");
+      err.statusCode = 404;
+      return next(err);
+    }
+
+    if (user.password) {
+      const err = new Error("A password is already set for this account.");
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    // Set the password (hashing will happen in pre-save middleware)
+    user.password = password;
+    await user.save();
+
+    await redis.del(`otp:create-password:${email}`);
+
+    // Automatically log user in after setting password
+    const token = jsonwebtoken.sign(
+      { id: user._id, username: user.username },
+      process.env.JWT_SECRET || "default_secret",
+      { expiresIn: "1d" },
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    return res.status(200).json({
+      message: "Password created successfully. You are now logged in.",
+      user: userResponse
+    });
+  } catch (err) {
+    console.error(err);
+    err.statusCode = err.statusCode || 500;
+    err.message = err.message || "Something went wrong while creating password.";
+    return next(err);
+  }
+}
 
     

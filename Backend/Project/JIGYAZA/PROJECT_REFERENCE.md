@@ -1,7 +1,7 @@
 # JIGYAZA — Project Reference
 
 > This file is a living reference for the JIGYAZA full-stack AI assistant application.  
-> Last updated: 2026-04-08
+> Last updated: 2026-05-26
 
 ---
 
@@ -14,7 +14,7 @@
 - **Auth**: JWT in HTTP-only cookies + Redis token blacklisting for logout  
 - **AI**: LangChain agent → Gemini 2.5 Flash (primary) + Mistral Large (title generation)  
 - **Email**: Nodemailer via Gmail App Password  
-- **Realtime**: Socket.io (partially implemented — connection only, streaming not yet wired)
+- **Realtime**: Socket.io (fully implemented — hybrid HTTP POST + Socket.io streaming of tokens and thinking/searching states)
 
 ---
 
@@ -22,6 +22,8 @@
 
 ```
 JIGYAZA/
+├── PROJECT_REFERENCE.md           # This project reference document
+├── STREAMING_GUIDE.md             # Architecture & implementation guide for real-time socket streaming
 ├── Backend/
 │   ├── server.js                  # Entry point: HTTP server + Socket.io + Redis wait
 │   ├── .env                       # Environment variables (see §5)
@@ -40,7 +42,7 @@ JIGYAZA/
 │       ├── models/
 │       │   ├── user.model.js      # User schema (bcrypt pre-save hook, comparePassword)
 │       │   ├── chat.model.js      # Chat schema (user ref, title)
-│       │   └── message.model.js   # Message schema (chat ref, content, role: user|ai)
+│       │   └── message.model.js   # Message schema (chat ref, content, thinking, role: user|ai)
 │       ├── routes/
 │       │   ├── auth.routes.js     # /api/auth/* routes
 │       │   └── chat.routes.js     # /api/chats/* routes
@@ -161,20 +163,24 @@ Also available as `GET /verify` directly on the root app (for email links).
 4. Sets `req.user = decoded` (contains `id`)
 
 ### 3.5 Chat Flow (`chatController.js → ai.service.js`)
-1. Client sends `POST /api/chats/messages` with `{ messages: string, chatId?: string }`
-2. If no `chatId`: AI generates a title (Mistral), a new `Chat` doc is created
-3. User message is saved as a `Message` doc (`role: "user"`)
-4. All messages for the chat are fetched from DB and passed to `generateResponse()`
-5. `generateResponse()` maps DB messages → LangChain message types, invokes the LangChain agent
-6. AI response is saved as `Message` doc (`role: "ai"`)
-7. Response returned to client
+1. **Request:** Client sends `POST /api/chats/messages` with `{ messages: string, chatId?: string, socketId?: string }`.
+2. **Setup:** If no `chatId`, a title is generated (Mistral) and a new `Chat` doc is created. User message is saved to DB (`role: "user"`).
+3. **Execution Choice:**
+   - **Streaming (Socket-based, if `socketId` is provided):**
+     - Generates a temporary message ID `_id` and responds instantly with HTTP 201 containing `{ chat, Aimessage: tempAimessage }`.
+     - Starts streaming in the background without blocking the HTTP thread.
+     - Listens to LangChain `streamEvents()` (v2) and emits `chat_thinking` (tool start/end) and `chat_chunk` (text tokens) to the client's socket ID in real time.
+     - Saves the final AI response and accumulated thinking thoughts into MongoDB, then emits `chat_done`.
+   - **Fallback (Synchronous, if `socketId` is absent):**
+     - Calls `generateResponse()` (which blocks until complete), saves the complete AI response to DB, and returns HTTP 200 with all messages.
 
 ### 3.6 AI Service (`src/services/ai.service.js`)
 - **Primary model**: `gemini-2.5-flash` via `@langchain/google-genai`
 - **Title model**: `mistral-large-latest` via `@langchain/mistralai`
 - **Tool**: `internet_search` — calls Tavily with `maxResults: 5`, `searchDepth: "fast"`
 - **Agent**: LangChain `createAgent` with Gemini + Tavily tool
-- `generateResponse(messages)` — takes DB message array, formats to LangChain messages, invokes agent
+- `generateResponse(messages)` — synchronous execution using agent `.invoke()`
+- `generateStreamResponse(messages)` — asynchronous execution yielding event chunks using agent `.streamEvents(..., { version: "v2" })`
 - `createChatTitle(message)` — uses Mistral to generate a ≤6-word title
 
 ### 3.7 MongoDB Models
@@ -193,7 +199,7 @@ Also available as `GET /verify` directly on the root app (for email links).
 
 **Message**
 ```
-{ chat: ObjectId→Chat, content: string, role: enum["user", "ai"] }
+{ chat: ObjectId→Chat, content: string, thinking: string, role: enum["user", "ai"] }
 ```
 
 ### 3.8 Redis Usage
@@ -202,9 +208,10 @@ Also available as `GET /verify` directly on the root app (for email links).
 - Server waits for Redis `ready` event before accepting requests
 
 ### 3.9 Socket.io
-- Initialized on the HTTP server (CORS: `localhost:5173`)
-- Currently only logs connections; **streaming not yet wired to events**
-- `getIo()` / `getId()` accessor available for broadcasting from anywhere
+- Initialized on the HTTP server (CORS: `localhost:5173`, credentials enabled)
+- Integrated into backend chat controllers for real-time background streaming
+- Emits events `chat_thinking` (thinking logs), `chat_chunk` (token streams), `chat_done` (final completion), and `chat_error`
+- `getIo()` / `getId()` accessors available to retrieve the server instance for broadcasting
 
 ---
 
@@ -243,17 +250,18 @@ Actions: setUser, setLoading, setError
   isLoading: false,
   error: null
 }
-Actions: createNewChat, createNewMessage, setMessagesForChat, removeChat,
-         setchats, setcurrentChatId, setisLoading, seterror
+Actions: createNewChat, createNewMessage, appendTokenToLastMessage, updateLastMessageThinking,
+         updateLastMessageContent, setMessagesForChat, removeChat, setchats, setcurrentChatId,
+         setisLoading, seterror
 ```
 
 ### 4.3 Chat Feature Flow
-1. `Dashboard.jsx` — top-level layout; holds sidebar open/close state; renders `<Sidebar>` + `<Chat>`
-2. `useChat.js` — custom hook providing: `handelSendMessage`, `fetchChats`, `fetchChatMessages`, `deleteChatProcess`
-3. `Chat.jsx` — renders message thread (ReactMarkdown + GFM + custom `CodeBlock` with copy button), typing indicator, input textarea (Enter to send, Shift+Enter for newline), quick-chip suggestions on new chat
-4. `Sidebar.jsx` — shows chat history list; handles chat selection + delete
+1. `Dashboard.jsx` — top-level layout; holds sidebar open/close state; renders `<Sidebar>` + `<Chat>`, invokes socket connection and registers socket listeners on mount
+2. `useChat.js` — custom hook providing: `inializeSocketConnection`, `setupSocketListeners` (registers socket events to Redux dispatch), `handelSendMessage`, `fetchChats`, `fetchChatMessages`, `deleteChatProcess`
+3. `Chat.jsx` — renders message thread (ReactMarkdown + GFM + custom `CodeBlock` with copy button), typing indicator, interactive collapsible search thinking process block (`AIMessageRow`), smoothly animated typing/token stream, input textarea (Enter to send, Shift+Enter for newline), quick-chip suggestions on new chat
+4. `Sidebar.jsx` — shows chat history list; handles chat selection + delete (with inline deletion confirmation)
 5. `chat.api.js` — Axios wrapper for `/api/chats/*` endpoints
-6. `chat.socket.js` — initializes Socket.io client to `localhost:3000` (connect only)
+6. `chat.socket.js` — initializes and caches a single persistent Socket.io client connected to `localhost:3000` with credential support
 
 ### 4.4 Key UI Details (Chat.jsx)
 - **Optimistic UI**: message appears immediately before API response
@@ -346,7 +354,7 @@ cd Frontend && npm run dev     # → Vite dev server on localhost:5173
 
 ## 8. Known Issues / WIP / Design Decisions
 
-1. **Socket.io streaming not wired** — `server.socket.js` only logs connections. The plan was to stream LangChain tokens via `ai:chunk` events but this is not yet implemented (see conversation `8b7664c7`).
+1. **[RESOLVED] Socket.io streaming** — Now fully wired. Real-time token streaming and intermediate tool-calling thinking logs are supported via hybrid HTTP + Socket.io integration.
 2. **`chatMessageController`** passes the raw DB message array to `generateResponse()`; messages have `{ content, role }` not the initial string body — `ai.service.js` correctly handles this.
 3. **Auth controller is very large** (`63 KB`) — covers register, login, email verification (OTP + link), forgot/reset password, auto-verify, getMe, logout.
 4. **`chat.slice.js` message structure inconsistency**: new messages optimistically pushed as `{ message, role }` but DB-loaded messages have `{ content, role }` — the `Chat.jsx` renders using `msg.content` so optimistic messages may display incorrectly after refresh (fixed by full fetch on re-load).
@@ -368,3 +376,5 @@ cd Frontend && npm run dev     # → Vite dev server on localhost:5173
 | Apr 8 | LangChain agent + Tavily tool integration |
 | Apr 8 | Chat context optimization (sliding window / windowing) |
 | Apr 8 | Planned Socket.io streaming for LangChain tokens |
+| May 24 | Tested local model configuration (Ollama/Qwen) for agent execution |
+| May 24 | Implemented complete real-time token/thinking streaming via Socket.io and cleaned up root-level redundant npm package files |
