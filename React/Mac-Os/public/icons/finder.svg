@@ -1,0 +1,32 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <defs>
+    <linearGradient id="finder_face" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#EEE"/>
+      <stop offset="100%" style="stop-color:#CCC"/>
+    </linearGradient>
+    <linearGradient id="finder_blue" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#42A5F5"/>
+      <stop offset="100%" style="stop-color:#1E88E5"/>
+    </linearGradient>
+  </defs>
+  <rect x="5" y="5" width="90" height="90" rx="22" ry="22" fill="url(#finder_face)"/>
+  
+  <!-- Blue Split -->
+  <path d="M 50 15 C 30 15 15 25 15 50 C 15 75 30 85 50 85 V 95 C 20 95 5 75 5 50 C 5 25 20 5 50 5 V 15" fill="none" /> <!-- Just ref path -->
+  
+  <!-- Bottom Blue Smile Area -->
+  <path d="M 50 50 H 15 C 15 75 25 90 50 90 C 75 90 85 75 85 50 H 50 Z" fill="url(#finder_blue)" opacity="0.9"/>
+  <path d="M 50 50 H 15 C 15 25 25 10 50 10 C 75 10 85 25 85 50 H 50 Z" fill="#DDD" opacity="0.5"/>
+  
+  <!-- Face Lines -->
+  <path d="M 50 10 V 90" stroke="#333" stroke-width="2" />
+  <path d="M 15 50 H 85" stroke="#333" stroke-width="2" />
+  
+  <!-- Eyes -->
+  <ellipse cx="32" cy="35" rx="4" ry="6" fill="#333"/>
+  <ellipse cx="68" cy="35" rx="4" ry="6" fill="#333"/>
+  
+  <!-- Smile -->
+  <path d="M 28 65 Q 50 85 72 65" fill="none" stroke="#333" stroke-width="3" stroke-linecap="round"/>
+</svg>

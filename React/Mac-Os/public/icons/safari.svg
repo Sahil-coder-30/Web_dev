@@ -1,0 +1,25 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <defs>
+    <linearGradient id="safari_grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF" />
+      <stop offset="100%" style="stop-color:#EEE" />
+    </linearGradient>
+  </defs>
+  <rect x="5" y="5" width="90" height="90" rx="22" ry="22" fill="url(#safari_grad)"/>
+  
+  <!-- Blue Circle -->
+  <circle cx="50" cy="50" r="40" fill="#29B6F6" />
+  
+  <!-- Degree Ticks -->
+  <g stroke="white" stroke-width="2">
+    <line x1="50" y1="15" x2="50" y2="20" />
+    <line x1="50" y1="80" x2="50" y2="85" />
+    <line x1="15" y1="50" x2="20" y2="50" />
+    <line x1="80" y1="50" x2="85" y2="50" />
+  </g>
+  
+  <!-- Needle (Red/White) -->
+  <path d="M 50 50 L 75 25 L 55 45 Z" fill="#F44336" /> <!-- North -->
+  <path d="M 50 50 L 25 75 L 45 55 Z" fill="#E0E0E0" /> <!-- South -->
+</svg>

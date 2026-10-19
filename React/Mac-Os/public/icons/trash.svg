@@ -1,0 +1,28 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="trash_can_metal" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#999" />
+        <stop offset="20%" style="stop-color:#EEE" />
+        <stop offset="50%" style="stop-color:#FFF" />
+        <stop offset="80%" style="stop-color:#EEE" />
+        <stop offset="100%" style="stop-color:#999" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Shadow -->
+  <ellipse cx="50" cy="92" rx="20" ry="3" fill="black" opacity="0.3" />
+
+  <!-- Back of bin -->
+  <path d="M 25 25 L 30 85 C 30 92 35 95 50 95 C 65 95 70 92 70 85 L 75 25 H 25 Z" fill="url(#trash_can_metal)" stroke="#888" stroke-width="1" />
+  
+  <!-- Vertical Lines (Ribs) -->
+  <line x1="38" y1="25" x2="40" y2="85" stroke="#BBB" stroke-width="2" />
+  <line x1="50" y1="25" x2="50" y2="90" stroke="#BBB" stroke-width="2" />
+  <line x1="62" y1="25" x2="60" y2="85" stroke="#BBB" stroke-width="2" />
+
+  <!-- Rim -->
+  <rect x="23" y="23" width="54" height="4" rx="2" fill="#CCC" stroke="#999" stroke-width="1"/>
+
+  <!-- Papers (Content) -->
+  <path d="M 35 23 L 45 10 L 55 15 L 65 5 L 60 -10 L 40 5 Z" fill="white" stroke="#DDD" transform="translate(0, 15) rotate(10, 50, 20)"  />
+</svg>

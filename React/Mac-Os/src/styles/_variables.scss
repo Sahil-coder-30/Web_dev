@@ -1,0 +1,68 @@
+:root {
+
+    --macos-blue: #007AFF;
+    --macos-teal: #59ADC4;
+    --macos-cyan: #55BEF0;
+    --macos-green: #34C759;
+    --macos-indigo: #5856D6;
+    --macos-orange: #FF9500;
+    --macos-pink: #FF2D55;
+    --macos-purple: #AF52DE;
+    --macos-red: #FF3B30;
+    --macos-yellow: #FFCC00;
+    --macos-gray: #8E8E93;
+    --macos-gray-2: #AEAEB2;
+    --macos-gray-3: #C7C7CC;
+    --macos-gray-4: #D1D1D6;
+    --macos-gray-5: #E5E5EA;
+    --macos-gray-6: #F2F2F7;
+
+
+    --text-primary: #000000;
+    --text-secondary: rgba(0, 0, 0, 0.6);
+    --text-tertiary: rgba(0, 0, 0, 0.3);
+    --text-white: #FFFFFF;
+    --text-white-secondary: rgba(255, 255, 255, 0.7);
+
+
+    --glass-bg-light: rgba(255, 255, 255, 0.15);
+    --glass-border-light: rgba(255, 255, 255, 0.2);
+    --glass-shadow: rgba(0, 0, 0, 0.1);
+
+    --dock-bg: rgba(255, 255, 255, 0.1);
+    --menu-bar-bg: rgba(255, 255, 255, 0.25);
+    --window-bg: #FFFFFF;
+
+
+    --spacing-xxs: 4px;
+    --spacing-xs: 8px;
+    --spacing-sm: 12px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-xxl: 48px;
+    --spacing-huge: 64px;
+
+
+    --ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+    --ease-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
+    --ease-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
+    --ease-bounce: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
+
+
+    --blur-light: 20px;
+    --blur-medium: 40px;
+    --blur-heavy: 60px;
+
+
+    --z-base: 0;
+    --z-window: 1000;
+    --z-dock: 9999;
+    --z-menubar: 10000;
+    --z-modal: 10001;
+    --z-tooltip: 10002;
+}

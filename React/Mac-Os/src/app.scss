@@ -1,0 +1,69 @@
+@import './styles/variables';
+@import './styles/mixins';
+
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body,
+html,
+#root {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+        "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+
+main {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    background-image: url('./assets/2aaf2a72978ba407f4cc7ebadead2bde-2.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at center,
+                transparent 0%,
+                rgba(0, 0, 0, 0.15) 100%);
+        pointer-events: none;
+        z-index: var(--z-base);
+    }
+
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.08);
+        pointer-events: none;
+        z-index: var(--z-base);
+        transition: background 0.3s var(--ease-standard);
+    }
+}
+
+
+@media (max-width: 768px) {
+    main {
+        background-attachment: scroll;
+
+        &::after {
+            background: rgba(0, 0, 0, 0.12);
+        }
+    }
+}

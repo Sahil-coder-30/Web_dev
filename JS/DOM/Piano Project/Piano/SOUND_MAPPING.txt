@@ -1,0 +1,48 @@
+PIANO SOUND MAPPING - Dusty Keys Sample Pack
+================================================
+
+WHITE KEYS:
+-----------
+C3 (MIDI 48): 448546__tedagame__c3.wav
+D3 (MIDI 50): 448608__tedagame__d3.wav
+E3 (MIDI 52): 448614__tedagame__e3.wav
+F3 (MIDI 53): 448589__tedagame__f3.wav
+G3 (MIDI 55): 448559__tedagame__g3.wav
+A3 (MIDI 57): 448562__tedagame__a3.wav
+B3 (MIDI 59): 448568__tedagame__b3.wav
+
+C4 (MIDI 60): 448549__tedagame__c4.wav
+D4 (MIDI 62): 448609__tedagame__d4.wav
+E4 (MIDI 64): 448613__tedagame__e4.wav
+F4 (MIDI 65): 448595__tedagame__f4.wav
+G4 (MIDI 67): 448552__tedagame__g4.wav
+A4 (MIDI 69): 448561__tedagame__a4.wav
+B4 (MIDI 71): 448536__tedagame__b4.wav
+
+BLACK KEYS:
+-----------
+C#3 (MIDI 49): [CHECK YOUR FOLDER - should match 448538]
+D#3 (MIDI 51): [CHECK YOUR FOLDER - should match 448601]
+F#3 (MIDI 54): [CHECK YOUR FOLDER - should match 448584]
+G#3 (MIDI 56): [CHECK YOUR FOLDER - should match 448593]
+A#3 (MIDI 58): [CHECK YOUR FOLDER - should match 448570]
+
+C#4 (MIDI 61): [CHECK YOUR FOLDER - should match 448539]
+D#4 (MIDI 63): [CHECK YOUR FOLDER - should match 448602]
+F#4 (MIDI 66): [CHECK YOUR FOLDER - should match 448585]
+G#4 (MIDI 68): [CHECK YOUR FOLDER - should match 448592]
+A#4 (MIDI 70): [CHECK YOUR FOLDER - should match 448577]
+
+================================================
+INSTRUCTIONS:
+1. Open your Dusty Keys Sample Pack folder
+2. List all .wav files
+3. Match file IDs to the notes above
+4. Update script.js with correct file paths
+
+
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/Sahil-coder-30/Piano.git
+git push -u origin main

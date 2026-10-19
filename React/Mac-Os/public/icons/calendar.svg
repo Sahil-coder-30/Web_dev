@@ -1,0 +1,19 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dynamic Date using JS? No, static for SVG but look nice -->
+  <defs>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect x="5" y="5" width="90" height="90" rx="22" ry="22" fill="#FFFFFF" filter="url(#shadow)"/>
+  
+  <!-- Red Top -->
+  <path d="M 5 27 C 5 15 15 5 27 5 H 73 C 85 5 95 15 95 27 V 32 H 5 V 27 Z" fill="#FF3B30" />
+  
+  <!-- Date Number -->
+  <text x="50" y="75" font-family="-apple-system, sans-serif" font-size="42" font-weight="500" fill="#333" text-anchor="middle">18</text>
+  <!-- Month -->
+  <text x="50" y="26" font-family="-apple-system, sans-serif" font-size="14" font-weight="600" fill="white" text-anchor="middle" letter-spacing="1">JUL</text>
+</svg>

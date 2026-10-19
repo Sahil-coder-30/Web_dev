@@ -1,0 +1,7 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Squircle -->
+  <rect x="5" y="5" width="90" height="90" rx="22" ry="22" fill="#4CAF50"/>
+  
+  <!-- Speech Bubble -->
+  <path d="M 25 28 H 75 C 82 28 85 33 85 40 V 60 C 85 67 82 72 75 72 H 40 L 25 82 V 72 H 25 C 18 72 15 67 15 60 V 40 C 15 33 18 28 25 28 Z" fill="white" />
+</svg>
